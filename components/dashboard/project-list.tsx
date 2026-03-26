@@ -5,11 +5,11 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const projects = [
-  { name: "Develop API Endpoints", date: "Nov 26, 2024", color: "bg-blue-500", icon: "⚡" },
-  { name: "Onboarding Flow", date: "Nov 28, 2024", color: "bg-cyan-500", icon: "🌊" },
-  { name: "Build Dashboard", date: "Nov 30, 2024", color: "bg-emerald-500", icon: "🎨" },
-  { name: "Optimize Page Load", date: "Dec 5, 2024", color: "bg-amber-500", icon: "⚡" },
-  { name: "Cross-Browser Testing", date: "Dec 6, 2024", color: "bg-purple-500", icon: "🔍" },
+  { name: "Desenvolver Endpoints da API", date: "26 de Nov, 2024", color: "bg-blue-500", icon: "⚡" },
+  { name: "Fluxo de Integração", date: "28 de Nov, 2024", color: "bg-cyan-500", icon: "🌊" },
+  { name: "Construir Painel", date: "30 de Nov, 2024", color: "bg-emerald-500", icon: "🎨" },
+  { name: "Otimizar Carregamento", date: "5 de Dez, 2024", color: "bg-amber-500", icon: "⚡" },
+  { name: "Teste em Navegadores", date: "6 de Dez, 2024", color: "bg-purple-500", icon: "🔍" },
 ]
 
 export function ProjectList() {
@@ -19,10 +19,10 @@ export function ProjectList() {
       style={{ animationDelay: "700ms" }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Project</h2>
+        <h2 className="text-xl font-semibold text-foreground">Projeto</h2>
         <Button variant="outline" size="sm" className="transition-all duration-300 hover:scale-105 bg-transparent">
           <Plus className="w-4 h-4 mr-1" />
-          New
+          Novo
         </Button>
       </div>
       <div className="space-y-3">
@@ -39,7 +39,7 @@ export function ProjectList() {
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground text-sm">{project.name}</p>
-              <p className="text-xs text-muted-foreground">Due date: {project.date}</p>
+              <p className="text-xs text-muted-foreground">Data de entrega: {project.date}</p>
             </div>
           </div>
         ))}

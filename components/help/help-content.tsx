@@ -7,36 +7,36 @@ import { Search, BookOpen, Video, MessageCircle, Mail } from "lucide-react"
 const helpCategories = [
   {
     icon: BookOpen,
-    title: "Documentation",
-    description: "Browse our comprehensive guides and tutorials",
+    title: "Documentação",
+    description: "Navegue por nossos guias e tutoriais abrangentes",
     color: "bg-blue-500",
   },
-  { icon: Video, title: "Video Tutorials", description: "Watch step-by-step video guides", color: "bg-purple-500" },
+  { icon: Video, title: "Tutoriais em Vídeo", description: "Assista guias em vídeo passo a passo", color: "bg-purple-500" },
   {
     icon: MessageCircle,
-    title: "Community Forum",
-    description: "Connect with other users and get answers",
+    title: "Fórum da Comunidade",
+    description: "Conecte-se com outros usuários e obtenha respostas",
     color: "bg-green-600",
   },
-  { icon: Mail, title: "Contact Support", description: "Get help from our support team", color: "bg-amber-500" },
+  { icon: Mail, title: "Contatar Suporte", description: "Obtenha ajuda da nossa equipe de suporte", color: "bg-amber-500" },
 ]
 
 const faqs = [
   {
-    question: "How do I create a new project?",
-    answer: "Click the 'Add Project' button on the dashboard to create a new project.",
+    question: "Como criar um novo projeto?",
+    answer: "Clique no botão 'Adicionar Projeto' no painel para criar um novo projeto.",
   },
   {
-    question: "Can I invite team members?",
-    answer: "Yes, go to the Team page and click 'Add Member' to invite new team members.",
+    question: "Posso convidar membros do time?",
+    answer: "Sim, vá para a página Time e clique em 'Adicionar Membro' para convidar novos membros.",
   },
   {
-    question: "How do I track time on tasks?",
-    answer: "Use the Time Tracker widget on the dashboard to start tracking time for your tasks.",
+    question: "Como rastrear tempo nas tarefas?",
+    answer: "Use o widget Cronômetro no painel para começar a rastrear tempo para suas tarefas.",
   },
   {
-    question: "Can I export my data?",
-    answer: "Yes, you can export your data from the Settings page under Data Management.",
+    question: "Posso exportar meus dados?",
+    answer: "Sim, você pode exportar seus dados na página Admin em Gerenciamento de Dados.",
   },
 ]
 
@@ -45,7 +45,7 @@ export function HelpContent() {
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="relative">
         <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Search for help..." className="pl-10 h-12" />
+        <Input placeholder="Buscar ajuda..." className="pl-10 h-12" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -69,7 +69,7 @@ export function HelpContent() {
       </div>
 
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-6">Frequently Asked Questions</h3>
+        <h3 className="font-semibold text-lg mb-6">Perguntas Frequentes</h3>
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div

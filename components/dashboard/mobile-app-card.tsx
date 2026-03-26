@@ -28,8 +28,8 @@ export function MobileAppCard() {
 
       <div className="relative z-10">
         <Smartphone className="w-6 h-6 mb-3" />
-        <h2 className="text-xl font-bold mb-1">Download our Mobile App</h2>
-        <p className="text-xs opacity-80 mb-4">Get easy in another way</p>
+        <h2 className="text-xl font-bold mb-1">Baixe nosso App Mobile</h2>
+        <p className="text-xs opacity-80 mb-4">Acesse de forma mais fácil</p>
 
         <div className="flex flex-col gap-2 mb-4">
           <Button
@@ -38,7 +38,7 @@ export function MobileAppCard() {
           >
             <Apple className="w-5 h-5" />
             <div className="flex flex-col items-start text-left">
-              <span className="text-[10px] leading-none">Download on the</span>
+              <span className="text-[10px] leading-none">Baixar na</span>
               <span className="text-sm font-semibold leading-none">App Store</span>
             </div>
           </Button>
@@ -51,7 +51,7 @@ export function MobileAppCard() {
               <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
             </svg>
             <div className="flex flex-col items-start text-left">
-              <span className="text-[10px] leading-none">Get it on</span>
+              <span className="text-[10px] leading-none">Obter no</span>
               <span className="text-sm font-semibold leading-none">Google Play</span>
             </div>
           </Button>

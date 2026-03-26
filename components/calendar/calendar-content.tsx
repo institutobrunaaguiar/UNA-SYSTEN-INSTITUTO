@@ -7,21 +7,21 @@ import { ChevronLeft, ChevronRight, Video } from "lucide-react"
 import { useState } from "react"
 
 const events = [
-  { id: 1, title: "Team Standup", time: "09:00 AM", duration: "30 min", type: "meeting", color: "bg-blue-500" },
-  { id: 2, title: "Design Review", time: "11:00 AM", duration: "1 hour", type: "review", color: "bg-purple-500" },
+  { id: 1, title: "Standup do Time", time: "09:00", duration: "30 min", type: "meeting", color: "bg-blue-500" },
+  { id: 2, title: "Revisão de Design", time: "11:00", duration: "1 hora", type: "review", color: "bg-purple-500" },
   {
     id: 3,
-    title: "Client Presentation",
-    time: "02:00 PM",
-    duration: "2 hours",
+    title: "Apresentação ao Cliente",
+    time: "14:00",
+    duration: "2 horas",
     type: "presentation",
     color: "bg-green-600",
   },
-  { id: 4, title: "Code Review Session", time: "04:30 PM", duration: "45 min", type: "meeting", color: "bg-amber-500" },
+  { id: 4, title: "Sessão de Revisão de Código", time: "16:30", duration: "45 min", type: "meeting", color: "bg-amber-500" },
 ]
 
 const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1)
-const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
 
 export function CalendarContent() {
   const [currentDate] = useState(new Date())
@@ -34,7 +34,7 @@ export function CalendarContent() {
           <Button variant="outline" size="icon">
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="font-semibold min-w-[120px] text-center">November 2024</span>
+          <span className="font-semibold min-w-[120px] text-center">Novembro 2024</span>
           <Button variant="outline" size="icon">
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -72,7 +72,7 @@ export function CalendarContent() {
         </Card>
 
         <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Today's Events</h3>
+          <h3 className="font-semibold text-lg mb-4">Eventos de Hoje</h3>
           <div className="space-y-3">
             {events.map((event, index) => (
               <div

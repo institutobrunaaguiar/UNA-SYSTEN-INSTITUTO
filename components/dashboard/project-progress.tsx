@@ -24,7 +24,7 @@ export function ProjectProgress() {
       className="p-4 transition-all duration-500 hover:shadow-xl animate-slide-in-up overflow-hidden"
       style={{ animationDelay: "800ms" }}
     >
-      <h2 className="text-lg font-semibold text-foreground mb-4">Project Progress</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">Progresso do Projeto</h2>
       <div className="flex flex-col items-center">
         <div className="relative w-40 h-40 mb-4">
           <div
@@ -59,17 +59,17 @@ export function ProjectProgress() {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-4xl font-bold text-foreground">{progress}%</span>
-            <span className="text-xs text-muted-foreground mt-1">Project Ended</span>
+            <span className="text-xs text-muted-foreground mt-1">Projeto Finalizado</span>
           </div>
         </div>
         <div className="flex flex-wrap justify-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
-            <span className="text-muted-foreground whitespace-nowrap">Completed</span>
+            <span className="text-muted-foreground whitespace-nowrap">Concluído</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-foreground flex-shrink-0" />
-            <span className="text-muted-foreground whitespace-nowrap">In Progress</span>
+            <span className="text-muted-foreground whitespace-nowrap">Em Progresso</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div
@@ -79,7 +79,7 @@ export function ProjectProgress() {
                   "repeating-linear-gradient(45deg, transparent, transparent 2px, oklch(0.55 0.02 120) 2px, oklch(0.55 0.02 120) 4px)",
               }}
             />
-            <span className="text-muted-foreground whitespace-nowrap">Pending</span>
+            <span className="text-muted-foreground whitespace-nowrap">Pendente</span>
           </div>
         </div>
       </div>

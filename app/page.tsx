@@ -19,18 +19,18 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-3 md:p-4 lg:p-5 lg:ml-64">
         <Header
-          title="Dashboard"
-          description="Plan, prioritize, and accomplish your tasks with ease."
+          title="Painel"
+          description="Planeje, priorize e realize suas tarefas com facilidade."
           actions={
             <>
               <Button className="w-full sm:w-auto h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
-                + Add Project
+                + Adicionar Projeto
               </Button>
               <Button
                 variant="outline"
                 className="w-full sm:w-auto h-9 text-sm transition-all duration-300 hover:shadow-md hover:scale-105 bg-transparent"
               >
-                Import Data
+                Importar Dados
               </Button>
             </>
           }

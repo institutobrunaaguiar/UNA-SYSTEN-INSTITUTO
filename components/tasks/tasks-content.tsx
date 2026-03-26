@@ -11,57 +11,57 @@ import { useState } from "react"
 const tasks = [
   {
     id: 1,
-    title: "Design landing page mockup",
-    project: "Website Redesign",
-    priority: "High",
-    dueDate: "Nov 24, 2024",
+    title: "Projetar mockup de página inicial",
+    project: "Redesenho do Website",
+    priority: "Alta",
+    dueDate: "24 de Nov, 2024",
     completed: false,
     tags: ["Design", "UI/UX"],
   },
   {
     id: 2,
-    title: "Implement authentication flow",
-    project: "Mobile App",
-    priority: "High",
-    dueDate: "Nov 25, 2024",
+    title: "Implementar fluxo de autenticação",
+    project: "App Mobile",
+    priority: "Alta",
+    dueDate: "25 de Nov, 2024",
     completed: false,
-    tags: ["Backend", "Security"],
+    tags: ["Backend", "Segurança"],
   },
   {
     id: 3,
-    title: "Review pull requests",
-    project: "Github Project",
-    priority: "Medium",
-    dueDate: "Nov 23, 2024",
+    title: "Revisar pull requests",
+    project: "Projeto Github",
+    priority: "Média",
+    dueDate: "23 de Nov, 2024",
     completed: true,
-    tags: ["Code Review"],
+    tags: ["Revisão de Código"],
   },
   {
     id: 4,
-    title: "Update documentation",
-    project: "API Development",
-    priority: "Low",
-    dueDate: "Nov 26, 2024",
+    title: "Atualizar documentação",
+    project: "Desenvolvimento da API",
+    priority: "Baixa",
+    dueDate: "26 de Nov, 2024",
     completed: false,
-    tags: ["Documentation"],
+    tags: ["Documentação"],
   },
   {
     id: 5,
-    title: "Fix responsive layout issues",
-    project: "Website Redesign",
-    priority: "High",
-    dueDate: "Nov 24, 2024",
+    title: "Corrigir problemas de layout responsivo",
+    project: "Redesenho do Website",
+    priority: "Alta",
+    dueDate: "24 de Nov, 2024",
     completed: false,
     tags: ["Frontend", "Bug"],
   },
   {
     id: 6,
-    title: "Database optimization",
-    project: "Backend System",
-    priority: "Medium",
-    dueDate: "Nov 27, 2024",
+    title: "Otimização de banco de dados",
+    project: "Sistema Backend",
+    priority: "Média",
+    dueDate: "27 de Nov, 2024",
     completed: false,
-    tags: ["Database", "Performance"],
+    tags: ["Database", "Desempenho"],
   },
 ]
 
@@ -80,33 +80,33 @@ export function TasksContent() {
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 relative">
           <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search tasks..." className="pl-10" />
+          <Input placeholder="Buscar tarefas..." className="pl-10" />
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2 bg-transparent">
             <Filter className="w-4 h-4" />
-            Filter
+            Filtro
           </Button>
           <Button variant="outline" className="gap-2 bg-transparent">
             <Calendar className="w-4 h-4" />
-            Date
+            Data
           </Button>
         </div>
       </div>
 
       <div className="flex gap-2">
         <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")} size="sm">
-          All ({tasks.length})
+          Todos ({tasks.length})
         </Button>
         <Button variant={filter === "active" ? "default" : "outline"} onClick={() => setFilter("active")} size="sm">
-          Active ({tasks.filter((t) => !t.completed).length})
+          Ativos ({tasks.filter((t) => !t.completed).length})
         </Button>
         <Button
           variant={filter === "completed" ? "default" : "outline"}
           onClick={() => setFilter("completed")}
           size="sm"
         >
-          Completed ({tasks.filter((t) => t.completed).length})
+          Concluídos ({tasks.filter((t) => t.completed).length})
         </Button>
       </div>
 
@@ -126,7 +126,7 @@ export function TasksContent() {
                   </h3>
                   <Badge
                     variant={
-                      task.priority === "High" ? "destructive" : task.priority === "Medium" ? "default" : "secondary"
+                      task.priority === "Alta" ? "destructive" : task.priority === "Média" ? "default" : "secondary"
                     }
                     className="shrink-0"
                   >

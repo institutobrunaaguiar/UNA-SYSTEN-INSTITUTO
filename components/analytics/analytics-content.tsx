@@ -5,18 +5,18 @@ import { TrendingUp, TrendingDown, Users, CheckCircle, Clock, Target, ArrowUpRig
 import { useState } from "react"
 
 const stats = [
-  { title: "Total Tasks Completed", value: "247", change: "+12%", trend: "up", icon: CheckCircle },
-  { title: "Active Projects", value: "12", change: "+3", trend: "up", icon: Target },
-  { title: "Team Members", value: "24", change: "-2", trend: "down", icon: Users },
-  { title: "Avg. Completion Time", value: "2.3", subtitle: "days", change: "-0.5", trend: "up", icon: Clock },
+  { title: "Tarefas Concluídas Total", value: "247", change: "+12%", trend: "up", icon: CheckCircle },
+  { title: "Projetos Ativos", value: "12", change: "+3", trend: "up", icon: Target },
+  { title: "Membros do Time", value: "24", change: "-2", trend: "down", icon: Users },
+  { title: "Tempo Médio de Conclusão", value: "2.3", subtitle: "dias", change: "-0.5", trend: "up", icon: Clock },
 ]
 
 const monthlyData = [
   { month: "Jan", tasks: 45, projects: 8 },
-  { month: "Feb", tasks: 52, projects: 9 },
+  { month: "Fev", tasks: 52, projects: 9 },
   { month: "Mar", tasks: 48, projects: 10 },
-  { month: "Apr", tasks: 61, projects: 11 },
-  { month: "May", tasks: 55, projects: 12 },
+  { month: "Abr", tasks: 61, projects: 11 },
+  { month: "Mai", tasks: 55, projects: 12 },
   { month: "Jun", tasks: 67, projects: 12 },
 ]
 
@@ -70,7 +70,7 @@ export function AnalyticsContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-6">Monthly Task Completion</h3>
+          <h3 className="font-semibold text-lg mb-6">Conclusão de Tarefas Mensal</h3>
           <div className="space-y-4">
             {monthlyData.map((data, index) => (
               <div
@@ -80,7 +80,7 @@ export function AnalyticsContent() {
               >
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">{data.month}</span>
-                  <span className="text-muted-foreground">{data.tasks} tasks</span>
+                  <span className="text-muted-foreground">{data.tasks} tarefas</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                   <div
@@ -94,13 +94,13 @@ export function AnalyticsContent() {
         </Card>
 
         <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-6">Project Distribution</h3>
+          <h3 className="font-semibold text-lg mb-6">Distribuição de Projetos</h3>
           <div className="space-y-4">
             {[
-              { name: "In Progress", count: 8, color: "bg-blue-500" },
-              { name: "Completed", count: 15, color: "bg-green-600" },
-              { name: "Pending", count: 5, color: "bg-amber-500" },
-              { name: "On Hold", count: 2, color: "bg-gray-500" },
+              { name: "Em Progresso", count: 8, color: "bg-blue-500" },
+              { name: "Concluído", count: 15, color: "bg-green-600" },
+              { name: "Pendente", count: 5, color: "bg-amber-500" },
+              { name: "Suspenso", count: 2, color: "bg-gray-500" },
             ].map((item, index) => (
               <div
                 key={item.name}

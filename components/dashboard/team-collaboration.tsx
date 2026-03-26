@@ -8,32 +8,32 @@ import { Plus } from "lucide-react"
 const members = [
   {
     name: "Alexandra Deff",
-    task: "Github Project Repository",
-    status: "Completed",
+    task: "Repositório de Projeto Github",
+    status: "Concluído",
     statusColor: "bg-emerald-100 text-emerald-700",
     avatar: "AD",
     avatarImage: "/avatars/avatar-1.jpg",
   },
   {
     name: "Edwin Adenike",
-    task: "Integrate User Authentication System",
-    status: "In Progress",
+    task: "Integrar Sistema de Autenticação",
+    status: "Em Progresso",
     statusColor: "bg-amber-100 text-amber-700",
     avatar: "EA",
     avatarImage: "/avatars/avatar-2.jpg",
   },
   {
     name: "Isaac Oluwatemilorun",
-    task: "Develop Search and Filter Functionality",
-    status: "Pending",
+    task: "Desenvolver Funcionalidade de Busca e Filtro",
+    status: "Pendente",
     statusColor: "bg-rose-100 text-rose-700",
     avatar: "IO",
     avatarImage: "/avatars/avatar-3.jpg",
   },
   {
     name: "David Oshodi",
-    task: "Responsive Layout for Homepage",
-    status: "In Progress",
+    task: "Layout Responsivo para Página Inicial",
+    status: "Em Progresso",
     statusColor: "bg-amber-100 text-amber-700",
     avatar: "DO",
     avatarImage: "/avatars/avatar-4.jpg",
@@ -47,10 +47,10 @@ export function TeamCollaboration() {
       style={{ animationDelay: "600ms" }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Team Collaboration</h2>
+        <h2 className="text-xl font-semibold text-foreground">Colaboração do Time</h2>
         <Button variant="outline" size="sm" className="transition-all duration-300 hover:scale-105 bg-transparent">
           <Plus className="w-4 h-4 mr-1" />
-          Add Member
+          Adicionar Membro
         </Button>
       </div>
       <div className="space-y-4">
@@ -67,7 +67,7 @@ export function TeamCollaboration() {
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-foreground text-sm">{member.name}</p>
               <p className="text-xs text-muted-foreground truncate">
-                Working on <span className="font-medium">{member.task}</span>
+                Trabalhando em <span className="font-medium">{member.task}</span>
               </p>
             </div>
             <span

@@ -14,42 +14,42 @@ export function SettingsContent() {
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-6">Profile Information</h3>
+        <h3 className="font-semibold text-lg mb-6">Informações do Perfil</h3>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="w-20 h-20">
-              <AvatarImage src="/profile.jpg" alt="Jessin Sam" />
-              <AvatarFallback>JS</AvatarFallback>
+              <AvatarImage src="/profile.jpg" alt="UNA Admin" />
+              <AvatarFallback>UA</AvatarFallback>
             </Avatar>
             <div>
-              <Button variant="outline">Change Photo</Button>
-              <p className="text-xs text-muted-foreground mt-2">JPG, PNG or GIF. Max size 2MB</p>
+              <Button variant="outline">Alterar Foto</Button>
+              <p className="text-xs text-muted-foreground mt-2">JPG, PNG ou GIF. Tamanho máximo 2MB</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue="Jessin Sam" />
+              <Label htmlFor="name">Nome Completo</Label>
+              <Input id="name" defaultValue="UNA Admin" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="jessin@gmail.com" />
+              <Input id="email" type="email" defaultValue="admin@una.com" />
             </div>
           </div>
 
-          <Button className="bg-primary hover:bg-primary/90">Save Changes</Button>
+          <Button className="bg-primary hover:bg-primary/90">Salvar Alterações</Button>
         </div>
       </Card>
 
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-6">Notifications</h3>
+        <h3 className="font-semibold text-lg mb-6">Notificações</h3>
         <div className="space-y-4">
           {[
-            { label: "Email notifications", description: "Receive email about your account activity" },
-            { label: "Push notifications", description: "Receive push notifications in your browser" },
-            { label: "Task reminders", description: "Get reminded about upcoming task deadlines" },
-            { label: "Team updates", description: "Notifications about team member activities" },
+            { label: "Notificações por Email", description: "Receber email sobre atividades da sua conta" },
+            { label: "Notificações Push", description: "Receber notificações push no seu navegador" },
+            { label: "Lembretes de Tarefas", description: "Ser lembrado sobre prazos das tarefas" },
+            { label: "Atualizações do Time", description: "Notificações sobre atividades dos membros do time" },
           ].map((item, index) => (
             <div
               key={item.label}
@@ -66,12 +66,12 @@ export function SettingsContent() {
       </Card>
 
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-6">Appearance</h3>
+        <h3 className="font-semibold text-lg mb-6">Aparência</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Dark Mode</p>
-              <p className="text-sm text-muted-foreground">Enable dark mode theme</p>
+              <p className="font-medium">Modo Escuro</p>
+              <p className="text-sm text-muted-foreground">Ativar tema escuro</p>
             </div>
             <Switch checked={theme === "dark"} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} />
           </div>

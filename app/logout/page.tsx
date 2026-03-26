@@ -24,15 +24,15 @@ export default function LogoutPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">Logout</h1>
-              <p className="text-muted-foreground">Are you sure you want to logout?</p>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Sair</h1>
+              <p className="text-muted-foreground">Tem certeza de que deseja sair?</p>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1 bg-transparent" onClick={() => router.back()}>
-                Cancel
+                Cancelar
               </Button>
               <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => router.push("/")}>
-                Logout
+                Sair
               </Button>
             </div>
           </Card>

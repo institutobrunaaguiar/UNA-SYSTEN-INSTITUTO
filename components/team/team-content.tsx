@@ -9,8 +9,8 @@ import { Mail, Phone, MoreHorizontal } from "lucide-react"
 const teamMembers = [
   {
     name: "Alexandra Deff",
-    role: "Product Designer",
-    email: "alexandra@tasko.com",
+    role: "Designer de Produto",
+    email: "alexandra@una.com",
     status: "active",
     tasks: 12,
     avatar: "/avatars/avatar-1.jpg",
@@ -18,8 +18,8 @@ const teamMembers = [
   },
   {
     name: "Edwin Adenike",
-    role: "Frontend Developer",
-    email: "edwin@tasko.com",
+    role: "Desenvolvedor Frontend",
+    email: "edwin@una.com",
     status: "active",
     tasks: 8,
     avatar: "/avatars/avatar-2.jpg",
@@ -27,8 +27,8 @@ const teamMembers = [
   },
   {
     name: "Isaac Oluwatemilorun",
-    role: "Backend Developer",
-    email: "isaac@tasko.com",
+    role: "Desenvolvedor Backend",
+    email: "isaac@una.com",
     status: "away",
     tasks: 15,
     avatar: "/avatars/avatar-3.jpg",
@@ -36,8 +36,8 @@ const teamMembers = [
   },
   {
     name: "David Oshodi",
-    role: "UI/UX Designer",
-    email: "david@tasko.com",
+    role: "Designer UI/UX",
+    email: "david@una.com",
     status: "active",
     tasks: 6,
     avatar: "/avatars/avatar-4.jpg",
@@ -72,12 +72,12 @@ export function TeamContent() {
               </div>
 
               <Badge variant={member.status === "active" ? "default" : "secondary"}>
-                {member.status === "active" ? "Active" : "Away"}
+                {member.status === "active" ? "Ativo" : "Ausente"}
               </Badge>
 
               <div className="pt-2 border-t border-border">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Active Tasks</span>
+                  <span className="text-muted-foreground">Tarefas Ativas</span>
                   <span className="font-semibold">{member.tasks}</span>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export function TeamContent() {
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                   <Phone className="w-4 h-4 mr-1" />
-                  Call
+                  Ligar
                 </Button>
               </div>
             </div>

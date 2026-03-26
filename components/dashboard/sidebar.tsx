@@ -7,17 +7,17 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: CheckSquare, label: "Tasks", badge: "124", href: "/tasks" },
-  { icon: Calendar, label: "Calendar", href: "/calendar" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: Users, label: "Team", href: "/team" },
+  { icon: LayoutDashboard, label: "Painel", href: "/" },
+  { icon: CheckSquare, label: "Proposta", badge: "124", href: "/tasks" },
+  { icon: Calendar, label: "Calendário", href: "/calendar" },
+  { icon: BarChart3, label: "Relatórios", href: "/analytics" },
+  { icon: Users, label: "Time", href: "/team" },
 ]
 
 const generalItems = [
-  { icon: Settings, label: "Settings", href: "/settings" },
-  { icon: HelpCircle, label: "Help", href: "/help" },
-  { icon: LogOut, label: "Logout", href: "/logout" },
+  { icon: Settings, label: "Admin", href: "/settings" },
+  { icon: HelpCircle, label: "Ajuda", href: "/help" },
+  { icon: LogOut, label: "Sair", href: "/logout" },
 ]
 
 export function Sidebar() {
@@ -39,13 +39,13 @@ export function Sidebar() {
             />
             <div className="w-3 h-1.5 border-b-2 border-primary-foreground rounded-full absolute bottom-2.5" />
           </div>
-          <span className="text-lg font-semibold text-foreground">Tasko</span>
+          <span className="text-lg font-semibold text-foreground">UNA</span>
         </Link>
       </div>
 
       <div className="space-y-4">
         <div>
-          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Menu</p>
+          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Menu Principal</p>
           <nav className="space-y-0.5">
             {menuItems.map((item) => {
               const isActive = pathname === item.href
@@ -77,7 +77,7 @@ export function Sidebar() {
         </div>
 
         <div>
-          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">General</p>
+          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Geral</p>
           <nav className="space-y-0.5">
             {generalItems.map((item) => {
               const isActive = pathname === item.href
