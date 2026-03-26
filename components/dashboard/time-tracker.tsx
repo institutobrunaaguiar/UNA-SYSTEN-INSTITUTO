@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Pause, Square } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Pause, Square } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export function TimeTracker() {
   const [seconds, setSeconds] = useState(24 * 3600 + 8)
@@ -23,12 +23,12 @@ export function TimeTracker() {
   const minutes = Math.floor((seconds % 3600) / 60)
   const secs = seconds % 60
 
-  const formatTime = (num: number) => String(num).padStart(2, "0")
+  const formatTime = (num: number) => String(num).padStart(2, '0')
 
   return (
     <Card
       className="bg-foreground text-background p-4 transition-all duration-500 hover:shadow-2xl animate-slide-in-up overflow-hidden relative group"
-      style={{ animationDelay: "1000ms" }}
+      style={{ animationDelay: '1000ms' }}
     >
       <div className="absolute top-0 right-0 w-48 h-full opacity-15">
         {[...Array(6)].map((_, i) => (
@@ -38,8 +38,8 @@ export function TimeTracker() {
             style={{
               top: `${i * 50}px`,
               right: `-${i * 10}px`,
-              width: "150px",
-              height: "80px",
+              width: '150px',
+              height: '80px',
             }}
             viewBox="0 0 100 50"
             preserveAspectRatio="none"
