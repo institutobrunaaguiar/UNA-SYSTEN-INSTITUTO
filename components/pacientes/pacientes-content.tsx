@@ -50,14 +50,14 @@ export function PacientesContent() {
     try {
       setLoading(true)
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 
-      if (!supabaseUrl || !supabaseAnonKey) {
+      if (!supabaseUrl || !supabaseKey) {
         console.error("[v0] Variáveis Supabase não configuradas")
         return
       }
 
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      const supabase = createClient(supabaseUrl, supabaseKey)
       const { data, error } = await supabase.from("pacientes").select("*").order("created_at", { ascending: false })
 
       if (error) {

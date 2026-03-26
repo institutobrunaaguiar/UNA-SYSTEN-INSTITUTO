@@ -55,7 +55,7 @@ export function TimeTracker() {
       </div>
 
       <div className="relative z-10">
-        <h2 className="text-lg font-semibold mb-4">Cronômetro
+        <h2 className="text-lg font-semibold mb-4">Cronômetro</h2>
         <div className="text-4xl sm:text-5xl font-mono font-bold mb-4 tracking-tight break-all">
           {formatTime(hours)}:{formatTime(minutes)}:{formatTime(secs)}
         </div>
