@@ -12,6 +12,7 @@ const menuItems = [
   { icon: Calendar, label: "Calendário", href: "/calendar" },
   { icon: BarChart3, label: "Relatórios", href: "/analytics" },
   { icon: Users, label: "Time", href: "/team" },
+  { icon: Stethoscope, label: "Pacientes", href: "/pacientes" },
 ]
 
 const generalItems = [
