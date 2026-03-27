@@ -23,6 +23,7 @@ export interface Proposta {
 export interface PropostaItem {
   procedimentoId: string
   procedimentoNome: string
+  profissionalId: number | null
   profissionalNome: string
   valor: number
   desconto_tipo: "percentual" | "valor" | null
@@ -43,11 +44,15 @@ export interface Paciente {
   ativo: boolean
 }
 
-export interface Procedimento {
+export interface ProcedimentoClinica {
   id: number
+  categoria: string
+  tipo: string
   nome: string
-  especialidade_id: number
-  especialidade_nome: string
+  descricao: string | null
+  valor: number
+  profissional_id: number
+  relevante: boolean
   ativo: boolean
 }
 

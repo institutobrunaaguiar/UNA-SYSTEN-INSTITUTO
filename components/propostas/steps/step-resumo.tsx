@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Percent, DollarSign, User, Stethoscope, CreditCard, FileText } from "lucide-react"
-import type { PropostaItem, CenarioTipo, TaxasMDR } from "../types"
-import { CENARIOS } from "../types"
+import { Percent, DollarSign, User, Stethoscope, CreditCard, FileText, Tag } from "lucide-react"
+import type { PropostaItem, CenarioTipo, TaxasMDR, PropostaStatus } from "../types"
+import { CENARIOS, STATUS_CONFIG } from "../types"
 
 interface StepResumoProps {
   nomeCliente: string
@@ -20,8 +20,10 @@ interface StepResumoProps {
   descontoProtocoloTipo: "percentual" | "valor" | null
   descontoProtocoloValor: number
   observacoes: string
+  status: PropostaStatus
   onDescontoProtocoloChange: (tipo: "percentual" | "valor" | null, valor: number) => void
   onObservacoesChange: (obs: string) => void
+  onStatusChange: (status: PropostaStatus) => void
 }
 
 export function StepResumo({
@@ -35,8 +37,10 @@ export function StepResumo({
   descontoProtocoloTipo,
   descontoProtocoloValor,
   observacoes,
+  status,
   onDescontoProtocoloChange,
   onObservacoesChange,
+  onStatusChange,
 }: StepResumoProps) {
   const subtotal = itens.reduce((sum, item) => sum + item.valor_final, 0)
   const descontoItens = itens.reduce((sum, item) => sum + (item.valor - item.valor_final), 0)
@@ -182,6 +186,30 @@ export function StepResumo({
               <span className="text-sm text-muted-foreground">= - {formatCurrency(descontoProtocolo)}</span>
             </>
           )}
+        </div>
+      </Card>
+
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Tag className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">Status da Proposta</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {(Object.entries(STATUS_CONFIG) as [PropostaStatus, { label: string; color: string }][]).map(([key, config]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onStatusChange(key)}
+              className={[
+                "rounded-lg px-3 py-2 text-sm font-medium border-2 transition-all text-left",
+                status === key
+                  ? `${config.color} border-current`
+                  : "border-transparent bg-muted/50 text-muted-foreground hover:bg-muted",
+              ].join(" ")}
+            >
+              {config.label}
+            </button>
+          ))}
         </div>
       </Card>
 

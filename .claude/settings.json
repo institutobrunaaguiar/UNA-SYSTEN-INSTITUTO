@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Supabase__list_organizations",
+      "Bash(bash scripts/start-server.sh --project-dir /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO)"
+    ]
+  }
+}

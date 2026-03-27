@@ -9,7 +9,7 @@ import { StepCliente } from "./steps/step-cliente"
 import { StepProcedimentos } from "./steps/step-procedimentos"
 import { StepCenarios } from "./steps/step-cenarios"
 import { StepResumo } from "./steps/step-resumo"
-import type { Proposta, PropostaItem, CenarioTipo, TaxasMDR } from "./types"
+import type { Proposta, PropostaItem, CenarioTipo, TaxasMDR, PropostaStatus } from "./types"
 import { TAXAS_MDR_PADRAO, CENARIOS } from "./types"
 
 interface PropostaFormProps {
@@ -66,6 +66,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
     proposta?.desconto_protocolo_percentual || proposta?.desconto_protocolo_valor || 0
   )
   const [observacoes, setObservacoes] = useState(proposta?.observacoes ?? "")
+  const [status, setStatus] = useState<PropostaStatus>(proposta?.status ?? "em_negociacao")
 
   // Recalculate cenario when itens change
   useEffect(() => {
@@ -137,7 +138,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
         valor_entrada: finalEntrada,
         num_parcelas: finalParcelas,
         fluxo_caixa_imediato: finalEntrada,
-        status: proposta?.status ?? "em_negociacao",
+        status,
         observacoes: observacoes || null,
       }
 
@@ -245,11 +246,13 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
             descontoProtocoloTipo={descontoProtocoloTipo}
             descontoProtocoloValor={descontoProtocoloValor}
             observacoes={observacoes}
+            status={status}
             onDescontoProtocoloChange={(tipo, valor) => {
               setDescontoProtocoloTipo(tipo)
               setDescontoProtocoloValor(valor)
             }}
             onObservacoesChange={setObservacoes}
+            onStatusChange={setStatus}
           />
         )}
       </Card>
