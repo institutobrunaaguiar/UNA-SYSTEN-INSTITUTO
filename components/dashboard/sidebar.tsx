@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, CheckSquare, Calendar, BarChart3, Settings, HelpCircle, LogOut, Stethoscope } from "lucide-react"
+import { LayoutDashboard, CheckSquare, Calendar, BarChart3, Settings, HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import Link from "next/link"
@@ -12,6 +12,8 @@ const menuItems = [
   { icon: Calendar, label: "Calendário", href: "/calendar" },
   { icon: BarChart3, label: "Relatórios", href: "/analytics" },
   { icon: Stethoscope, label: "Pacientes", href: "/pacientes" },
+  { icon: DollarSign, label: "Comissão", href: "/comissao" },
+  { icon: Megaphone, label: "Campanha", href: "/campanha" },
 ]
 
 const generalItems = [

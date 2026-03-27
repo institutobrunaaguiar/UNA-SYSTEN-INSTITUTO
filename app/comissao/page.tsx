@@ -1,15 +1,15 @@
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { RelatoriosContent } from "@/components/relatorios/relatorios-content"
+import { ComissaoContent } from "@/components/comissao/comissao-content"
 
-export default function AnalyticsPage() {
+export default function ComissaoPage() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 p-4 lg:p-6 lg:ml-64">
-        <Header title="Relatorios" description="Analise operacional e financeira do negocio." />
+        <Header title="Comissão" description="Auditoria, validação e aprovação de comissões da equipe." />
         <div className="mt-6">
-          <RelatoriosContent />
+          <ComissaoContent />
         </div>
       </main>
     </div>
