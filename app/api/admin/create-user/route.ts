@@ -11,7 +11,7 @@ function getAdminClient() {
 }
 
 export async function POST(request: Request) {
-  const { nome, email, password, role } = await request.json()
+  const { nome, email, password, role, modulos } = await request.json()
 
   if (!nome || !email || !password || !role) {
     return NextResponse.json({ error: "Campos obrigatórios faltando." }, { status: 400 })
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
     nome,
     email,
     role,
+    modulos: modulos ?? ["painel", "proposta", "calendario", "relatorios", "pacientes"],
   })
 
   if (profileError) {

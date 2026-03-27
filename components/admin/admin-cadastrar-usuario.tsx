@@ -8,12 +8,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { CheckCircle } from "lucide-react"
+import { ModulosSelector } from "./modulos-selector"
+
+const DEFAULT_MODULOS = ["painel", "proposta", "calendario", "relatorios", "pacientes"]
 
 export function AdminCadastrarUsuario() {
   const [nome, setNome] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState<"admin" | "operador" | "visualizador">("operador")
+  const [modulos, setModulos] = useState<string[]>(DEFAULT_MODULOS)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
@@ -27,7 +31,7 @@ export function AdminCadastrarUsuario() {
     const res = await fetch("/api/admin/create-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, email, password, role }),
+      body: JSON.stringify({ nome, email, password, role, modulos }),
     })
     const data = await res.json()
     setSaving(false)
@@ -40,13 +44,14 @@ export function AdminCadastrarUsuario() {
       setEmail("")
       setPassword("")
       setRole("operador")
+      setModulos(DEFAULT_MODULOS)
     }
   }
 
   return (
     <Card className="p-6 max-w-lg">
       <h3 className="text-sm font-semibold text-foreground mb-4">Novo Usuário</h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nome completo</Label>
@@ -72,6 +77,9 @@ export function AdminCadastrarUsuario() {
             </Select>
           </div>
         </div>
+
+        <ModulosSelector value={modulos} onChange={setModulos} />
+
         {error && <p className="text-sm text-destructive">{error}</p>}
         {success && (
           <div className="flex items-center gap-2 text-green-500 text-sm">

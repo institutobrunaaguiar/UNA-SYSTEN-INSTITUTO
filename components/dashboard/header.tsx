@@ -1,8 +1,6 @@
 "use client"
 
-import { Mail, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MobileNav } from "./mobile-nav"
 import { BuscaGlobal } from "@/components/busca/busca-global"
 import type { ReactNode } from "react"
@@ -23,31 +21,12 @@ export function Header({ title, description, actions }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 h-8 w-8"
-          >
-            <Mail className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 h-8 w-8"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse" />
-          </Button>
-
-          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border">
-            <Avatar className="w-7 h-7 md:w-8 md:h-8 ring-2 ring-primary/20 transition-all duration-300 hover:ring-primary/40">
-              <AvatarImage src="/profile.jpg" alt="UNA Admin" />
-              <AvatarFallback className="text-xs">UA</AvatarFallback>
-            </Avatar>
-            <div className="text-xs hidden sm:block">
-              <p className="font-semibold text-foreground">UNA Admin</p>
-              <p className="text-muted-foreground text-[10px]">admin@una.com</p>
-            </div>
+<div className="flex items-center pl-2 md:pl-3 border-l border-border">
+            <img
+              src="https://institutobrunaaguiar.com.br/images/logo-1.png"
+              alt="Instituto Bruna Aguiar"
+              className="h-8 w-auto object-contain"
+            />
           </div>
         </div>
       </div>

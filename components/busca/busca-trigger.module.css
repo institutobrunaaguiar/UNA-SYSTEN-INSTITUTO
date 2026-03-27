@@ -1,0 +1,145 @@
+/* busca-trigger.module.css — magnifying glass → X animation */
+
+.form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 330px;
+  height: 58px;
+  padding: 0 21px;
+  background-color: hsl(var(--primary));
+  border-radius: 12px;
+  box-shadow: 0 6px 24px hsl(var(--primary) / 0.45), 0 0 0 12px hsl(var(--background) / 0.92);
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.form:hover {
+  box-shadow: 0 8px 28px hsl(var(--primary) / 0.55), 0 0 0 12px hsl(var(--background) / 0.92);
+}
+
+.fx {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+}
+
+/* ── Text area ─────────────────────────────────────── */
+.inputArea {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+}
+
+.placeholder {
+  color: hsl(var(--primary-foreground) / 0.65);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: hsl(var(--primary-foreground) / 0.5);
+  background: hsl(var(--primary-foreground) / 0.12);
+  border-radius: 4px;
+  border: 1px solid hsl(var(--primary-foreground) / 0.2);
+}
+
+/* ── Icon area ─────────────────────────────────────── */
+.iconArea {
+  position: relative;
+  width: 50px;
+  height: 58px;
+  flex-shrink: 0;
+}
+
+/* Circle (lens of magnifying glass) */
+.circle {
+  position: relative;
+  top: -5px;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border: 9px solid hsl(var(--primary-foreground));
+  background-color: transparent;
+  border-radius: 50%;
+  transition: 0.5s ease all;
+}
+
+/* Handle of magnifying glass */
+.line {
+  position: absolute;
+  top: 41px;
+  left: 26px;
+  display: block;
+  width: 27px;
+  height: 9px;
+  background-color: transparent;
+  border-radius: 6px;
+  transform: rotateZ(52deg);
+  transition: 0.5s ease all;
+}
+
+.line::before,
+.line::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 27px;
+  height: 9px;
+  background-color: hsl(var(--primary-foreground));
+  border-radius: 6px;
+  transform: rotateZ(0);
+  transition: 0.5s ease all;
+}
+
+/* ── Hover: morphs to X ───────────────────────────── */
+.iconArea:hover .circle {
+  top: -1px;
+  width: 40px;
+  height: 9px;
+  border-width: 0;
+  background-color: hsl(var(--primary-foreground));
+  border-radius: 10px;
+}
+
+.iconArea:hover .line {
+  top: 50%;
+  left: 34px;
+  width: 15px;
+  margin-top: -5px;
+  transform: rotateZ(0);
+}
+
+.iconArea:hover .line::before {
+  bottom: 7px;
+  transform: rotateZ(52deg);
+}
+
+.iconArea:hover .line::after {
+  bottom: -7px;
+  transform: rotateZ(-52deg);
+}
+
+.iconArea:hover .line::before,
+.iconArea:hover .line::after {
+  right: -4px;
+  width: 24px;
+  background-color: hsl(var(--primary-foreground));
+}

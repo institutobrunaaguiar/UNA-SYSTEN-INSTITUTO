@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ModulosSelector } from "./modulos-selector"
 import type { UserProfile } from "./admin-lista-usuarios"
 
 interface Props {
@@ -15,9 +16,12 @@ interface Props {
   onSaved: () => void
 }
 
+const DEFAULT_MODULOS = ["painel", "proposta", "calendario", "relatorios", "pacientes"]
+
 export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
   const [nome, setNome] = useState("")
   const [role, setRole] = useState<"admin" | "operador" | "visualizador">("operador")
+  const [modulos, setModulos] = useState<string[]>(DEFAULT_MODULOS)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
@@ -25,6 +29,7 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
     if (usuario) {
       setNome(usuario.nome)
       setRole(usuario.role)
+      setModulos(usuario.modulos ?? DEFAULT_MODULOS)
       setError("")
     }
   }, [usuario])
@@ -36,7 +41,7 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
     const res = await fetch("/api/admin/update-user", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: usuario.id, nome, role }),
+      body: JSON.stringify({ id: usuario.id, nome, role, modulos }),
     })
     const data = await res.json()
     setSaving(false)
@@ -49,11 +54,11 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
 
   return (
     <Sheet open={!!usuario} onOpenChange={(v) => { if (!v) onClose() }}>
-      <SheetContent>
+      <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar Usuário</SheetTitle>
         </SheetHeader>
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-5">
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nome</Label>
             <Input value={nome} onChange={(e) => setNome(e.target.value)} />
@@ -73,6 +78,9 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
               </SelectContent>
             </Select>
           </div>
+
+          <ModulosSelector value={modulos} onChange={setModulos} />
+
           {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2 pt-2">
             <Button variant="outline" className="flex-1" onClick={onClose}>Cancelar</Button>

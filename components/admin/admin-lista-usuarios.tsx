@@ -19,6 +19,7 @@ export interface UserProfile {
   email: string
   role: "admin" | "operador" | "visualizador"
   ativo: boolean
+  modulos: string[]
   created_at: string
 }
 

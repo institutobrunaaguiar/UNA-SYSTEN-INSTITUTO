@@ -11,7 +11,7 @@ function getAdminClient() {
 }
 
 export async function PATCH(request: Request) {
-  const { id, nome, role, ativo } = await request.json()
+  const { id, nome, role, ativo, modulos } = await request.json()
 
   if (!id) {
     return NextResponse.json({ error: "id é obrigatório." }, { status: 400 })
@@ -22,6 +22,7 @@ export async function PATCH(request: Request) {
   if (nome !== undefined) updates.nome = nome
   if (role !== undefined) updates.role = role
   if (ativo !== undefined) updates.ativo = ativo
+  if (modulos !== undefined) updates.modulos = modulos
 
   const { error } = await supabase.from("user_profiles").update(updates).eq("id", id)
 

@@ -1,221 +1,284 @@
+// components/pacientes/pacientes-content.tsx
 "use client"
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { useEffect, useState, useCallback } from "react"
 import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, Download, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Search, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
+import { algoliasearch } from "algoliasearch"
+import { PacienteDetalhe, type Paciente } from "./paciente-detalhe"
 
-interface Paciente {
-  id: number
-  nome: string
-  nome_social: string | null
-  sexo: string | null
-  genero: string | null
-  cpf_cnpj: string | null
-  data_nascimento: string | null
-  telefone: string | null
-  telefone_celular: string | null
-  email: string | null
-  cep: string | null
-  rua: string | null
-  numero: string | null
-  complemento: string | null
-  bairro: string | null
-  id_cidade: number | null
-  estrangeiro: boolean | null
-  numero_identificacao: string | null
-  ativo: boolean
-  created_at: string
+const PAGE_SIZE = 50
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
 }
+
+const algolia = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+  process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
+)
+
+function avatarColor(nome: string) {
+  const colors = [
+    "bg-indigo-600", "bg-cyan-600", "bg-violet-600",
+    "bg-emerald-600", "bg-amber-600", "bg-rose-600",
+  ]
+  return colors[nome.charCodeAt(0) % colors.length]
+}
+
+function getInitials(nome: string) {
+  return nome.split(" ").filter(Boolean).slice(0, 2).map((n) => n[0].toUpperCase()).join("")
+}
+
+function formatCpf(cpf: string | null) {
+  if (!cpf) return null
+  const d = cpf.replace(/\D/g, "")
+  if (d.length === 11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+  return cpf
+}
+
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return null
+  try {
+    const date = new Date(dateStr)
+    const now = new Date()
+    let age = now.getFullYear() - date.getFullYear()
+    const m = now.getMonth() - date.getMonth()
+    if (m < 0 || (m === 0 && now.getDate() < date.getDate())) age--
+    return `${date.toLocaleDateString("pt-BR")} · ${age} anos`
+  } catch {
+    return dateStr
+  }
+}
+
+type FilterStatus = "all" | "ativo" | "inativo"
 
 export function PacientesContent() {
   const [pacientes, setPacientes] = useState<Paciente[]>([])
-  const [filteredPacientes, setFilteredPacientes] = useState<Paciente[]>([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
+  const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all")
+  const [page, setPage] = useState(0)
+  const [selected, setSelected] = useState<Paciente | null>(null)
 
+  // Debounce search input
   useEffect(() => {
-    fetchPacientes()
-  }, [])
+    const t = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(0)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [search])
 
-  useEffect(() => {
-    filterPacientes()
-  }, [searchTerm, filterStatus, pacientes])
+  // Reset page on filter change
+  useEffect(() => { setPage(0) }, [filterStatus])
 
-  async function fetchPacientes() {
-    try {
-      setLoading(true)
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  const fetchPacientes = useCallback(async () => {
+    setLoading(true)
 
-      if (!supabaseUrl || !supabaseKey) {
-        console.error("[v0] Variáveis Supabase não configuradas")
-        return
+    // When searching: use Algolia (typo tolerance + fuzzy)
+    if (debouncedSearch) {
+      try {
+        const filters =
+          filterStatus === "ativo" ? "ativo:true"
+          : filterStatus === "inativo" ? "ativo:false"
+          : undefined
+
+        const { results } = await algolia.search({
+          requests: [{
+            indexName: "pacientes",
+            query: debouncedSearch,
+            hitsPerPage: PAGE_SIZE,
+            page,
+            ...(filters ? { filters } : {}),
+          }],
+        })
+
+        const result = results[0] as { hits: Paciente[]; nbHits: number; nbPages: number }
+        setPacientes(result.hits ?? [])
+        setTotal(result.nbHits ?? 0)
+      } catch (e) {
+        console.error("[pacientes-algolia]", e)
+      } finally {
+        setLoading(false)
       }
-
-      const supabase = createClient(supabaseUrl, supabaseKey)
-      const { data, error } = await supabase.from("pacientes").select("*").order("created_at", { ascending: false })
-
-      if (error) {
-        console.error("[v0] Erro ao buscar pacientes:", error.message)
-        return
-      }
-
-      if (data) {
-        console.log("[v0] Pacientes carregados:", data.length)
-        setPacientes(data as Paciente[])
-      }
-    } catch (error) {
-      console.error("[v0] Erro na busca de pacientes:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  function filterPacientes() {
-    let filtered = pacientes
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(
-        (p) =>
-          p.nome.toLowerCase().includes(term) ||
-          (p.email && p.email.toLowerCase().includes(term)) ||
-          (p.cpf_cnpj && p.cpf_cnpj.includes(term)) ||
-          (p.telefone_celular && p.telefone_celular.includes(term))
-      )
+      return
     }
 
-    if (filterStatus === "ativo") {
-      filtered = filtered.filter((p) => p.ativo === true)
-    } else if (filterStatus === "inativo") {
-      filtered = filtered.filter((p) => p.ativo === false)
-    }
+    // No search: use Supabase with server-side pagination
+    const from = page * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
 
-    setFilteredPacientes(filtered)
-  }
+    let query = getSupabase()
+      .from("pacientes")
+      .select("*", { count: "exact" })
+      .order("nome")
+      .range(from, to)
+
+    if (filterStatus === "ativo") query = query.eq("ativo", true)
+    if (filterStatus === "inativo") query = query.eq("ativo", false)
+
+    const { data, count } = await query
+    if (data) setPacientes(data as Paciente[])
+    if (count != null) setTotal(count)
+    setLoading(false)
+  }, [page, filterStatus, debouncedSearch])
+
+  useEffect(() => { fetchPacientes() }, [fetchPacientes])
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const from = total === 0 ? 0 : page * PAGE_SIZE + 1
+  const to = Math.min((page + 1) * PAGE_SIZE, total)
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nome, email ou CPF..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 bg-transparent">
-            <Filter className="w-4 h-4" />
-            Filtro
-          </Button>
-          <Button variant="outline" className="gap-2 bg-transparent">
-            <Download className="w-4 h-4" />
-            Exportar
-          </Button>
-        </div>
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="relative max-w-sm">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por nome, CPF, telefone ou e-mail..."
+          className="pl-9 h-9 text-sm"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
-      <div className="flex gap-2">
-        <Button variant={filterStatus === "all" ? "default" : "outline"} onClick={() => setFilterStatus("all")} size="sm">
-          Todos ({pacientes.length})
-        </Button>
-        <Button
-          variant={filterStatus === "ativo" ? "default" : "outline"}
-          onClick={() => setFilterStatus("ativo")}
-          size="sm"
-        >
-          Ativos ({pacientes.filter((p) => p.ativo).length})
-        </Button>
-        <Button
-          variant={filterStatus === "inativo" ? "default" : "outline"}
-          onClick={() => setFilterStatus("inativo")}
-          size="sm"
-        >
-          Inativos ({pacientes.filter((p) => !p.ativo).length})
-        </Button>
+      {/* Filter tabs */}
+      <div className="flex gap-1 bg-muted rounded-lg p-1 w-fit">
+        {(["all", "ativo", "inativo"] as FilterStatus[]).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilterStatus(f)}
+            className={[
+              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+              filterStatus === f
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            ].join(" ")}
+          >
+            {f === "all" ? "Todos" : f === "ativo" ? "Ativos" : "Inativos"}
+            {!debouncedSearch && f === "all" && total > 0 && ` (${total})`}
+          </button>
+        ))}
       </div>
 
+      {/* Table */}
       {loading ? (
-        <Card className="p-12 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-            <p className="text-muted-foreground">Carregando pacientes...</p>
-          </div>
-        </Card>
+        <div className="flex justify-center py-20">
+          <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full" />
+        </div>
       ) : (
-        <div className="overflow-x-auto">
-          <Card className="border border-border">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">ID</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Nome</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Email</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Telefone</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">CPF/CNPJ</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Data de Nascimento</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Cidade</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPacientes.length > 0 ? (
-                  filteredPacientes.map((paciente) => (
-                    <tr
-                      key={paciente.id}
-                      className="border-b border-border hover:bg-muted/30 transition-colors duration-200"
-                    >
-                      <td className="px-4 py-3 text-sm text-foreground font-medium">{paciente.id}</td>
-                      <td className="px-4 py-3 text-sm text-foreground">
-                        <div>
-                          <p className="font-medium">{paciente.nome}</p>
-                          {paciente.nome_social && <p className="text-xs text-muted-foreground">({paciente.nome_social})</p>}
+        <Card className="overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/50">
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Paciente</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">Contato</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">CPF</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">Nascimento</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {pacientes.length > 0 ? (
+                pacientes.map((p) => (
+                  <tr
+                    key={p.id}
+                    onClick={() => setSelected(p)}
+                    className="hover:bg-muted/40 cursor-pointer transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${avatarColor(p.nome)}`}>
+                          {getInitials(p.nome)}
                         </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{paciente.email || "-"}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{paciente.telefone_celular || paciente.telefone || "-"}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{paciente.cpf_cnpj || "-"}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {paciente.data_nascimento ? new Date(paciente.data_nascimento).toLocaleDateString("pt-BR") : "-"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{paciente.id_cidade || "-"}</td>
-                      <td className="px-4 py-3">
-                        <Badge variant={paciente.ativo ? "default" : "secondary"}>
-                          {paciente.ativo ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button variant="outline" size="sm" className="bg-transparent hover:bg-muted">
-                          Ver
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
-                      Nenhum paciente encontrado.
+                        <div>
+                          <p className="font-medium text-foreground">{p.nome}</p>
+                          {p.nome_social && (
+                            <p className="text-xs text-muted-foreground">({p.nome_social})</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <div className="space-y-0.5">
+                        {p.telefone_celular && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Phone className="w-3 h-3" />{p.telefone_celular}
+                          </p>
+                        )}
+                        {p.email && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 truncate max-w-[180px]">
+                            <Mail className="w-3 h-3 shrink-0" />{p.email}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell font-mono">
+                      {formatCpf(p.cpf_cnpj) ?? "-"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell">
+                      {formatDate(p.data_nascimento) ?? "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge variant={p.ativo ? "default" : "secondary"} className="text-[10px] py-0 h-5">
+                        {p.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </Card>
-        </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground text-sm">
+                    Nenhum paciente encontrado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Card>
       )}
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>Mostrando {filteredPacientes.length} de {pacientes.length} pacientes</span>
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          {total === 0 ? "Nenhum resultado" : `${from}–${to} de ${total} pacientes`}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            disabled={page === 0 || loading}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <span className="text-xs text-muted-foreground min-w-[80px] text-center">
+            Pág. {page + 1} de {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            disabled={page >= totalPages - 1 || loading}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
+
+      <PacienteDetalhe paciente={selected} onClose={() => setSelected(null)} />
     </div>
   )
 }
