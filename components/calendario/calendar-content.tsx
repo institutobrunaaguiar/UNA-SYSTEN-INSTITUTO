@@ -258,7 +258,7 @@ export function CalendarContent() {
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prev}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="text-sm font-semibold min-w-[160px] text-center">{getPeriodLabel()}</span>
+            <span className="text-sm font-semibold min-w-0 sm:min-w-[160px] text-center">{getPeriodLabel()}</span>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -271,7 +271,7 @@ export function CalendarContent() {
 
         <div className="flex items-center gap-2 flex-wrap">
           <Select value={filterProfissional} onValueChange={setFilterProfissional}>
-            <SelectTrigger className="w-[180px] h-8 text-xs">
+            <SelectTrigger className="w-full sm:w-[180px] h-8 text-xs">
               <SelectValue placeholder="Profissional" />
             </SelectTrigger>
             <SelectContent>

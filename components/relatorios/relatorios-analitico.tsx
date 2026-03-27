@@ -155,6 +155,7 @@ export function RelatoriosAnalitico({ filters }: RelatoriosAnaliticoProps) {
   return (
     <div className="space-y-4 animate-fade-in">
       <Card className="p-0 overflow-hidden hover:shadow-lg transition-all duration-300">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
@@ -208,6 +209,7 @@ export function RelatoriosAnalitico({ filters }: RelatoriosAnaliticoProps) {
             })}
           </TableBody>
         </Table>
+        </div>
       </Card>
 
       {/* Pagination */}

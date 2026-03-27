@@ -239,7 +239,7 @@ export function ComissaoLista() {
             value={filterStatus}
             onValueChange={(v) => setFilterStatus(v as Comissao["status"] | "todas")}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -252,7 +252,7 @@ export function ComissaoLista() {
           </Select>
         </div>
 
-        <div className="relative flex-1 max-w-[200px]">
+        <div className="relative flex-1 sm:max-w-[200px]">
           <Input
             type="month"
             placeholder="Periodo (YYYY-MM)"
@@ -304,12 +304,12 @@ export function ComissaoLista() {
                     />
                   </TableHead>
                   <TableHead>Profissional</TableHead>
-                  <TableHead>Procedimento</TableHead>
-                  <TableHead className="text-right">Valor Base</TableHead>
-                  <TableHead className="text-right">%</TableHead>
+                  <TableHead className="hidden md:table-cell">Procedimento</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Valor Base</TableHead>
+                  <TableHead className="hidden lg:table-cell text-right">%</TableHead>
                   <TableHead className="text-right">Comissao</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Periodo</TableHead>
+                  <TableHead className="hidden lg:table-cell">Periodo</TableHead>
                   <TableHead className="w-[50px]" />
                 </TableRow>
               </TableHeader>
@@ -333,13 +333,13 @@ export function ComissaoLista() {
                       <TableCell className="font-medium text-foreground">
                         {comissao.profissional_nome}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden md:table-cell text-muted-foreground">
                         {comissao.procedimento_nome}
                       </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
+                      <TableCell className="hidden md:table-cell text-right text-muted-foreground">
                         {formatCurrency(comissao.valor_base)}
                       </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
+                      <TableCell className="hidden lg:table-cell text-right text-muted-foreground">
                         {comissao.percentual}%
                       </TableCell>
                       <TableCell className="text-right font-semibold text-foreground">
@@ -353,7 +353,7 @@ export function ComissaoLista() {
                           {statusConfig.label}
                         </span>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden lg:table-cell text-muted-foreground">
                         {comissao.periodo_referencia}
                       </TableCell>
                       <TableCell>

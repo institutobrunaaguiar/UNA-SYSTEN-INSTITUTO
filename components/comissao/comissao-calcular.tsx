@@ -357,7 +357,7 @@ export function ComissaoCalcular({ open, onOpenChange, onComplete }: ComissaoCal
 
         {step === "preview" && preview.length > 0 && (
           <div className="space-y-4 py-2 animate-fade-in">
-            <div className="rounded-lg border overflow-hidden">
+            <div className="rounded-lg border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>

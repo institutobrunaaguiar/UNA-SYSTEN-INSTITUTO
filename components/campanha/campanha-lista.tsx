@@ -129,7 +129,7 @@ export function CampanhaLista({ onSelect, onNew, refreshKey }: CampanhaListaProp
 
       {/* Loading skeleton */}
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="p-4 space-y-3">
               <Skeleton className="h-5 w-3/4" />
@@ -173,7 +173,7 @@ export function CampanhaLista({ onSelect, onNew, refreshKey }: CampanhaListaProp
 
       {/* Campaign grid */}
       {!loading && filtered.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((campanha, index) => {
             const status = derivarStatus(campanha)
             const tipoConfig = TIPO_CONFIG[campanha.tipo]

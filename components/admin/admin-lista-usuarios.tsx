@@ -76,8 +76,8 @@ export function AdminListaUsuarios() {
           <thead>
             <tr className="border-b border-border bg-muted/50">
               <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nome</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">E-mail</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nível</th>
+              <th className="hidden md:table-cell text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">E-mail</th>
+              <th className="hidden lg:table-cell text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nível</th>
               <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
               <th className="px-4 py-3" />
             </tr>
@@ -88,8 +88,8 @@ export function AdminListaUsuarios() {
               return (
                 <tr key={u.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-medium text-foreground">{u.nome}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
-                  <td className="px-4 py-3">
+                  <td className="hidden md:table-cell px-4 py-3 text-muted-foreground">{u.email}</td>
+                  <td className="hidden lg:table-cell px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${role.className}`}>
                       {role.label}
                     </span>

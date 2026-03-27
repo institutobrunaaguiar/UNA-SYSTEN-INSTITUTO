@@ -20,7 +20,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
       const THREE = await import("three")
       if (cancelled || !wrapRef.current) return
 
-      const canvassize = 500
+      const canvassize = Math.min(window.innerWidth - 32, window.innerHeight - 100, 500)
       const length = 30
       const radius = 5.6
       const rotatevalue = 0.035
@@ -181,8 +181,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
     >
       <div
         ref={wrapRef}
-        className="relative"
-        style={{ width: 500, height: 500 }}
+        className="relative w-full max-w-[500px] aspect-square"
       />
       <p className="absolute bottom-6 text-white/40 text-[11px] tracking-[0.15em] uppercase">
         Clique para entrar

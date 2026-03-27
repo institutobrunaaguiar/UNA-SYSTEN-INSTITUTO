@@ -320,11 +320,11 @@ export function ComissaoRegras() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Procedimento / Profissional</TableHead>
+                <TableHead className="hidden md:table-cell">Tipo</TableHead>
+                <TableHead className="hidden md:table-cell">Procedimento / Profissional</TableHead>
                 <TableHead className="text-right">Percentual</TableHead>
-                <TableHead className="text-right">Bonus</TableHead>
-                <TableHead>Ativo</TableHead>
+                <TableHead className="hidden lg:table-cell text-right">Bonus</TableHead>
+                <TableHead className="hidden lg:table-cell">Ativo</TableHead>
                 <TableHead className="w-[50px]" />
               </TableRow>
             </TableHeader>
@@ -341,14 +341,14 @@ export function ComissaoRegras() {
                     <TableCell className="font-medium text-foreground">
                       {regra.nome}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${tipoConfig.className}`}
                       >
                         {tipoConfig.label}
                       </span>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="hidden md:table-cell text-muted-foreground">
                       {regra.tipo === "procedimento"
                         ? regra.procedimento_nome || "-"
                         : regra.tipo === "profissional"
@@ -358,10 +358,10 @@ export function ComissaoRegras() {
                     <TableCell className="text-right text-foreground font-medium">
                       {regra.percentual}%
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="hidden lg:table-cell text-right text-muted-foreground">
                       {regra.bonus_percentual ? `${regra.bonus_percentual}%` : "-"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           regra.ativo
