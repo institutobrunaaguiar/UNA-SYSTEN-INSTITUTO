@@ -1,13 +1,29 @@
 "use client"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@supabase/supabase-js"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
+}
+
 export default function LogoutPage() {
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  async function handleLogout() {
+    setLoading(true)
+    await getSupabase().auth.signOut()
+    router.replace("/settings/login")
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -31,8 +47,8 @@ export default function LogoutPage() {
               <Button variant="outline" className="flex-1 bg-transparent" onClick={() => router.back()}>
                 Cancelar
               </Button>
-              <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => router.push("/")}>
-                Sair
+              <Button className="flex-1 bg-primary hover:bg-primary/90" disabled={loading} onClick={handleLogout}>
+                {loading ? "Saindo..." : "Sair"}
               </Button>
             </div>
           </Card>
