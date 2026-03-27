@@ -1,12 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter, Inter_Tight } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-heading" })
 
 export const metadata: Metadata = {
   title: "UNA - Sistema de Gestão de Pacientes",
@@ -38,8 +38,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased`}>
-        <ThemeProvider defaultTheme="light" storageKey="tasko-theme">
+      <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>
+        <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
           {children}
         </ThemeProvider>
         <Analytics />
