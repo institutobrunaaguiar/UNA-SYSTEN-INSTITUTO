@@ -1,0 +1,135 @@
+<h2>Admin — Gestão de Usuários</h2>
+<p class="subtitle">Apenas /settings exige login. O restante da aplicação continua aberto.</p>
+
+<div class="section">
+  <h3>Fluxo de acesso</h3>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <div style="background:#1e293b;border-radius:6px;padding:8px 12px;color:#f1f5f9;font-size:12px">Clica em "Admin" na sidebar</div>
+    <div style="color:#64748b;font-size:16px">→</div>
+    <div style="background:#1e293b;border-radius:6px;padding:8px 12px;color:#f1f5f9;font-size:12px">Não tem sessão?</div>
+    <div style="color:#64748b;font-size:16px">→</div>
+    <div style="background:#312e81;border-radius:6px;padding:8px 12px;color:#a5b4fc;font-size:12px">/settings/login</div>
+    <div style="color:#64748b;font-size:16px">→</div>
+    <div style="background:#14532d;border-radius:6px;padding:8px 12px;color:#22c55e;font-size:12px">/settings (painel)</div>
+  </div>
+</div>
+
+<div class="split" style="margin-top:16px">
+
+  <!-- Login page -->
+  <div class="mockup">
+    <div class="mockup-header">Tela de Login — /settings/login</div>
+    <div class="mockup-body" style="background:#0f172a;padding:32px;font-family:sans-serif;display:flex;justify-content:center">
+      <div style="background:#1e293b;border-radius:10px;padding:24px;width:260px;border:1px solid #334155">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="color:#f1f5f9;font-size:14px;font-weight:700">Área Administrativa</div>
+          <div style="color:#64748b;font-size:11px;margin-top:3px">Instituto Bruna Aguiar</div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">E-MAIL</div>
+          <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#94a3b8;font-size:12px">admin@institutobruna.com.br</div>
+        </div>
+        <div style="margin-bottom:16px">
+          <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">SENHA</div>
+          <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#94a3b8;font-size:12px">••••••••</div>
+        </div>
+        <div style="background:#6366f1;border-radius:6px;padding:9px;text-align:center;color:#fff;font-size:12px;font-weight:600">Entrar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div class="mockup">
+    <div class="mockup-header">Painel Admin — /settings</div>
+    <div class="mockup-body" style="background:#0f172a;padding:16px;font-family:sans-serif">
+      <!-- Tabs -->
+      <div style="display:flex;gap:2px;margin-bottom:14px;background:#1e293b;border-radius:8px;padding:3px;width:fit-content">
+        <div style="background:#334155;border-radius:6px;padding:6px 14px;color:#f1f5f9;font-size:11px;font-weight:600">Usuários</div>
+        <div style="padding:6px 14px;color:#64748b;font-size:11px">Cadastrar</div>
+      </div>
+      <!-- User table -->
+      <div style="background:#1e293b;border-radius:8px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1fr 1.4fr .8fr .6fr .5fr;gap:0;padding:8px 12px;border-bottom:1px solid #334155">
+          <div style="color:#475569;font-size:9px;letter-spacing:.5px">NOME</div>
+          <div style="color:#475569;font-size:9px;letter-spacing:.5px">E-MAIL</div>
+          <div style="color:#475569;font-size:9px;letter-spacing:.5px">NÍVEL</div>
+          <div style="color:#475569;font-size:9px;letter-spacing:.5px">STATUS</div>
+          <div style="color:#475569;font-size:9px;letter-spacing:.5px"></div>
+        </div>
+        <!-- Row 1 -->
+        <div style="display:grid;grid-template-columns:1fr 1.4fr .8fr .6fr .5fr;gap:0;padding:10px 12px;border-bottom:1px solid #0f172a;align-items:center">
+          <div style="color:#f1f5f9;font-size:11px;font-weight:500">Alex Santos</div>
+          <div style="color:#64748b;font-size:10px">alex@inst...</div>
+          <div><span style="background:#312e81;color:#a5b4fc;font-size:9px;padding:2px 7px;border-radius:10px">Admin</span></div>
+          <div><span style="background:#14532d;color:#22c55e;font-size:9px;padding:2px 6px;border-radius:10px">Ativo</span></div>
+          <div style="color:#475569;font-size:10px">···</div>
+        </div>
+        <!-- Row 2 -->
+        <div style="display:grid;grid-template-columns:1fr 1.4fr .8fr .6fr .5fr;gap:0;padding:10px 12px;border-bottom:1px solid #0f172a;align-items:center">
+          <div style="color:#f1f5f9;font-size:11px;font-weight:500">Mariana Costa</div>
+          <div style="color:#64748b;font-size:10px">mari@inst...</div>
+          <div><span style="background:#1e3a5f;color:#60a5fa;font-size:9px;padding:2px 7px;border-radius:10px">Operador</span></div>
+          <div><span style="background:#14532d;color:#22c55e;font-size:9px;padding:2px 6px;border-radius:10px">Ativo</span></div>
+          <div style="color:#475569;font-size:10px">···</div>
+        </div>
+        <!-- Row 3 -->
+        <div style="display:grid;grid-template-columns:1fr 1.4fr .8fr .6fr .5fr;gap:0;padding:10px 12px;align-items:center">
+          <div style="color:#f1f5f9;font-size:11px;font-weight:500">Roberta Lima</div>
+          <div style="color:#64748b;font-size:10px">rob@inst...</div>
+          <div><span style="background:#1c1917;color:#a8a29e;font-size:9px;padding:2px 7px;border-radius:10px">Visualizador</span></div>
+          <div><span style="background:#450a0a;color:#f87171;font-size:9px;padding:2px 6px;border-radius:10px">Inativo</span></div>
+          <div style="color:#475569;font-size:10px">···</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px" class="section">
+  <h3>Cadastrar usuário</h3>
+  <div style="background:#1e293b;border-radius:8px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px">
+    <div>
+      <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">NOME COMPLETO</div>
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#64748b;font-size:12px">Nome do usuário</div>
+    </div>
+    <div>
+      <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">E-MAIL</div>
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#64748b;font-size:12px">email@dominio.com</div>
+    </div>
+    <div>
+      <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">SENHA INICIAL</div>
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#64748b;font-size:12px">••••••••</div>
+    </div>
+    <div>
+      <div style="color:#94a3b8;font-size:10px;margin-bottom:4px">NÍVEL DE ACESSO</div>
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#64748b;font-size:12px">Admin / Operador / Visualizador</div>
+    </div>
+    <div style="grid-column:1/-1">
+      <div style="background:#6366f1;border-radius:6px;padding:9px 16px;color:#fff;font-size:12px;font-weight:600;width:fit-content">Criar Usuário</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px" class="section">
+  <h3>Estrutura técnica</h3>
+  <ul style="color:#cbd5e1;font-size:13px;line-height:2">
+    <li><strong>Supabase Auth</strong> — email + senha, sessão gerenciada pelo SDK</li>
+    <li>Tabela <code>user_profiles</code> — id (UUID = auth.users.id), nome, role, ativo</li>
+    <li>Criar usuário via <strong>Route Handler</strong> com service role key (lado servidor)</li>
+    <li><code>/settings/login</code> — página pública de login</li>
+    <li><code>/settings</code> — verifica sessão no middleware, redireciona para login se ausente</li>
+    <li>Menu lateral: link "Admin" permanece visível, acesso exige sessão</li>
+  </ul>
+</div>
+
+<div style="margin-top:12px;display:flex;gap:10px">
+  <div class="option" data-choice="ok" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Aprovado</h3><p>Gerar specs e planos de implementação</p></div>
+  </div>
+  <div class="option" data-choice="ajuste" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Ajustar</h3><p>Quero mudar algo</p></div>
+  </div>
+</div>

@@ -1,0 +1,115 @@
+<h2>Busca Global — Command Palette</h2>
+<p class="subtitle">Abre ao clicar no campo do header ou pressionar ⌘K. Busca por nome ou CPF.</p>
+
+<div class="mockup" style="max-width:640px">
+  <div class="mockup-header">Modal centralizado — por cima de qualquer página</div>
+  <div class="mockup-body" style="background:#0f172a;padding:24px;font-family:sans-serif">
+
+    <!-- Overlay backdrop hint -->
+    <div style="background:rgba(0,0,0,0.6);border-radius:12px;padding:16px">
+
+      <!-- Command palette box -->
+      <div style="background:#1e293b;border-radius:10px;border:1px solid #334155;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.6)">
+
+        <!-- Search input -->
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #334155">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span style="color:#f1f5f9;font-size:14px;flex:1">ana</span>
+          <span style="color:#475569;font-size:11px;background:#0f172a;padding:2px 7px;border-radius:4px">ESC</span>
+        </div>
+
+        <!-- Results -->
+        <div style="max-height:320px;overflow:hidden">
+
+          <!-- Group: Pacientes -->
+          <div style="padding:8px 16px 4px">
+            <div style="color:#475569;font-size:10px;letter-spacing:.8px;font-weight:600">PACIENTES</div>
+          </div>
+
+          <!-- Result item — highlighted -->
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:#334155;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="color:#fff;font-size:12px;font-weight:700">AL</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="color:#f1f5f9;font-size:13px;font-weight:500">Ana Lima</div>
+              <div style="color:#64748b;font-size:11px">CPF 123.456.789-00 · (11) 99999-0001</div>
+            </div>
+            <div style="color:#475569;font-size:10px">Paciente</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:#0891b2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="color:#fff;font-size:12px;font-weight:700">AS</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="color:#f1f5f9;font-size:13px;font-weight:500">Ana Santos</div>
+              <div style="color:#64748b;font-size:11px">CPF 987.654.321-00 · (11) 98888-0002</div>
+            </div>
+            <div style="color:#475569;font-size:10px">Paciente</div>
+          </div>
+
+          <!-- Group: Propostas -->
+          <div style="padding:10px 16px 4px;border-top:1px solid #1e293b;margin-top:2px">
+            <div style="color:#475569;font-size:10px;letter-spacing:.8px;font-weight:600">PROPOSTAS</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:8px;background:#14532d;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="color:#f1f5f9;font-size:13px;font-weight:500">Ana Lima</div>
+              <div style="color:#64748b;font-size:11px">R$ 3.200 · CO2 Face + Preenchimento</div>
+            </div>
+            <span style="background:#14532d;color:#22c55e;font-size:9px;padding:2px 7px;border-radius:10px;white-space:nowrap">Pago</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:8px;background:#1e3a5f;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="color:#f1f5f9;font-size:13px;font-weight:500">Ana Souza</div>
+              <div style="color:#64748b;font-size:11px">R$ 1.850 · Botox Feminino</div>
+            </div>
+            <span style="background:#1e3a5f;color:#60a5fa;font-size:9px;padding:2px 7px;border-radius:10px;white-space:nowrap">Aguardando</span>
+          </div>
+
+        </div>
+
+        <!-- Footer hints -->
+        <div style="display:flex;gap:16px;align-items:center;padding:10px 16px;border-top:1px solid #334155;background:#0f172a">
+          <span style="color:#475569;font-size:10px">↑↓ navegar</span>
+          <span style="color:#475569;font-size:10px">↵ abrir</span>
+          <span style="color:#475569;font-size:10px">⌘K fechar</span>
+          <span style="flex:1"></span>
+          <span style="color:#475569;font-size:10px">Busca por nome ou CPF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px" class="section">
+  <h3>Comportamento</h3>
+  <ul style="color:#cbd5e1;font-size:14px;line-height:2">
+    <li>Campo do header vira <strong>botão trigger</strong> — clique abre o modal (não digita inline)</li>
+    <li><strong>⌘K</strong> abre de qualquer página</li>
+    <li>Busca simultânea em <code>pacientes</code> (nome, cpf_cnpj) e <code>propostas</code> (nome_cliente, cpf_cliente)</li>
+    <li>Mínimo 2 caracteres para disparar a busca</li>
+    <li>Enter ou clique no resultado: navega para <code>/pacientes?id=X</code> ou abre a proposta</li>
+    <li>Resultados em tempo real com debounce de 300ms</li>
+  </ul>
+</div>
+
+<div style="margin-top:12px;display:flex;gap:10px">
+  <div class="option" data-choice="ok" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Aprovado</h3><p>Seguir para Admin</p></div>
+  </div>
+  <div class="option" data-choice="ajuste" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Ajustar</h3><p>Quero mudar algo</p></div>
+  </div>
+</div>
