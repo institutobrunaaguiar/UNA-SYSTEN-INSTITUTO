@@ -18,10 +18,12 @@ import {
 import { STATUS_CONFIG } from "@/components/propostas/types"
 import type { PropostaStatus } from "@/components/propostas/types"
 
-const algolia = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-  process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
-)
+function getAlgolia() {
+  return algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
+  )
+}
 
 interface PacienteHit {
   objectID: string
@@ -88,7 +90,7 @@ export function BuscaGlobal() {
     }
     setLoading(true)
     try {
-      const { results } = await algolia.search({
+      const { results } = await getAlgolia().search({
         requests: [
           { indexName: "pacientes", query: term, hitsPerPage: 6 },
           { indexName: "propostas", query: term, hitsPerPage: 4 },

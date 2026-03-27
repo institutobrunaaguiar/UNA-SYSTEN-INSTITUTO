@@ -20,10 +20,12 @@ function getSupabase() {
   )
 }
 
-const algolia = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-  process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
-)
+function getAlgolia() {
+  return algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
+  )
+}
 
 function avatarColor(nome: string) {
   const colors = [
@@ -93,7 +95,7 @@ export function PacientesContent() {
           : filterStatus === "inativo" ? "ativo:false"
           : undefined
 
-        const { results } = await algolia.search({
+        const { results } = await getAlgolia().search({
           requests: [{
             indexName: "pacientes",
             query: debouncedSearch,
