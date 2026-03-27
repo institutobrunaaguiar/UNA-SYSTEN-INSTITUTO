@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter, Inter_Tight } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AppLoader } from "@/components/loading/app-loader"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -40,7 +41,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>
         <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
-          {children}
+          <AppLoader>
+            {children}
+          </AppLoader>
         </ThemeProvider>
         <Analytics />
       </body>
