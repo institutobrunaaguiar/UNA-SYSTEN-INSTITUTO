@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   Search,
   Plus,
@@ -14,6 +13,8 @@ import {
   Copy,
   RefreshCw,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -45,15 +46,30 @@ interface PropostasListaProps {
   onVerDetalhes: (proposta: Proposta) => void
 }
 
+const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
+const MESES = [
+  "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+]
+
 export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes }: PropostasListaProps) {
   const [propostas, setPropostas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState<PropostaStatus | "todas">("todas")
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
 
   useEffect(() => {
     fetchPropostas()
+  }, [])
+
+  // Selecionar o dia de hoje por padrao
+  useEffect(() => {
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    setSelectedDay(todayStr)
   }, [])
 
   function getSupabase() {
@@ -133,6 +149,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     }
   }
 
+  // Filtrar propostas
   const filtered = propostas.filter((p) => {
     const term = searchTerm.toLowerCase()
     const matchesSearch =
@@ -142,6 +159,60 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     const matchesStatus = filterStatus === "todas" || p.status === filterStatus
     return matchesSearch && matchesStatus
   })
+
+  // Agrupar propostas por dia (YYYY-MM-DD)
+  function getDateKey(dateStr: string): string {
+    const d = new Date(dateStr)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+  }
+
+  const propostasPorDia: Record<string, Proposta[]> = {}
+  filtered.forEach((p) => {
+    const key = getDateKey(p.created_at)
+    if (!propostasPorDia[key]) propostasPorDia[key] = []
+    propostasPorDia[key].push(p)
+  })
+
+  // Gerar dias do calendario
+  const year = currentDate.getFullYear()
+  const month = currentDate.getMonth()
+  const firstDay = new Date(year, month, 1)
+  const lastDay = new Date(year, month + 1, 0)
+  const startPad = firstDay.getDay()
+  const totalDays = lastDay.getDate()
+
+  const calendarDays: (number | null)[] = []
+  for (let i = 0; i < startPad; i++) calendarDays.push(null)
+  for (let d = 1; d <= totalDays; d++) calendarDays.push(d)
+
+  function prevMonth() {
+    setCurrentDate(new Date(year, month - 1, 1))
+    setSelectedDay(null)
+  }
+
+  function nextMonth() {
+    setCurrentDate(new Date(year, month + 1, 1))
+    setSelectedDay(null)
+  }
+
+  function goToToday() {
+    const today = new Date()
+    setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1))
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    setSelectedDay(todayStr)
+  }
+
+  function getDayKey(day: number): string {
+    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+  }
+
+  const todayStr = (() => {
+    const t = new Date()
+    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`
+  })()
+
+  // Propostas do dia selecionado
+  const propostasDoDia = selectedDay ? (propostasPorDia[selectedDay] || []) : []
 
   const statusCounts = {
     todas: propostas.length,
@@ -155,8 +226,16 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
   }
 
+  function formatSelectedDate(): string {
+    if (!selectedDay) return ""
+    const [y, m, d] = selectedDay.split("-").map(Number)
+    const date = new Date(y, m - 1, d)
+    return date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Header: busca + botao */}
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 relative">
           <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -176,6 +255,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         </Button>
       </div>
 
+      {/* Filtros de status */}
       <div className="flex gap-2 flex-wrap">
         {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
           <Button
@@ -197,101 +277,192 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           </div>
         </Card>
       ) : (
-        <div className="overflow-x-auto">
-          <Card className="border border-border">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">#</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Cliente</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">CPF</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Procedimentos</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Valor Total</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Data</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Acoes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length > 0 ? (
-                  filtered.map((proposta) => (
-                    <tr
-                      key={proposta.id}
-                      className="border-b border-border hover:bg-muted/30 transition-colors duration-200"
-                    >
-                      <td className="px-4 py-3 text-sm text-foreground font-medium">{proposta.id}</td>
-                      <td className="px-4 py-3 text-sm text-foreground font-medium">{proposta.nome_cliente}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{proposta.cpf_cliente || "-"}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-foreground font-medium">
-                        {formatCurrency(proposta.valor_total)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_CONFIG[proposta.status].color}`}>
-                          {STATUS_CONFIG[proposta.status].label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {new Date(proposta.created_at).toLocaleDateString("pt-BR")}
-                      </td>
-                      <td className="px-4 py-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => onVerDetalhes(proposta)}>
-                              <Eye className="w-4 h-4 mr-2" /> Ver detalhes
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onEditarProposta(proposta)}>
-                              <Pencil className="w-4 h-4 mr-2" /> Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDuplicar(proposta)}>
-                              <Copy className="w-4 h-4 mr-2" /> Duplicar
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger>
-                                <RefreshCw className="w-4 h-4 mr-2" /> Alterar status
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent>
-                                {(Object.keys(STATUS_CONFIG) as PropostaStatus[]).map((s) => (
-                                  <DropdownMenuItem
-                                    key={s}
-                                    onClick={() => handleStatusChange(proposta.id, s)}
-                                    disabled={proposta.status === s}
-                                  >
-                                    {STATUS_CONFIG[s].label}
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => setDeleteId(proposta.id)}
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" /> Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
-                      Nenhuma proposta encontrada.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
+          {/* Calendario */}
+          <Card className="p-4">
+            {/* Navegacao do mes */}
+            <div className="flex items-center justify-between mb-4">
+              <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {MESES[month]} {year}
+                </h3>
+                <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-6 px-2">
+                  Hoje
+                </Button>
+              </div>
+              <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Dias da semana */}
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {DIAS_SEMANA.map((dia) => (
+                <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-1">
+                  {dia}
+                </div>
+              ))}
+            </div>
+
+            {/* Dias do mes */}
+            <div className="grid grid-cols-7 gap-1">
+              {calendarDays.map((day, i) => {
+                if (day === null) {
+                  return <div key={`empty-${i}`} className="h-10" />
+                }
+                const dayKey = getDayKey(day)
+                const dayPropostas = propostasPorDia[dayKey] || []
+                const count = dayPropostas.length
+                const isToday = dayKey === todayStr
+                const isSelected = dayKey === selectedDay
+
+                return (
+                  <button
+                    key={dayKey}
+                    type="button"
+                    onClick={() => setSelectedDay(dayKey)}
+                    className={`h-10 rounded-lg text-sm relative transition-all duration-200 flex flex-col items-center justify-center ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground font-semibold"
+                        : isToday
+                          ? "bg-primary/10 text-primary font-semibold ring-1 ring-primary/30"
+                          : "text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span className="text-xs">{day}</span>
+                    {count > 0 && (
+                      <div className={`flex gap-0.5 mt-0.5 ${isSelected ? "" : ""}`}>
+                        {count <= 3 ? (
+                          dayPropostas.slice(0, 3).map((p, idx) => (
+                            <div
+                              key={idx}
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                isSelected
+                                  ? "bg-primary-foreground"
+                                  : p.status === "pago"
+                                    ? "bg-green-500"
+                                    : p.status === "em_negociacao"
+                                      ? "bg-yellow-500"
+                                      : p.status === "aguardando_pagamento"
+                                        ? "bg-blue-500"
+                                        : "bg-red-500"
+                              }`}
+                            />
+                          ))
+                        ) : (
+                          <span className={`text-[9px] font-bold ${isSelected ? "text-primary-foreground" : "text-primary"}`}>
+                            {count}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </Card>
+
+          {/* Propostas do dia selecionado */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground capitalize">
+                  {formatSelectedDate()}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
+                  {propostasDoDia.length > 0 && (
+                    <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {propostasDoDia.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {propostasDoDia.map((proposta) => (
+                  <Card
+                    key={proposta.id}
+                    className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={() => onVerDetalhes(proposta)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-muted-foreground">#{proposta.id}</span>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
+                            {STATUS_CONFIG[proposta.status].label}
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground truncate">{proposta.nome_cliente}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
+                        </p>
+                        <p className="text-sm font-bold text-foreground mt-1">
+                          {formatCurrency(proposta.valor_total)}
+                        </p>
+                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onVerDetalhes(proposta) }}>
+                            <Eye className="w-4 h-4 mr-2" /> Ver detalhes
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditarProposta(proposta) }}>
+                            <Pencil className="w-4 h-4 mr-2" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicar(proposta) }}>
+                            <Copy className="w-4 h-4 mr-2" /> Duplicar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              <RefreshCw className="w-4 h-4 mr-2" /> Alterar status
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                              {(Object.keys(STATUS_CONFIG) as PropostaStatus[]).map((s) => (
+                                <DropdownMenuItem
+                                  key={s}
+                                  onClick={(e) => { e.stopPropagation(); handleStatusChange(proposta.id, s) }}
+                                  disabled={proposta.status === s}
+                                >
+                                  {STATUS_CONFIG[s].label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuSub>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={(e) => { e.stopPropagation(); setDeleteId(proposta.id) }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

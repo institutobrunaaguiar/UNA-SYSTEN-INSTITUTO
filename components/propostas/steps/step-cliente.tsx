@@ -50,7 +50,7 @@ export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect }: S
       const supabase = getSupabase()
       const { data, error } = await supabase
         .from("pacientes")
-        .select("id, nome, cpf_cnpj, telefone, telefone_celular, email, ativo")
+        .select("id, nome, cpf_cnpj, telefone_celular, email, ativo")
         .or(`nome.ilike.%${term}%,cpf_cnpj.ilike.%${term}%`)
         .eq("ativo", true)
         .limit(10)
@@ -151,7 +151,7 @@ export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect }: S
                 <div>
                   <p className="text-sm font-medium text-foreground">{paciente.nome}</p>
                   <p className="text-xs text-muted-foreground">
-                    {paciente.cpf_cnpj || "Sem CPF"} • {paciente.telefone_celular || paciente.telefone || "Sem telefone"}
+                    {paciente.cpf_cnpj || "Sem CPF"} • {paciente.telefone_celular || "Sem telefone"}
                   </p>
                 </div>
               </button>

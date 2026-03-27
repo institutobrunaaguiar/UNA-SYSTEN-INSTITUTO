@@ -38,7 +38,6 @@ export interface Paciente {
   id: number
   nome: string
   cpf_cnpj: string | null
-  telefone: string | null
   telefone_celular: string | null
   email: string | null
   ativo: boolean
