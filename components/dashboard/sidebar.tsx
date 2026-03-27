@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation"
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Painel", href: "/" },
-  { icon: CheckSquare, label: "Proposta", badge: "124", href: "/tasks" },
+  { icon: CheckSquare, label: "Proposta", href: "/proposta" },
   { icon: Calendar, label: "Calendário", href: "/calendar" },
   { icon: BarChart3, label: "Relatórios", href: "/analytics" },
   { icon: Users, label: "Time", href: "/team" },
