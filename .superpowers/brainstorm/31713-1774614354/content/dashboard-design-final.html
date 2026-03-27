@@ -1,0 +1,155 @@
+<h2>Design final — Novo Painel</h2>
+<p class="subtitle">Mockup com os dados reais que vão puxar do Supabase. Confirme se está ok.</p>
+
+<div class="mockup" style="max-width:780px">
+  <div class="mockup-header">Painel — Instituto Bruna Aguiar</div>
+  <div class="mockup-body" style="background:#0f172a;padding:16px;font-family:sans-serif">
+
+    <!-- Header row -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div style="color:#f1f5f9;font-size:15px;font-weight:700">Painel</div>
+        <div style="color:#64748b;font-size:10px">Março 2026</div>
+      </div>
+    </div>
+
+    <!-- TOP SECTION: KPIs left + Chart right -->
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:10px;margin-bottom:10px">
+
+      <!-- KPI Column -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:#1e293b;border-radius:8px;padding:12px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px;margin-bottom:3px">RECEBIDO (MÊS)</div>
+          <div style="color:#22c55e;font-size:20px;font-weight:800;letter-spacing:-0.5px">R$ 32.480</div>
+          <div style="color:#4ade80;font-size:9px;margin-top:2px">↑ 14% vs fev</div>
+          <div style="color:#64748b;font-size:8px;margin-top:1px">11 propostas pagas</div>
+        </div>
+        <div style="background:#1e293b;border-radius:8px;padding:12px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px;margin-bottom:3px">A RECEBER</div>
+          <div style="color:#60a5fa;font-size:20px;font-weight:800;letter-spacing:-0.5px">R$ 18.200</div>
+          <div style="color:#93c5fd;font-size:9px;margin-top:2px">5 propostas aguardando</div>
+        </div>
+        <div style="background:#1e293b;border-radius:8px;padding:12px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px;margin-bottom:3px">TICKET MÉDIO</div>
+          <div style="color:#f1f5f9;font-size:20px;font-weight:800;letter-spacing:-0.5px">R$ 2.953</div>
+          <div style="color:#94a3b8;font-size:9px;margin-top:2px">propostas pagas</div>
+        </div>
+        <div style="background:#1e293b;border-radius:8px;padding:12px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px;margin-bottom:3px">CONVERSÃO</div>
+          <div style="color:#f1f5f9;font-size:20px;font-weight:800;letter-spacing:-0.5px">69%</div>
+          <div style="color:#94a3b8;font-size:9px;margin-top:2px">ganhas / (total − perdidas)</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div style="background:#1e293b;border-radius:8px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div>
+            <div style="color:#f1f5f9;font-size:11px;font-weight:600">Jornada do Caixa — 2026</div>
+            <div style="color:#64748b;font-size:9px">Receita recebida · meses futuros = previsão</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:16px;height:2px;background:#6366f1;border-radius:2px"></span><span style="color:#94a3b8;font-size:8px">Recebido</span></span>
+            <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:16px;height:2px;background:#6366f1;border-radius:2px;opacity:.4;border-top:2px dashed #6366f1"></span><span style="color:#94a3b8;font-size:8px">Previsão</span></span>
+          </div>
+        </div>
+        <!-- Chart area -->
+        <svg viewBox="0 0 460 100" style="width:100%;height:100px">
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <line x1="0" y1="80" x2="460" y2="80" stroke="#334155" stroke-width="0.5"/>
+          <line x1="0" y1="55" x2="460" y2="55" stroke="#334155" stroke-width="0.5"/>
+          <line x1="0" y1="30" x2="460" y2="30" stroke="#334155" stroke-width="0.5"/>
+          <!-- Realized area (Jan-Mar) -->
+          <path d="M20,75 C50,70 70,60 100,52 S140,40 165,35 S200,28 230,25" fill="none" stroke="#6366f1" stroke-width="2"/>
+          <path d="M20,75 C50,70 70,60 100,52 S140,40 165,35 S200,28 230,25 L230,80 L20,80 Z" fill="url(#areaGrad)"/>
+          <!-- Dashed forecast (Apr-Dez) -->
+          <path d="M230,25 C255,22 275,18 305,15 S350,10 385,8 S425,6 450,5" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.6"/>
+          <!-- Month labels -->
+          <text x="20" y="95" fill="#475569" font-size="7">Jan</text>
+          <text x="58" y="95" fill="#475569" font-size="7">Fev</text>
+          <text x="98" y="95" fill="#475569" font-size="7">Mar</text>
+          <text x="135" y="95" fill="#475569" font-size="7">Abr</text>
+          <text x="173" y="95" fill="#475569" font-size="7">Mai</text>
+          <text x="210" y="95" fill="#475569" font-size="7">Jun</text>
+          <text x="248" y="95" fill="#475569" font-size="7">Jul</text>
+          <text x="286" y="95" fill="#475569" font-size="7">Ago</text>
+          <text x="320" y="95" fill="#475569" font-size="7">Set</text>
+          <text x="358" y="95" fill="#475569" font-size="7">Out</text>
+          <text x="395" y="95" fill="#475569" font-size="7">Nov</text>
+          <text x="433" y="95" fill="#475569" font-size="7">Dez</text>
+          <!-- Today marker -->
+          <line x1="230" y1="10" x2="230" y2="80" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="232" y="15" fill="#f59e0b" font-size="7">hoje</text>
+        </svg>
+        <!-- Y labels -->
+        <div style="display:flex;justify-content:space-between;margin-top:4px;padding:0 4px">
+          <div style="color:#64748b;font-size:8px">R$ 0</div>
+          <div style="color:#64748b;font-size:8px">R$ 20k</div>
+          <div style="color:#64748b;font-size:8px">R$ 40k</div>
+          <div style="color:#64748b;font-size:8px">R$ 60k</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Pipeline -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="background:#1e293b;border-radius:8px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px">GANHAS</div>
+          <span style="background:#14532d;color:#22c55e;font-size:8px;padding:2px 6px;border-radius:10px">11 propostas</span>
+        </div>
+        <div style="color:#22c55e;font-size:16px;font-weight:700;margin-bottom:6px">R$ 32.480</div>
+        <div style="background:#0f172a;border-radius:3px;height:5px"><div style="background:#22c55e;border-radius:3px;height:5px;width:69%"></div></div>
+        <div style="color:#64748b;font-size:8px;margin-top:3px">69% do total</div>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px">EM ABERTO</div>
+          <span style="background:#1e3a5f;color:#60a5fa;font-size:8px;padding:2px 6px;border-radius:10px">13 propostas</span>
+        </div>
+        <div style="color:#60a5fa;font-size:16px;font-weight:700;margin-bottom:6px">R$ 24.600</div>
+        <div style="background:#0f172a;border-radius:3px;height:5px"><div style="background:#60a5fa;border-radius:3px;height:5px;width:54%"></div></div>
+        <div style="color:#64748b;font-size:8px;margin-top:3px">Em negociação + aguardando</div>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="color:#64748b;font-size:9px;letter-spacing:.5px">PERDIDAS</div>
+          <span style="background:#450a0a;color:#f87171;font-size:8px;padding:2px 6px;border-radius:10px">5 propostas</span>
+        </div>
+        <div style="color:#f87171;font-size:16px;font-weight:700;margin-bottom:6px">R$ 9.200</div>
+        <div style="background:#0f172a;border-radius:3px;height:5px"><div style="background:#f87171;border-radius:3px;height:5px;width:20%"></div></div>
+        <div style="color:#64748b;font-size:8px;margin-top:3px">20% do total</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="margin-top:16px" class="section">
+  <h3>O que muda no código</h3>
+  <ul style="color:#cbd5e1;font-size:14px;line-height:2">
+    <li>Remove: <code>TimeTracker</code>, <code>ProjectAnalytics</code>, <code>TeamCollaboration</code>, <code>Reminders</code>, <code>ProjectProgress</code>, <code>ProjectList</code>, <code>MobileAppCard</code></li>
+    <li>Adiciona: <code>components/painel/painel-content.tsx</code> — orquestra tudo</li>
+    <li>KPIs buscam da tabela <code>propostas</code> (sum/count por status e mês)</li>
+    <li>Gráfico: agrupa <code>valor_total</code> por mês (campo <code>updated_at</code> onde status = pago)</li>
+    <li>Previsão = soma de <code>valor_total</code> de propostas em aberto por mês esperado</li>
+    <li>Header atual: remover botões "Adicionar Projeto" e "Importar Dados", manter busca</li>
+  </ul>
+</div>
+
+<div style="margin-top:12px;display:flex;gap:10px">
+  <div class="option" data-choice="ok" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Aprovado</h3><p>Pode avançar para o design de Busca e Admin</p></div>
+  </div>
+  <div class="option" data-choice="ajuste" onclick="toggleSelect(this)" style="flex:1">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Ajustar</h3><p>Quero mudar algo antes</p></div>
+  </div>
+</div>
