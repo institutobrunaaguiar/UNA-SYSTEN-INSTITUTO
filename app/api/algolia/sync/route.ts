@@ -4,10 +4,12 @@ import { NextResponse } from "next/server"
 import { algoliasearch } from "algoliasearch"
 import { createClient } from "@supabase/supabase-js"
 
-const algolia = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-  process.env.ALGOLIA_ADMIN_KEY!
-)
+function getAlgolia() {
+  return algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+    process.env.ALGOLIA_ADMIN_KEY!
+  )
+}
 
 function getSupabase() {
   return createClient(
@@ -47,6 +49,8 @@ export async function POST() {
     const supabase = getSupabase()
 
     // Configure index settings
+    const algolia = getAlgolia()
+
     await Promise.all([
       algolia.setSettings({
         indexName: "pacientes",
