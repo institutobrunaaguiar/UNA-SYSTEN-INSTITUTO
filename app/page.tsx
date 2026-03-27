@@ -1,6 +1,7 @@
 // app/page.tsx
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
+import { PainelContent } from "@/components/painel/painel-content"
 
 export default function DashboardPage() {
   return (
@@ -10,8 +11,8 @@ export default function DashboardPage() {
       </div>
       <main className="flex-1 p-3 md:p-4 lg:p-5 lg:ml-64">
         <Header title="Painel" description="Métricas de propostas e receita." />
-        <div className="mt-4">
-          <p className="text-muted-foreground text-sm">Carregando painel...</p>
+        <div className="mt-4 md:mt-5">
+          <PainelContent />
         </div>
       </main>
     </div>
