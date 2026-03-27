@@ -2,7 +2,7 @@
 
 import { LayoutDashboard, CheckSquare, Calendar, BarChart3, Settings, HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -24,7 +24,10 @@ const generalItems = [
 
 export function Sidebar() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => setMounted(true), [])
 
   return (
     <aside className="fixed top-0 left-0 w-64 bg-card border-r border-border p-4 h-screen overflow-y-auto lg:block">
@@ -50,7 +53,7 @@ export function Sidebar() {
           <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Menu Principal</p>
           <nav className="space-y-0.5">
             {menuItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = mounted && pathname === item.href
               return (
                 <Link
                   key={item.label}
@@ -82,7 +85,7 @@ export function Sidebar() {
           <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Geral</p>
           <nav className="space-y-0.5">
             {generalItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = mounted && pathname === item.href
               return (
                 <Link
                   key={item.label}
