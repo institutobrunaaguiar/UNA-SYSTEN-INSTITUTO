@@ -152,7 +152,6 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </div>
-      </div>
     </div>
   )
 }
