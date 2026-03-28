@@ -10,7 +10,7 @@ export default function SettingsPage() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+      <main className="flex-1 p-4 lg:p-6 lg:ml-64 dock-spacer">
         <Header title="Admin" description="Gestão de usuários e configurações." />
         <div className="mt-6">
           <AdminGuard>

@@ -29,7 +29,7 @@ export default function LogoutPage() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+      <main className="flex-1 p-4 lg:p-6 lg:ml-64 dock-spacer">
         <Header />
 
         <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">

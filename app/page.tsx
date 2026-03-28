@@ -9,7 +9,7 @@ export default function DashboardPage() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      <main className="flex-1 p-3 md:p-4 lg:p-5 lg:ml-64">
+      <main className="flex-1 p-3 md:p-4 lg:p-5 lg:ml-64 dock-spacer">
         <Header title="Painel" description="Métricas de propostas e receita." />
         <div className="mt-4 md:mt-5">
           <PainelContent />

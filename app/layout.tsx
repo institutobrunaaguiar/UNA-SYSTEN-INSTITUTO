@@ -1,9 +1,11 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Inter_Tight } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AppLoader } from "@/components/loading/app-loader"
+import { MobileDock } from "@/components/dashboard/mobile-dock"
+import { ServiceWorkerRegister } from "@/components/pwa/sw-register"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -13,6 +15,15 @@ export const metadata: Metadata = {
   title: "UNA - Sistema de Gestão de Pacientes",
   description: "Gerencie pacientes e visualize todos os dados do sistema",
   generator: "v0.app",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "UNA System",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       {
@@ -32,19 +43,30 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: "#536648",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>
         <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
           <AppLoader>
             {children}
+            <MobileDock />
           </AppLoader>
         </ThemeProvider>
+        <ServiceWorkerRegister />
         <Analytics />
       </body>
     </html>

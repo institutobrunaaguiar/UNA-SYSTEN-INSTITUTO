@@ -1,0 +1,42 @@
+{
+  "name": "UNA - Sistema de Gestão",
+  "short_name": "UNA System",
+  "description": "Sistema de Gestão de Pacientes - Instituto Bruna Aguiar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1B1D24",
+  "theme_color": "#536648",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Painel",
+      "url": "/",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Propostas",
+      "url": "/proposta",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Agenda",
+      "url": "/calendar",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["business", "medical", "productivity"]
+}

@@ -212,6 +212,25 @@
   animation: fade-in 0.2s ease-out forwards;
 }
 
+/* PWA safe area for bottom dock */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile dock spacing — adds bottom padding so content isn't hidden behind dock */
+@media (max-width: 1023px) {
+  .dock-spacer {
+    padding-bottom: 76px;
+  }
+}
+
+/* Standalone PWA mode adjustments */
+@media all and (display-mode: standalone) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+}
+
 /* Ocean wave animation for login background */
 .ocean {
   height: 5%;
