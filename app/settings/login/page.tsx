@@ -38,13 +38,32 @@ export default function AdminLoginPage() {
   const passwordActive = passwordFocused || password.length > 0
 
   return (
-    <div className="min-h-screen bg-[#e6e6e6] dark:bg-background flex items-center justify-center p-4">
-      <div className="relative">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 overflow-hidden relative"
+      style={{
+        background: "radial-gradient(ellipse at center, #f5f0e8 0%, #f5f0e8 35%, #c2d4c0 100%)",
+      }}
+    >
+      {/* Dark mode overlay */}
+      <div
+        className="absolute inset-0 hidden dark:block"
+        style={{
+          background: "radial-gradient(ellipse at center, #1B1D24 0%, #1B1D24 35%, #2a3328 100%)",
+        }}
+      />
+
+      {/* Ocean waves */}
+      <div className="ocean">
+        <div className="wave" />
+        <div className="wave" />
+      </div>
+
+      <div className="relative z-10">
         {/* Shadow card behind */}
         <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-[98%] h-1/2 bg-white/50 dark:bg-white/5 rounded-[10px] -z-10" />
 
         {/* Login box */}
-        <div className="w-full max-w-[400px] bg-white dark:bg-card rounded-[10px] shadow-[2px_4px_4px_#dcdcdc,-2px_4px_4px_#dcdcdc] dark:shadow-none dark:border dark:border-border px-[50px] py-5 relative">
+        <div className="w-full max-w-[400px] bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-[10px] shadow-[2px_4px_4px_#dcdcdc,-2px_4px_4px_#dcdcdc] dark:shadow-none dark:border dark:border-border px-[50px] py-5 relative">
           {/* Header with accent bar */}
           <div className="relative h-[50px] leading-[50px]">
             <div className="absolute -left-[50px] top-0 h-full w-2 bg-primary rounded-l-[10px]" />
@@ -132,6 +151,7 @@ export default function AdminLoginPage() {
             </div>
           </form>
         </div>
+      </div>
       </div>
     </div>
   )
