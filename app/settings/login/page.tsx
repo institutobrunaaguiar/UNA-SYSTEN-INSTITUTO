@@ -41,14 +41,14 @@ export default function AdminLoginPage() {
     <div
       className="min-h-screen flex items-center justify-center p-4 overflow-hidden relative"
       style={{
-        background: "radial-gradient(ellipse at center, #f5f0e8 0%, #f5f0e8 35%, #c2d4c0 100%)",
+        background: "radial-gradient(ellipse at center, rgba(255,254,234,1) 0%, rgba(255,254,234,1) 35%, #B7E8EB 100%)",
       }}
     >
       {/* Dark mode overlay */}
       <div
         className="absolute inset-0 hidden dark:block"
         style={{
-          background: "radial-gradient(ellipse at center, #1B1D24 0%, #1B1D24 35%, #2a3328 100%)",
+          background: "radial-gradient(ellipse at center, #1B1D24 0%, #1B1D24 35%, #1a3a3f 100%)",
         }}
       />
 
