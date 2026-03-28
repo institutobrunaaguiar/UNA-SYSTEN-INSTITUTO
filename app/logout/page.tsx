@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
-import { Sidebar } from "@/components/dashboard/sidebar"
+import { AppSidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 
 function getSupabase() {
@@ -27,9 +27,9 @@ export default function LogoutPage() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
+      <AppSidebar />
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-64 dock-spacer">
+      <main className="flex-1 p-4 lg:p-6 lg:ml-[68px] dock-spacer">
         <Header />
 
         <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">
