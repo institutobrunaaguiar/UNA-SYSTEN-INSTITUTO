@@ -135,21 +135,18 @@ export function BuscaGlobal() {
 
   return (
     <>
-      {/* Trigger */}
+      {/* Neumorphic Finder Trigger */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={styles.form}
+        className={`${styles.finder} ${query.length > 0 ? styles.active : ""}`}
         aria-label="Abrir busca"
       >
-        <div className={styles.fx}>
-          <div className={styles.inputArea}>
+        <div className={styles.finderOuter}>
+          <div className={styles.finderInner}>
+            <div className={styles.finderIcon} />
             <span className={styles.placeholder}>Buscar paciente ou proposta...</span>
             <kbd className={`${styles.kbd} hidden md:inline-flex`}>⌘K</kbd>
-          </div>
-          <div className={styles.iconArea}>
-            <div className={styles.circle} />
-            <span className={styles.line} />
           </div>
         </div>
       </button>

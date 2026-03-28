@@ -1,51 +1,145 @@
-/* busca-trigger.module.css — magnifying glass → X animation */
+/* Neumorphic finder search bar */
 
-.form {
-  position: relative;
+.finder {
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  border-radius: 15px;
+  padding: 6px;
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.06),
+    -6px -6px 12px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 500px;
+}
+
+:global(.dark) .finder {
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3),
+    -6px -6px 12px rgba(255, 255, 255, 0.03);
+}
+
+.finder:hover {
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.08),
+    -8px -8px 16px rgba(255, 255, 255, 0.6);
+}
+
+:global(.dark) .finder:hover {
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+    -8px -8px 16px rgba(255, 255, 255, 0.05);
+}
+
+.finderOuter {
   display: flex;
   align-items: center;
-  width: 330px;
-  height: 58px;
-  padding: 0 21px;
-  background-color: hsl(var(--primary));
-  border-radius: 12px;
-  box-shadow: 0 6px 24px hsl(var(--primary) / 0.45), 0 0 0 12px hsl(var(--background) / 0.92);
-  border: 0;
-  outline: none;
-  cursor: pointer;
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  box-shadow: inset 6px 6px 10px -8px rgba(0, 0, 0, 0.1),
+    inset -6px -6px 10px -8px rgba(255, 255, 255, 0.8);
+}
+
+:global(.dark) .finderOuter {
+  box-shadow: inset 6px 6px 10px -8px rgba(0, 0, 0, 0.4),
+    inset -6px -6px 10px -8px rgba(255, 255, 255, 0.03);
+}
+
+.finderInner {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.75rem;
+}
+
+/* Magnifying glass icon — pure CSS */
+.finderIcon {
+  width: 28px;
+  height: 28px;
+  transition: all 0.2s;
+  box-shadow: inset 0 0 0 14px hsl(var(--foreground));
+  border-radius: 50%;
+  position: relative;
   flex-shrink: 0;
 }
 
-.form:hover {
-  box-shadow: 0 8px 28px hsl(var(--primary) / 0.55), 0 0 0 12px hsl(var(--background) / 0.92);
+.finderIcon::after,
+.finderIcon::before {
+  display: block;
+  content: "";
+  position: absolute;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-.fx {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  width: 100%;
+/* Inner dot of magnifying glass */
+.finderIcon::after {
+  width: 7px;
+  height: 7px;
+  background-color: hsl(var(--foreground));
+  border: 2px solid hsl(var(--card));
+  top: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  margin: auto;
+  border-radius: 50%;
 }
 
-/* ── Text area ─────────────────────────────────────── */
-.inputArea {
-  flex: 1;
-  text-align: left;
-  overflow: hidden;
+/* Handle of magnifying glass */
+.finderIcon::before {
+  width: 3px;
+  height: 9px;
+  background-color: hsl(var(--card));
+  top: 50%;
+  left: 14px;
+  transform: rotateZ(45deg) translate(-50%, 0);
+  transform-origin: 0 0;
+  border-radius: 3px;
 }
 
+/* Active state — icon transforms */
+.active .finderIcon {
+  transform: translateY(-3px);
+}
+
+.active .finderIcon::after {
+  border-width: 7px;
+  background-color: hsl(var(--card));
+}
+
+.active .finderIcon::before {
+  background-color: hsl(var(--foreground));
+  width: 4px;
+  transform: rotateZ(45deg) translate(-50%, 18px);
+}
+
+/* Processing/spinner state */
+.processing .finderIcon {
+  transform-origin: 50%;
+  animation: finderSpinner 0.3s linear infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes finderSpinner {
+  0% {
+    transform: rotateZ(45deg);
+  }
+  100% {
+    transform: rotateZ(405deg);
+  }
+}
+
+/* Placeholder text */
 .placeholder {
-  color: hsl(var(--primary-foreground) / 0.65);
-  font-size: 15px;
+  color: hsl(var(--muted-foreground));
+  font-size: 14px;
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
 }
 
+/* Keyboard shortcut badge */
 .kbd {
   display: inline-flex;
   align-items: center;
@@ -54,92 +148,8 @@
   padding: 2px 6px;
   font-size: 10px;
   font-weight: 600;
-  color: hsl(var(--primary-foreground) / 0.5);
-  background: hsl(var(--primary-foreground) / 0.12);
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted));
   border-radius: 4px;
-  border: 1px solid hsl(var(--primary-foreground) / 0.2);
-}
-
-/* ── Icon area ─────────────────────────────────────── */
-.iconArea {
-  position: relative;
-  width: 50px;
-  height: 58px;
-  flex-shrink: 0;
-}
-
-/* Circle (lens of magnifying glass) */
-.circle {
-  position: relative;
-  top: -5px;
-  left: 0;
-  width: 26px;
-  height: 26px;
-  border: 9px solid hsl(var(--primary-foreground));
-  background-color: transparent;
-  border-radius: 50%;
-  transition: 0.5s ease all;
-}
-
-/* Handle of magnifying glass */
-.line {
-  position: absolute;
-  top: 41px;
-  left: 26px;
-  display: block;
-  width: 27px;
-  height: 9px;
-  background-color: transparent;
-  border-radius: 6px;
-  transform: rotateZ(52deg);
-  transition: 0.5s ease all;
-}
-
-.line::before,
-.line::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 27px;
-  height: 9px;
-  background-color: hsl(var(--primary-foreground));
-  border-radius: 6px;
-  transform: rotateZ(0);
-  transition: 0.5s ease all;
-}
-
-/* ── Hover: morphs to X ───────────────────────────── */
-.iconArea:hover .circle {
-  top: -1px;
-  width: 40px;
-  height: 9px;
-  border-width: 0;
-  background-color: hsl(var(--primary-foreground));
-  border-radius: 10px;
-}
-
-.iconArea:hover .line {
-  top: 50%;
-  left: 34px;
-  width: 15px;
-  margin-top: -5px;
-  transform: rotateZ(0);
-}
-
-.iconArea:hover .line::before {
-  bottom: 7px;
-  transform: rotateZ(52deg);
-}
-
-.iconArea:hover .line::after {
-  bottom: -7px;
-  transform: rotateZ(-52deg);
-}
-
-.iconArea:hover .line::before,
-.iconArea:hover .line::after {
-  right: -4px;
-  width: 24px;
-  background-color: hsl(var(--primary-foreground));
+  border: 1px solid hsl(var(--border));
 }
