@@ -1,6 +1,5 @@
 "use client"
 
-import { MobileNav } from "./mobile-nav"
 import { BuscaGlobal } from "@/components/busca/busca-global"
 import type { ReactNode } from "react"
 
@@ -15,7 +14,6 @@ export function Header({ title, description, actions }: HeaderProps) {
     <header className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-1">
-          <MobileNav />
           <BuscaGlobal />
         </div>
 
