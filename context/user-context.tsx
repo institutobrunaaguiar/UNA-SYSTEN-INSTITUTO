@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import type { ReactNode } from "react"
 
 export interface UserProfile {
@@ -27,13 +27,6 @@ const UserContext = createContext<UserContextValue>({
 
 export function useUser() {
   return useContext(UserContext)
-}
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  )
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {

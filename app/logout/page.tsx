@@ -1,19 +1,12 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { AppSidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  )
-}
 
 export default function LogoutPage() {
   const router = useRouter()

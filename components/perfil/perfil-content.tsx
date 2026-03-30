@@ -1,18 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import { useUser } from "@/context/user-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  )
-}
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Administrador",

@@ -2,7 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import { MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
@@ -21,13 +21,6 @@ export interface UserProfile {
   ativo: boolean
   modulos: string[]
   created_at: string
-}
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  )
 }
 
 const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
