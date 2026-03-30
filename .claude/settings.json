@@ -4,7 +4,10 @@
       "mcp__claude_ai_Supabase__list_organizations",
       "Bash(bash scripts/start-server.sh --project-dir /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO)",
       "WebFetch(domain:api.clinicanasnuvens.com.br)",
-      "WebFetch(domain:www.algolia.com)"
+      "WebFetch(domain:www.algolia.com)",
+      "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO list motion)",
+      "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO list motion framer-motion)",
+      "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO build)"
     ]
   }
 }

@@ -26,7 +26,10 @@ export async function POST(request: Request) {
   })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    const mensagem = error.message.includes("already been registered")
+      ? "Este e-mail já está cadastrado no sistema. Verifique a lista de usuários ou use outro e-mail."
+      : error.message
+    return NextResponse.json({ error: mensagem }, { status: 400 })
   }
 
   const { error: profileError } = await supabase.from("user_profiles").insert({

@@ -25,12 +25,20 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
+  const [novaSenha, setNovaSenha] = useState("")
+  const [confirmSenha, setConfirmSenha] = useState("")
+  const [resetando, setResetando] = useState(false)
+  const [resetMsg, setResetMsg] = useState<{ tipo: "sucesso" | "erro"; texto: string } | null>(null)
+
   useEffect(() => {
     if (usuario) {
       setNome(usuario.nome)
       setRole(usuario.role)
       setModulos(usuario.modulos ?? DEFAULT_MODULOS)
       setError("")
+      setNovaSenha("")
+      setConfirmSenha("")
+      setResetMsg(null)
     }
   }, [usuario])
 
@@ -49,6 +57,37 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
       setError(data.error)
     } else {
       onSaved()
+    }
+  }
+
+  async function handleResetSenha() {
+    if (!usuario) return
+    setResetMsg(null)
+
+    if (novaSenha.length < 8) {
+      setResetMsg({ tipo: "erro", texto: "A senha deve ter no mínimo 8 caracteres." })
+      return
+    }
+    if (novaSenha !== confirmSenha) {
+      setResetMsg({ tipo: "erro", texto: "As senhas não coincidem." })
+      return
+    }
+
+    setResetando(true)
+    const res = await fetch("/api/admin/reset-password", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: usuario.id, password: novaSenha }),
+    })
+    const data = await res.json()
+    setResetando(false)
+
+    if (data.error) {
+      setResetMsg({ tipo: "erro", texto: data.error })
+    } else {
+      setResetMsg({ tipo: "sucesso", texto: "Senha redefinida com sucesso." })
+      setNovaSenha("")
+      setConfirmSenha("")
     }
   }
 
@@ -86,6 +125,41 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
             <Button variant="outline" className="flex-1" onClick={onClose}>Cancelar</Button>
             <Button className="flex-1" onClick={handleSave} disabled={saving}>
               {saving ? "Salvando..." : "Salvar"}
+            </Button>
+          </div>
+
+          <div className="border-t border-border pt-5 space-y-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Redefinir Senha</p>
+            <div>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nova Senha</Label>
+              <Input
+                type="password"
+                placeholder="Mínimo 8 caracteres"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Confirmar Nova Senha</Label>
+              <Input
+                type="password"
+                placeholder="Repita a nova senha"
+                value={confirmSenha}
+                onChange={(e) => setConfirmSenha(e.target.value)}
+              />
+            </div>
+            {resetMsg && (
+              <p className={`text-sm ${resetMsg.tipo === "sucesso" ? "text-green-600" : "text-destructive"}`}>
+                {resetMsg.texto}
+              </p>
+            )}
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleResetSenha}
+              disabled={resetando || !novaSenha || !confirmSenha}
+            >
+              {resetando ? "Redefinindo..." : "Redefinir Senha"}
             </Button>
           </div>
         </div>
