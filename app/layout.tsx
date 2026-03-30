@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { AppLoader } from "@/components/loading/app-loader"
 import { MobileDock } from "@/components/dashboard/mobile-dock"
 import { ServiceWorkerRegister } from "@/components/pwa/sw-register"
+import { UserProvider } from "@/context/user-context"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -61,10 +62,12 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>
         <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
-          <AppLoader>
-            {children}
-            <MobileDock />
-          </AppLoader>
+          <UserProvider>
+            <AppLoader>
+              {children}
+              <MobileDock />
+            </AppLoader>
+          </UserProvider>
         </ThemeProvider>
         <ServiceWorkerRegister />
         <Analytics />

@@ -4,26 +4,28 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3, Settings,
-  HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone,
+  HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone, UserCircle,
 } from "lucide-react"
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar"
 import { motion } from "motion/react"
 import Link from "next/link"
+import { useUser } from "@/context/user-context"
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Painel", href: "/" },
-  { icon: CheckSquare, label: "Proposta", href: "/proposta" },
-  { icon: Calendar, label: "Calendário", href: "/calendar" },
-  { icon: BarChart3, label: "Relatórios", href: "/analytics" },
-  { icon: Stethoscope, label: "Pacientes", href: "/pacientes" },
-  { icon: DollarSign, label: "Comissão", href: "/comissao" },
-  { icon: Megaphone, label: "Campanha", href: "/campanha" },
+  { icon: LayoutDashboard, label: "Painel",     href: "/",          modulo: "painel" },
+  { icon: CheckSquare,    label: "Proposta",    href: "/proposta",  modulo: "proposta" },
+  { icon: Calendar,       label: "Calendário",  href: "/calendar",  modulo: "calendario" },
+  { icon: BarChart3,      label: "Relatórios",  href: "/analytics", modulo: "relatorios" },
+  { icon: Stethoscope,    label: "Pacientes",   href: "/pacientes", modulo: "pacientes" },
+  { icon: DollarSign,     label: "Comissão",    href: "/comissao",  modulo: "comissao" },
+  { icon: Megaphone,      label: "Campanha",    href: "/campanha",  modulo: "campanha" },
 ]
 
 const systemItems = [
-  { icon: Settings, label: "Admin", href: "/settings" },
-  { icon: HelpCircle, label: "Ajuda", href: "/help" },
-  { icon: LogOut, label: "Sair", href: "/logout" },
+  { icon: Settings,    label: "Admin",   href: "/settings", modulo: "admin" },
+  { icon: UserCircle,  label: "Perfil",  href: "/perfil",   modulo: null },
+  { icon: HelpCircle,  label: "Ajuda",   href: "/help",     modulo: null },
+  { icon: LogOut,      label: "Sair",    href: "/logout",   modulo: null },
 ]
 
 function Logo({ open }: { open: boolean }) {
@@ -54,26 +56,33 @@ export function AppSidebar() {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const { user } = useUser()
 
   useEffect(() => setMounted(true), [])
 
-  const mainLinks = menuItems.map((item) => ({
-    label: item.label,
-    href: item.href,
-    active: mounted && pathname === item.href,
-    icon: (
-      <item.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover/sidebar:text-foreground transition-colors" />
-    ),
-  }))
+  const modulos = user?.modulos ?? []
 
-  const sysLinks = systemItems.map((item) => ({
-    label: item.label,
-    href: item.href,
-    active: mounted && pathname === item.href,
-    icon: (
-      <item.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover/sidebar:text-foreground transition-colors" />
-    ),
-  }))
+  const mainLinks = menuItems
+    .filter((item) => modulos.includes(item.modulo))
+    .map((item) => ({
+      label: item.label,
+      href: item.href,
+      active: mounted && pathname === item.href,
+      icon: (
+        <item.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover/sidebar:text-foreground transition-colors" />
+      ),
+    }))
+
+  const sysLinks = systemItems
+    .filter((item) => item.modulo === null || modulos.includes(item.modulo))
+    .map((item) => ({
+      label: item.label,
+      href: item.href,
+      active: mounted && pathname === item.href,
+      icon: (
+        <item.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover/sidebar:text-foreground transition-colors" />
+      ),
+    }))
 
   return (
     <Sidebar open={open} setOpen={setOpen}>
