@@ -12,7 +12,7 @@ import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 
 const mainItems = [
-  { icon: LayoutDashboard, label: "Painel", href: "/" },
+  { icon: LayoutDashboard, label: "Painel", href: "/painel" },
   { icon: CheckSquare, label: "Proposta", href: "/proposta" },
   { icon: Calendar, label: "Agenda", href: "/calendar" },
   { icon: BarChart3, label: "Relatórios", href: "/analytics" },

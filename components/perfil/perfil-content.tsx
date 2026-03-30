@@ -25,7 +25,7 @@ const MODULO_LABEL: Record<string, string> = {
 }
 
 export function PerfilContent() {
-  const { user, reload } = useUser()
+  const { user, loading, reload } = useUser()
 
   const [nome, setNome] = useState(user?.nome ?? "")
   const [savingNome, setSavingNome] = useState(false)
@@ -36,11 +36,19 @@ export function PerfilContent() {
   const [savingSenha, setSavingSenha] = useState(false)
   const [senhaMsg, setSenhaMsg] = useState<{ tipo: "sucesso" | "erro"; texto: string } | null>(null)
 
-  if (!user) {
+  if (loading) {
     return (
       <div className="flex justify-center py-10">
         <div className="animate-spin h-6 w-6 border-b-2 border-primary rounded-full" />
       </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <p className="text-sm text-muted-foreground py-10 text-center">
+        Não foi possível carregar o perfil. Tente recarregar a página.
+      </p>
     )
   }
 

@@ -23,7 +23,7 @@ export default function LoginPage() {
       setError("E-mail ou senha incorretos.")
       setLoading(false)
     } else {
-      router.replace("/")
+      router.replace("/painel")
     }
   }
 

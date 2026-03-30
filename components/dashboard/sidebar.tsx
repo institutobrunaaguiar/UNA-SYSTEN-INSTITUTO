@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useUser } from "@/context/user-context"
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Painel",     href: "/",          modulo: "painel" },
+  { icon: LayoutDashboard, label: "Painel",     href: "/painel",    modulo: "painel" },
   { icon: CheckSquare,    label: "Proposta",    href: "/proposta",  modulo: "proposta" },
   { icon: Calendar,       label: "Calendário",  href: "/calendar",  modulo: "calendario" },
   { icon: BarChart3,      label: "Relatórios",  href: "/analytics", modulo: "relatorios" },
@@ -61,9 +61,10 @@ export function AppSidebar() {
   useEffect(() => setMounted(true), [])
 
   const modulos = user?.modulos ?? []
+  const isAdmin = user?.role === "admin"
 
   const mainLinks = menuItems
-    .filter((item) => modulos.includes(item.modulo))
+    .filter((item) => isAdmin || modulos.includes(item.modulo))
     .map((item) => ({
       label: item.label,
       href: item.href,
@@ -72,8 +73,6 @@ export function AppSidebar() {
         <item.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover/sidebar:text-foreground transition-colors" />
       ),
     }))
-
-  const isAdmin = user?.role === "admin"
 
   const sysLinks = systemItems
     .filter((item) => item.modulo === null || modulos.includes(item.modulo) || (item.modulo === "admin" && isAdmin))

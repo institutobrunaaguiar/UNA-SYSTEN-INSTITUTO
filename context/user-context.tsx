@@ -34,26 +34,43 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function fetchUser() {
-    const supabase = getSupabase()
-    const { data: { session } } = await supabase.auth.getSession()
+    try {
+      const supabase = getSupabase()
 
-    if (!session) {
+      // getUser() validates against the server — more reliable than getSession()
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+
+      if (authError || !authUser) {
+        setUser(null)
+        setLoading(false)
+        return
+      }
+
+      const { data } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", authUser.id)
+        .single()
+
+      setUser(data ?? null)
+    } catch {
       setUser(null)
+    } finally {
       setLoading(false)
-      return
     }
-
-    const { data } = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single()
-
-    setUser(data ?? null)
-    setLoading(false)
   }
 
-  useEffect(() => { fetchUser() }, [])
+  useEffect(() => {
+    fetchUser()
+
+    // Re-fetch when auth state changes (login/logout)
+    const supabase = getSupabase()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      fetchUser()
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <UserContext.Provider value={{ user, loading, reload: fetchUser }}>
