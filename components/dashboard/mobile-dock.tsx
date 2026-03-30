@@ -25,7 +25,7 @@ const moreItems = [
   { icon: Settings, label: "Admin", href: "/settings" },
 ]
 
-const hiddenPaths = ["/settings/login", "/logout"]
+const hiddenPaths = ["/login", "/logout"]
 
 export function MobileDock() {
   const pathname = usePathname()

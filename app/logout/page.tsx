@@ -22,7 +22,7 @@ export default function LogoutPage() {
   async function handleLogout() {
     setLoading(true)
     await getSupabase().auth.signOut()
-    router.replace("/settings/login")
+    router.replace("/login")
   }
 
   return (

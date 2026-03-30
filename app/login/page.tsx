@@ -1,7 +1,7 @@
-// app/settings/login/page.tsx
+// app/login/page.tsx
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@supabase/supabase-js"
 
@@ -12,7 +12,7 @@ function getSupabase() {
   )
 }
 
-export default function AdminLoginPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
       setError("E-mail ou senha incorretos.")
       setLoading(false)
     } else {
-      router.replace("/settings")
+      router.replace("/")
     }
   }
 
