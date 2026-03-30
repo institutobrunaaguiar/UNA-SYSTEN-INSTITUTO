@@ -73,8 +73,10 @@ export function AppSidebar() {
       ),
     }))
 
+  const isAdmin = user?.role === "admin"
+
   const sysLinks = systemItems
-    .filter((item) => item.modulo === null || modulos.includes(item.modulo))
+    .filter((item) => item.modulo === null || modulos.includes(item.modulo) || (item.modulo === "admin" && isAdmin))
     .map((item) => ({
       label: item.label,
       href: item.href,
