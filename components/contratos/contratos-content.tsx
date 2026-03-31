@@ -144,14 +144,14 @@ export function ContratosContent() {
             )
           })}
         </div>
+      )}
 
-        {detalhe && (
-          <ContratoDetalheSheet
-            contrato={detalhe}
-            open={!!detalhe}
-            onClose={() => setDetalhe(null)}
-          />
-        )}
+      {detalhe && (
+        <ContratoDetalheSheet
+          contrato={detalhe}
+          open={!!detalhe}
+          onClose={() => setDetalhe(null)}
+        />
       )}
 
       <ContratoNovoSheet
