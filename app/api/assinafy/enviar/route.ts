@@ -42,6 +42,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Campos obrigatórios ausentes." }, { status: 400 })
   }
 
+  // 0. Aguardar documento ficar metadata_ready (polling até 30s)
+  let docStatus = ""
+  for (let i = 0; i < 15; i++) {
+    const statusRes = await assinafy(`/documents/${assinafy_document_id}`, "GET")
+    const statusData = await statusRes.json()
+    docStatus = statusData?.data?.status ?? statusData?.status ?? ""
+    if (docStatus === "metadata_ready" || docStatus === "uploaded") break
+    if (docStatus === "failed") {
+      return NextResponse.json({ error: "Documento falhou no processamento da Assinafy." }, { status: 400 })
+    }
+    await new Promise((r) => setTimeout(r, 2000))
+  }
+  if (docStatus !== "metadata_ready" && docStatus !== "uploaded") {
+    return NextResponse.json(
+      { error: "O documento ainda está sendo processado. Aguarde alguns segundos e tente novamente." },
+      { status: 400 }
+    )
+  }
+
   // 1. Criar ou buscar signatário na Assinafy
   let signer_id: string
   const searchRes = await assinafy(
