@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { FileSignature, Plus, ExternalLink, Copy, Check, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
+import { FileSignature, Plus, Clock, CheckCircle2, XCircle, AlertCircle, ChevronRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ContratoNovoSheet } from "./contrato-novo-sheet"
+import { ContratoDetalheSheet } from "./contrato-detalhe-sheet"
 import type { Contrato } from "./contratos-content"
 
 const STATUS_MAP: Record<Contrato["status"], { label: string; icon: React.ComponentType<{ className?: string }>; className: string }> = {
@@ -45,6 +46,7 @@ export function TabContratos({ pacienteId, nomePaciente, emailPaciente }: Props)
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [loading, setLoading] = useState(true)
   const [showNovo, setShowNovo] = useState(false)
+  const [detalhe, setDetalhe] = useState<Contrato | null>(null)
 
   async function load() {
     setLoading(true)
@@ -88,33 +90,27 @@ export function TabContratos({ pacienteId, nomePaciente, emailPaciente }: Props)
         contratos.map((c) => {
           const s = STATUS_MAP[c.status]
           return (
-            <Card key={c.id} className="p-3">
+            <Card
+              key={c.id}
+              className="p-3 cursor-pointer hover:border-primary/40 transition-colors"
+              onClick={() => setDetalhe(c)}
+            >
               <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-                <p className="text-sm font-medium text-foreground leading-tight">{c.titulo}</p>
+                <p className="text-sm font-medium text-foreground leading-tight flex-1 truncate">{c.titulo}</p>
                 <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${s.className}`}>
                   <s.icon className="w-3 h-3" />
                   {s.label}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">{formatDate(c.created_at)}</p>
-              {c.signed_at && (
-                <p className="text-xs text-green-500 mt-0.5">Assinado {formatDate(c.signed_at)}</p>
-              )}
-              {c.url_assinatura && c.status === "pendente" && (
-                <div className="flex items-center gap-2 mt-2 p-2 bg-muted rounded-md">
-                  <span className="text-[10px] text-muted-foreground truncate flex-1">{c.url_assinatura}</span>
-                  <CopyButton text={c.url_assinatura} />
-                  <a href={c.url_assinatura} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">{formatDate(c.created_at)}</p>
+                  {c.signed_at && (
+                    <p className="text-xs text-green-500 mt-0.5">Assinado {formatDate(c.signed_at)}</p>
+                  )}
                 </div>
-              )}
-              {c.url_certificado && (
-                <a href={c.url_certificado} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-primary hover:underline">
-                  <ExternalLink className="w-3 h-3" /> Baixar certificado
-                </a>
-              )}
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </div>
             </Card>
           )
         })
@@ -128,6 +124,14 @@ export function TabContratos({ pacienteId, nomePaciente, emailPaciente }: Props)
         nomePaciente={nomePaciente}
         emailPaciente={emailPaciente ?? ""}
       />
+
+      {detalhe && (
+        <ContratoDetalheSheet
+          contrato={detalhe}
+          open={!!detalhe}
+          onClose={() => setDetalhe(null)}
+        />
+      )}
     </div>
   )
 }

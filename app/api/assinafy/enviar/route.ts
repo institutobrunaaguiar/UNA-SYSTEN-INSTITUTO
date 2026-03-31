@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const assignment_id = assignData?.data?.id ?? assignData?.id
   const signing_url = assignData?.data?.signing_urls?.[0]?.url
     ?? assignData?.signing_urls?.[0]?.url
 
@@ -127,6 +128,7 @@ export async function POST(request: NextRequest) {
       email_paciente,
       mensagem: mensagem || null,
       assinafy_document_id,
+      assinafy_assignment_id: assignment_id ?? null,
       assinafy_signer_id: signer_id,
       status: "pendente",
       url_assinatura: signing_url ?? null,

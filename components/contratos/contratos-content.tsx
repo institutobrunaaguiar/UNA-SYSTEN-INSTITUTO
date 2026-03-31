@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { FileSignature, Plus, ExternalLink, Copy, Check, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
+import { FileSignature, Plus, Clock, CheckCircle2, XCircle, AlertCircle, ChevronRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ContratoNovoSheet } from "./contrato-novo-sheet"
+import { ContratoDetalheSheet } from "./contrato-detalhe-sheet"
 
 export interface Contrato {
   id: string
@@ -16,6 +16,9 @@ export interface Contrato {
   email_paciente: string | null
   url_assinatura: string | null
   url_certificado: string | null
+  assinafy_document_id: string | null
+  assinafy_assignment_id: string | null
+  assinafy_signer_id: string | null
   created_at: string
   signed_at: string | null
 }
@@ -52,6 +55,7 @@ export function ContratosContent() {
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [loading, setLoading] = useState(true)
   const [showNovo, setShowNovo] = useState(false)
+  const [detalhe, setDetalhe] = useState<Contrato | null>(null)
 
   async function load() {
     setLoading(true)
@@ -98,7 +102,11 @@ export function ContratosContent() {
           {contratos.map((c) => {
             const s = STATUS_MAP[c.status]
             return (
-              <Card key={c.id} className="p-4">
+              <Card
+                key={c.id}
+                className="p-4 cursor-pointer hover:border-primary/40 transition-colors"
+                onClick={() => setDetalhe(c)}
+              >
                 <div className="flex items-start gap-4">
                   <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <FileSignature className="w-4 h-4 text-primary" />
@@ -117,43 +125,33 @@ export function ContratosContent() {
                       {c.nome_paciente ?? "-"} · {c.email_paciente ?? "-"}
                     </p>
 
-                    <div className="flex items-center gap-3 mt-2 flex-wrap">
-                      <span className="text-[11px] text-muted-foreground">
-                        Enviado {formatDate(c.created_at)}
-                      </span>
-                      {c.signed_at && (
-                        <span className="text-[11px] text-green-500">
-                          Assinado {formatDate(c.signed_at)}
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="text-[11px] text-muted-foreground">
+                          {formatDate(c.created_at)}
                         </span>
-                      )}
-                    </div>
-
-                    {c.url_assinatura && c.status === "pendente" && (
-                      <div className="flex items-center gap-2 mt-2 p-2 bg-muted rounded-lg">
-                        <span className="text-[11px] text-muted-foreground truncate flex-1">{c.url_assinatura}</span>
-                        <CopyButton text={c.url_assinatura} />
-                        <a href={c.url_assinatura} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
+                        {c.signed_at && (
+                          <span className="text-[11px] text-green-500">
+                            Assinado {formatDate(c.signed_at)}
+                          </span>
+                        )}
                       </div>
-                    )}
-
-                    {c.url_certificado && (
-                      <a
-                        href={c.url_certificado}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-2 text-[11px] text-primary hover:underline"
-                      >
-                        <ExternalLink className="w-3 h-3" /> Baixar certificado
-                      </a>
-                    )}
+                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    </div>
                   </div>
                 </div>
               </Card>
             )
           })}
         </div>
+
+        {detalhe && (
+          <ContratoDetalheSheet
+            contrato={detalhe}
+            open={!!detalhe}
+            onClose={() => setDetalhe(null)}
+          />
+        )}
       )}
 
       <ContratoNovoSheet
