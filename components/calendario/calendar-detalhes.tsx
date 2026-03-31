@@ -14,10 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { User, Clock, MapPin, Stethoscope, FileText, Tag, Calendar } from "lucide-react"
+import { User, Clock, MapPin, Stethoscope, FileText, Tag, Calendar, FileSignature, MessageCircle } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
+import { useState } from "react"
 import type { Agendamento, AgendaStatus } from "./types"
 import { STATUS_CONFIG, ALL_STATUSES } from "./types"
+import { ContratoNovoSheet } from "@/components/contratos/contrato-novo-sheet"
 
 interface CalendarDetalhesProps {
   agendamento: Agendamento | null
@@ -27,6 +29,8 @@ interface CalendarDetalhesProps {
 }
 
 export function CalendarDetalhes({ agendamento, open, onClose, onStatusChanged }: CalendarDetalhesProps) {
+  const [showContrato, setShowContrato] = useState(false)
+
   if (!agendamento) return null
 
   const statusCfg = STATUS_CONFIG[agendamento.status] || STATUS_CONFIG.AGENDADO
@@ -170,6 +174,18 @@ export function CalendarDetalhes({ agendamento, open, onClose, onStatusChanged }
             </div>
           )}
 
+          {/* Enviar Contrato */}
+          <div className="pt-4 border-t border-border">
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => setShowContrato(true)}
+            >
+              <FileSignature className="w-4 h-4" />
+              Enviar Contrato / Termo
+            </Button>
+          </div>
+
           <div className="space-y-2 pt-4 border-t border-border">
             <p className="text-sm font-semibold text-foreground">Alterar Status</p>
             <Select
@@ -190,6 +206,15 @@ export function CalendarDetalhes({ agendamento, open, onClose, onStatusChanged }
           </div>
         </div>
       </SheetContent>
+
+      <ContratoNovoSheet
+        open={showContrato}
+        onClose={() => setShowContrato(false)}
+        onSuccess={() => setShowContrato(false)}
+        pacienteId={agendamento.id_paciente}
+        nomePaciente={agendamento.nome_paciente ?? ""}
+        emailPaciente={agendamento.email_paciente ?? ""}
+      />
     </Sheet>
   )
 }

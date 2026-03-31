@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { FileSignature, Plus, Clock, CheckCircle2, XCircle, AlertCircle, ChevronRight } from "lucide-react"
+import { FileSignature, Plus, Clock, CheckCircle2, XCircle, AlertCircle, ChevronRight, Search, RefreshCw } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ContratoNovoSheet } from "./contrato-novo-sheet"
 import { ContratoDetalheSheet } from "./contrato-detalhe-sheet"
 
@@ -56,6 +57,8 @@ export function ContratosContent() {
   const [loading, setLoading] = useState(true)
   const [showNovo, setShowNovo] = useState(false)
   const [detalhe, setDetalhe] = useState<Contrato | null>(null)
+  const [busca, setBusca] = useState("")
+  const [syncing, setSyncing] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -68,23 +71,45 @@ export function ContratosContent() {
     }
   }
 
+  async function syncAll() {
+    setSyncing(true)
+    await fetch("/api/assinafy/sync", { method: "POST" })
+    await load()
+    setSyncing(false)
+  }
+
   useEffect(() => { load() }, [])
+
+  const filtrados = busca.length < 2 ? contratos : contratos.filter((c) => {
+    const q = busca.toLowerCase()
+    return (c.titulo?.toLowerCase().includes(q)) ||
+      (c.nome_paciente?.toLowerCase().includes(q)) ||
+      (c.email_paciente?.toLowerCase().includes(q))
+  })
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{contratos.length} contrato{contratos.length !== 1 ? "s" : ""}</p>
-        <Button size="sm" onClick={() => setShowNovo(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Novo Contrato
-        </Button>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input placeholder="Buscar contrato, paciente..." value={busca} onChange={(e) => setBusca(e.target.value)} className="pl-9 h-9" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={syncAll} disabled={syncing} className="gap-1.5 h-9">
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} /> Sincronizar
+          </Button>
+          <Button size="sm" onClick={() => setShowNovo(true)} className="gap-2 h-9">
+            <Plus className="w-4 h-4" /> Novo Contrato
+          </Button>
+        </div>
       </div>
+      <p className="text-xs text-muted-foreground">{filtrados.length} contrato{filtrados.length !== 1 ? "s" : ""}</p>
 
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="animate-spin h-6 w-6 border-b-2 border-primary rounded-full" />
         </div>
-      ) : contratos.length === 0 ? (
+      ) : filtrados.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
             <FileSignature className="w-7 h-7 text-muted-foreground" />
@@ -99,7 +124,7 @@ export function ContratosContent() {
         </div>
       ) : (
         <div className="space-y-2">
-          {contratos.map((c) => {
+          {filtrados.map((c) => {
             const s = STATUS_MAP[c.status]
             return (
               <Card
