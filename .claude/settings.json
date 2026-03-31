@@ -10,7 +10,8 @@
       "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO build)",
       "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO add @supabase/ssr)",
       "WebFetch(domain:www.assinafy.com.br)",
-      "WebFetch(domain:api.assinafy.com.br)"
+      "WebFetch(domain:api.assinafy.com.br)",
+      "Bash(find /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO -path */.next -prune -o -path */node_modules -prune -o -type f \\\\\\(-name *.sql -o -name *migration* -o -name *schema* \\\\\\) -print)"
     ]
   }
 }

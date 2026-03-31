@@ -5,7 +5,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Upload, FileText, X, Loader2, CheckCircle2, Copy, Check, Search, User } from "lucide-react"
+import {
+  Upload, FileText, X, Loader2, CheckCircle2, Copy, Check,
+  Search, User, Stethoscope, FileSignature,
+} from "lucide-react"
 import { useUser } from "@/context/user-context"
 import { createClient } from "@supabase/supabase-js"
 
@@ -24,6 +27,20 @@ interface PacienteResult {
   telefone_celular: string | null
 }
 
+interface Procedimento {
+  id: number
+  nome: string
+  tipo: string
+  valor: number
+}
+
+interface Template {
+  id: string
+  nome: string
+  descricao: string | null
+  storage_path: string
+}
+
 interface Props {
   open: boolean
   onClose: () => void
@@ -39,6 +56,7 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
   const { user } = useUser()
   const fileRef = useRef<HTMLInputElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
+  const servicoRef = useRef<HTMLDivElement>(null)
 
   const [step, setStep] = useState<Step>("form")
   const [file, setFile] = useState<File | null>(null)
@@ -52,110 +70,146 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
   const [signingUrl, setSigningUrl] = useState("")
   const [copied, setCopied] = useState(false)
 
-  // Busca de paciente
+  // Paciente search
   const [searchTerm, setSearchTerm] = useState(nomePaciente ?? "")
   const [searchResults, setSearchResults] = useState<PacienteResult[]>([])
   const [searching, setSearching] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [pacienteSelecionado, setPacienteSelecionado] = useState<PacienteResult | null>(null)
 
-  // Fechar dropdown ao clicar fora
+  // Serviço search
+  const [servicoTerm, setServicoTerm] = useState("")
+  const [servicoResults, setServicoResults] = useState<Procedimento[]>([])
+  const [servicoBuscando, setServicoBuscando] = useState(false)
+  const [showServicoDropdown, setShowServicoDropdown] = useState(false)
+  const [servicoSelecionado, setServicoSelecionado] = useState<Procedimento | null>(null)
+
+  // Templates
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [templateSelecionado, setTemplateSelecionado] = useState<Template | null>(null)
+  const [loadingTemplates, setLoadingTemplates] = useState(false)
+
+  // Carregar templates ao abrir
+  useEffect(() => {
+    if (open) {
+      setLoadingTemplates(true)
+      fetch("/api/assinafy/templates")
+        .then((r) => r.json())
+        .then((d) => setTemplates(d.templates ?? []))
+        .finally(() => setLoadingTemplates(false))
+    }
+  }, [open])
+
+  // Fechar dropdowns ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowDropdown(false)
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowDropdown(false)
+      if (servicoRef.current && !servicoRef.current.contains(e.target as Node)) setShowServicoDropdown(false)
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Debounce da busca
+  // Paciente debounce
   useEffect(() => {
-    if (pacienteId) return // já veio preenchido
-    if (searchTerm.length < 2) {
-      setSearchResults([])
-      setShowDropdown(false)
-      return
-    }
-    const timeout = setTimeout(() => buscarPacientes(searchTerm), 300)
-    return () => clearTimeout(timeout)
+    if (pacienteId) return
+    if (searchTerm.length < 2) { setSearchResults([]); setShowDropdown(false); return }
+    const t = setTimeout(() => buscarPacientes(searchTerm), 300)
+    return () => clearTimeout(t)
   }, [searchTerm])
+
+  // Serviço debounce
+  useEffect(() => {
+    if (servicoTerm.length < 2) { setServicoResults([]); setShowServicoDropdown(false); return }
+    const t = setTimeout(() => buscarServicos(servicoTerm), 300)
+    return () => clearTimeout(t)
+  }, [servicoTerm])
 
   async function buscarPacientes(term: string) {
     setSearching(true)
     try {
-      const supabase = getSupabase()
-      const { data } = await supabase
-        .from("pacientes")
-        .select("id, nome, cpf_cnpj, email, telefone_celular")
-        .or(`nome.ilike.%${term}%,cpf_cnpj.ilike.%${term}%`)
-        .eq("ativo", true)
-        .limit(8)
+      const { data } = await getSupabase()
+        .from("pacientes").select("id, nome, cpf_cnpj, email, telefone_celular")
+        .or(`nome.ilike.%${term}%,cpf_cnpj.ilike.%${term}%`).eq("ativo", true).limit(8)
       setSearchResults(data ?? [])
       setShowDropdown((data?.length ?? 0) > 0)
-    } finally {
-      setSearching(false)
-    }
+    } finally { setSearching(false) }
+  }
+
+  async function buscarServicos(term: string) {
+    setServicoBuscando(true)
+    try {
+      const { data } = await getSupabase()
+        .from("procedimentos_clinica").select("id, nome, tipo, valor")
+        .ilike("nome", `%${term}%`).eq("ativo", true).limit(8)
+      setServicoResults(data ?? [])
+      setShowServicoDropdown((data?.length ?? 0) > 0)
+    } finally { setServicoBuscando(false) }
   }
 
   function selecionarPaciente(p: PacienteResult) {
-    setPacienteSelecionado(p)
-    setSearchTerm(p.nome)
-    setPacId(String(p.id))
-    setNome(p.nome)
-    setEmail(p.email ?? "")
-    setWhatsapp(p.telefone_celular ?? "")
-    setShowDropdown(false)
-    setSearchResults([])
+    setPacienteSelecionado(p); setSearchTerm(p.nome); setPacId(String(p.id))
+    setNome(p.nome); setEmail(p.email ?? ""); setWhatsapp(p.telefone_celular ?? "")
+    setShowDropdown(false); setSearchResults([])
   }
 
   function limparPaciente() {
-    setPacienteSelecionado(null)
-    setSearchTerm("")
-    setPacId("")
-    setNome("")
-    setEmail("")
-    setWhatsapp("")
+    setPacienteSelecionado(null); setSearchTerm(""); setPacId(""); setNome(""); setEmail(""); setWhatsapp("")
   }
+
+  function selecionarServico(p: Procedimento) {
+    setServicoSelecionado(p); setServicoTerm(p.nome)
+    setShowServicoDropdown(false); setServicoResults([])
+  }
+
+  function limparServico() { setServicoSelecionado(null); setServicoTerm("") }
+
+  function selecionarTemplate(t: Template) {
+    setTemplateSelecionado(t)
+    setFile(null) // limpa upload manual
+    if (!titulo) setTitulo(t.nome) // preenche título se vazio
+  }
+
+  function limparTemplate() { setTemplateSelecionado(null) }
 
   function reset() {
-    setStep("form")
-    setFile(null)
-    setTitulo("")
-    setNome(nomePaciente ?? "")
-    setEmail(emailPaciente ?? "")
-    setWhatsapp("")
-    setPacId(pacienteId ? String(pacienteId) : "")
-    setMensagem("")
-    setErroMsg("")
-    setSigningUrl("")
-    setCopied(false)
-    setSearchTerm(nomePaciente ?? "")
-    setPacienteSelecionado(null)
-    setSearchResults([])
-    setShowDropdown(false)
+    setStep("form"); setFile(null); setTitulo(""); setNome(nomePaciente ?? ""); setEmail(emailPaciente ?? "")
+    setWhatsapp(""); setPacId(pacienteId ? String(pacienteId) : ""); setMensagem(""); setErroMsg("")
+    setSigningUrl(""); setCopied(false); setSearchTerm(nomePaciente ?? "")
+    setPacienteSelecionado(null); setSearchResults([]); setShowDropdown(false)
+    setServicoSelecionado(null); setServicoTerm(""); setServicoResults([]); setShowServicoDropdown(false)
+    setTemplateSelecionado(null)
   }
 
-  function handleClose() {
-    reset()
-    onClose()
-  }
+  function handleClose() { reset(); onClose() }
 
   function copyUrl() {
-    navigator.clipboard.writeText(signingUrl)
-    setCopied(true)
+    navigator.clipboard.writeText(signingUrl); setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!file || !titulo || !nome || !email || !pacId) return
+    if ((!file && !templateSelecionado) || !titulo || !nome || !email || !pacId) return
 
     try {
       setStep("uploading")
+      let uploadFile = file
+
+      // Se template selecionado, baixar PDF do storage
+      if (!uploadFile && templateSelecionado) {
+        const supabase = getSupabase()
+        const { data: blob } = await supabase.storage
+          .from("contrato-templates")
+          .download(templateSelecionado.storage_path)
+        if (!blob) throw new Error("Erro ao baixar template.")
+        uploadFile = new File([blob], `${templateSelecionado.nome}.pdf`, { type: "application/pdf" })
+      }
+
+      if (!uploadFile) throw new Error("Nenhum arquivo selecionado.")
+
       const form = new FormData()
-      form.append("file", file, file.name)
+      form.append("file", uploadFile, uploadFile.name)
       const uploadRes = await fetch("/api/assinafy/upload", { method: "POST", body: form })
       const uploadData = await uploadRes.json()
       if (!uploadRes.ok) throw new Error(uploadData.error || "Erro no upload.")
@@ -171,6 +225,7 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
           email_paciente: email,
           whatsapp: whatsapp || undefined,
           mensagem: mensagem || undefined,
+          servico_nome: servicoSelecionado?.nome || undefined,
           assinafy_document_id: uploadData.document_id,
           created_by: user?.id,
         }),
@@ -186,7 +241,8 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
     }
   }
 
-  const canSubmit = !!file && !!titulo && !!nome && !!email && !!pacId
+  const hasFile = !!file || !!templateSelecionado
+  const canSubmit = hasFile && !!titulo && !!nome && !!email && !!pacId
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -200,18 +256,24 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
             {/* Título */}
             <div className="space-y-1.5">
               <Label>Título do contrato</Label>
-              <Input
-                placeholder="Ex: Termo de Consentimento"
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-                required
-              />
+              <Input placeholder="Ex: Termo de Consentimento" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
             </div>
 
-            {/* PDF */}
+            {/* Template ou Upload */}
             <div className="space-y-1.5">
-              <Label>Arquivo PDF</Label>
-              {file ? (
+              <Label>Documento</Label>
+              {templateSelecionado ? (
+                <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                  <FileSignature className="w-4 h-4 text-primary shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{templateSelecionado.nome}</p>
+                    <p className="text-xs text-muted-foreground">Template salvo</p>
+                  </div>
+                  <button type="button" onClick={limparTemplate} className="text-muted-foreground hover:text-foreground">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : file ? (
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <FileText className="w-4 h-4 text-primary shrink-0" />
                   <span className="text-sm truncate flex-1">{file.name}</span>
@@ -220,23 +282,43 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground"
-                >
-                  <Upload className="w-5 h-5" />
-                  <span className="text-sm">Clique para selecionar o PDF</span>
-                  <span className="text-xs">Máximo 25MB</span>
-                </button>
+                <div className="space-y-2">
+                  {/* Templates disponíveis */}
+                  {templates.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs text-muted-foreground">Usar um template</p>
+                      <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
+                        {templates.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => selecionarTemplate(t)}
+                            className="flex items-center gap-2 p-2 bg-muted rounded-lg hover:bg-accent transition-colors text-left"
+                          >
+                            <FileSignature className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <span className="text-xs font-medium text-foreground truncate">{t.nome}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-px bg-border" />
+                        <span className="text-[10px] text-muted-foreground">ou</span>
+                        <div className="flex-1 h-px bg-border" />
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-5 hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground"
+                  >
+                    <Upload className="w-5 h-5" />
+                    <span className="text-sm">Enviar PDF</span>
+                    <span className="text-xs">Máximo 25MB</span>
+                  </button>
+                </div>
               )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
+              <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setTemplateSelecionado(null) }} />
             </div>
 
             {/* Busca de Paciente */}
@@ -260,34 +342,19 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
                   <div ref={searchRef} className="relative">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                      {searching && (
-                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
-                      )}
-                      <Input
-                        placeholder="Buscar por nome ou CPF..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
-                        className="pl-9"
-                      />
+                      {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
+                      <Input placeholder="Buscar por nome ou CPF..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onFocus={() => searchResults.length > 0 && setShowDropdown(true)} className="pl-9" />
                     </div>
                     {showDropdown && searchResults.length > 0 && (
-                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
                         {searchResults.map((p) => (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => selecionarPaciente(p)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left"
-                          >
+                          <button key={p.id} type="button" onClick={() => selecionarPaciente(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
                             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                               <User className="w-3.5 h-3.5 text-primary" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">{p.nome}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {p.email ?? "sem e-mail"} · ID {p.id}
-                              </p>
+                              <p className="text-xs text-muted-foreground">{p.email ?? "sem e-mail"} · ID {p.id}</p>
                             </div>
                           </button>
                         ))}
@@ -298,43 +365,63 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
               </div>
             )}
 
-            {/* E-mail (editável caso precise corrigir) */}
+            {/* Serviço / Procedimento */}
+            <div className="space-y-1.5">
+              <Label>Serviço <span className="text-muted-foreground text-xs">(opcional)</span></Label>
+              {servicoSelecionado ? (
+                <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                  <Stethoscope className="w-4 h-4 text-primary shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{servicoSelecionado.nome}</p>
+                    <p className="text-xs text-muted-foreground">{servicoSelecionado.tipo}</p>
+                  </div>
+                  <button type="button" onClick={limparServico} className="text-muted-foreground hover:text-foreground">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div ref={servicoRef} className="relative">
+                  <div className="relative">
+                    <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    {servicoBuscando && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
+                    <Input placeholder="Buscar procedimento..." value={servicoTerm} onChange={(e) => setServicoTerm(e.target.value)} onFocus={() => servicoResults.length > 0 && setShowServicoDropdown(true)} className="pl-9" />
+                  </div>
+                  {showServicoDropdown && servicoResults.length > 0 && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+                      {servicoResults.map((p) => (
+                        <button key={p.id} type="button" onClick={() => selecionarServico(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
+                          <Stethoscope className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{p.nome}</p>
+                            <p className="text-xs text-muted-foreground">{p.tipo}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* E-mail */}
             <div className="space-y-1.5">
               <Label>E-mail para assinatura</Label>
-              <Input
-                type="email"
-                placeholder="email@exemplo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Input type="email" placeholder="email@exemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
               <Label>WhatsApp <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Input
-                placeholder="+5511999990000"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-              />
+              <Input placeholder="+5511999990000" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
             </div>
 
             <div className="space-y-1.5">
               <Label>Mensagem <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Input
-                placeholder="Mensagem para o paciente"
-                value={mensagem}
-                onChange={(e) => setMensagem(e.target.value)}
-              />
+              <Input placeholder="Mensagem para o paciente" value={mensagem} onChange={(e) => setMensagem(e.target.value)} />
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="flex-1" disabled={!canSubmit}>
-                Enviar para Assinatura
-              </Button>
+              <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>Cancelar</Button>
+              <Button type="submit" className="flex-1" disabled={!canSubmit}>Enviar para Assinatura</Button>
             </div>
           </form>
         )}
@@ -342,9 +429,7 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
         {(step === "uploading" || step === "sending") && (
           <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-sm font-medium">
-              {step === "uploading" ? "Fazendo upload do documento..." : "Enviando para assinatura..."}
-            </p>
+            <p className="text-sm font-medium">{step === "uploading" ? "Fazendo upload do documento..." : "Enviando para assinatura..."}</p>
             <p className="text-xs text-muted-foreground">Aguarde um momento</p>
           </div>
         )}
@@ -356,9 +441,7 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">Contrato enviado com sucesso!</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                O paciente receberá o link por e-mail para assinar.
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">O paciente receberá o link por e-mail para assinar.</p>
             </div>
             {signingUrl && (
               <div className="w-full">
@@ -371,9 +454,7 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
                 </div>
               </div>
             )}
-            <Button className="w-full mt-2" onClick={() => { reset(); onSuccess() }}>
-              Concluir
-            </Button>
+            <Button className="w-full mt-2" onClick={() => { reset(); onSuccess() }}>Concluir</Button>
           </div>
         )}
 

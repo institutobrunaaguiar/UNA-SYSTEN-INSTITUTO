@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     whatsapp,
     mensagem,
     assinafy_document_id,
+    servico_nome,
     created_by,
   } = body
 
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
       assinafy_document_id,
       assinafy_assignment_id: assignment_id ?? null,
       assinafy_signer_id: signer_id,
+      servico_nome: servico_nome || null,
       status: "pendente",
       url_assinatura: signing_url ?? null,
       created_by: created_by || null,
