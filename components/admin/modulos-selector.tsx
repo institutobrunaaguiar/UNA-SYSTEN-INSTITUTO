@@ -6,6 +6,7 @@ import {
   BarChart3,
   Stethoscope,
   Settings,
+  FileSignature,
 } from "lucide-react"
 
 export const MODULOS = [
@@ -14,6 +15,7 @@ export const MODULOS = [
   { key: "calendario",  label: "Calendário",  icon: Calendar },
   { key: "relatorios",  label: "Relatórios",  icon: BarChart3 },
   { key: "pacientes",   label: "Pacientes",   icon: Stethoscope },
+  { key: "contratos",   label: "Contratos",   icon: FileSignature },
   { key: "admin",       label: "Admin",       icon: Settings },
 ] as const
 

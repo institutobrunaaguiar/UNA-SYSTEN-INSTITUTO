@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3,
-  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X,
+  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature,
 } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { cn } from "@/lib/utils"
@@ -20,9 +20,10 @@ const mainItems = [
 ]
 
 const moreItems = [
-  { icon: DollarSign, label: "Comissão", href: "/comissao" },
-  { icon: Megaphone, label: "Campanha", href: "/campanha" },
-  { icon: Settings, label: "Admin", href: "/settings" },
+  { icon: DollarSign,    label: "Comissão",  href: "/comissao" },
+  { icon: Megaphone,     label: "Campanha",  href: "/campanha" },
+  { icon: FileSignature, label: "Contratos", href: "/contratos" },
+  { icon: Settings,      label: "Admin",     href: "/settings" },
 ]
 
 const hiddenPaths = ["/login", "/logout"]

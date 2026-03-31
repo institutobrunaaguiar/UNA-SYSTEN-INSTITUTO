@@ -21,7 +21,9 @@ import {
   User,
   Clock,
   AlertCircle,
+  FileSignature,
 } from "lucide-react"
+import { TabContratos } from "@/components/contratos/tab-contratos"
 
 export interface Paciente {
   id: number
@@ -317,15 +319,18 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
             </SheetHeader>
 
             <Tabs defaultValue="dados" className="mt-4">
-              <TabsList className="w-full grid grid-cols-3">
+              <TabsList className="w-full grid grid-cols-4">
                 <TabsTrigger value="dados" className="text-xs gap-1.5">
                   <User className="w-3.5 h-3.5" />Dados
                 </TabsTrigger>
                 <TabsTrigger value="agendamentos" className="text-xs gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />Agendamentos
+                  <Calendar className="w-3.5 h-3.5" />Agenda
                 </TabsTrigger>
                 <TabsTrigger value="orcamentos" className="text-xs gap-1.5">
                   <FileText className="w-3.5 h-3.5" />Orçamentos
+                </TabsTrigger>
+                <TabsTrigger value="contratos" className="text-xs gap-1.5">
+                  <FileSignature className="w-3.5 h-3.5" />Contratos
                 </TabsTrigger>
               </TabsList>
 
@@ -362,6 +367,14 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
 
               <TabsContent value="orcamentos">
                 <TabOrcamentos pacienteId={paciente.id} />
+              </TabsContent>
+
+              <TabsContent value="contratos">
+                <TabContratos
+                  pacienteId={paciente.id}
+                  nomePaciente={paciente.nome}
+                  emailPaciente={paciente.email}
+                />
               </TabsContent>
             </Tabs>
           </>
