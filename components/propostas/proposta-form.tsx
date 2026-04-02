@@ -48,6 +48,9 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
   const [pacienteId, setPacienteId] = useState<number | null>(proposta?.paciente_id ?? null)
   const [nomeCliente, setNomeCliente] = useState(proposta?.nome_cliente ?? "")
   const [cpfCliente, setCpfCliente] = useState(proposta?.cpf_cliente ?? "")
+  const [dataProposta, setDataProposta] = useState(
+    proposta?.data_proposta ?? new Date().toISOString().split("T")[0]
+  )
 
   // Step 2 state
   const [itens, setItens] = useState<PropostaItem[]>(proposta?.itens ?? [])
@@ -140,6 +143,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
         fluxo_caixa_imediato: finalEntrada,
         status,
         observacoes: observacoes || null,
+        data_proposta: dataProposta,
       }
 
       if (proposta) {
@@ -218,6 +222,8 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
               setNomeCliente(p.nome)
               setCpfCliente(p.cpf)
             }}
+            dataProposta={dataProposta}
+            onDataChange={setDataProposta}
           />
         )}
         {step === 2 && (
