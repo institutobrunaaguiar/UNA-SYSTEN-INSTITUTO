@@ -18,6 +18,7 @@ export interface Proposta {
   observacoes: string | null
   created_at: string
   updated_at: string
+  data_proposta: string  // formato ISO: "YYYY-MM-DD"
 }
 
 export interface PropostaItem {
