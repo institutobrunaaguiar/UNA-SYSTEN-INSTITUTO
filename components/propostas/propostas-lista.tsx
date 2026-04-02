@@ -168,7 +168,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
   const propostasPorDia: Record<string, Proposta[]> = {}
   filtered.forEach((p) => {
-    const key = getDateKey(p.created_at)
+    const key = p.data_proposta
     if (!propostasPorDia[key]) propostasPorDia[key] = []
     propostasPorDia[key].push(p)
   })
