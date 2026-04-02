@@ -75,6 +75,14 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 <p className="text-muted-foreground">CPF</p>
                 <p className="font-medium">{proposta.cpf_cliente || "Nao informado"}</p>
               </div>
+              <div>
+                <p className="text-muted-foreground">Data da Proposta</p>
+                <p className="font-medium">
+                  {proposta.data_proposta
+                    ? new Date(proposta.data_proposta + "T12:00:00").toLocaleDateString("pt-BR")
+                    : "Nao informado"}
+                </p>
+              </div>
             </div>
           </div>
 
