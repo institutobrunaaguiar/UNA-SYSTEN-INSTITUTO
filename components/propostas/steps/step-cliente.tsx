@@ -14,9 +14,11 @@ interface StepClienteProps {
   nomeCliente: string
   cpfCliente: string
   onSelect: (paciente: { id: number; nome: string; cpf: string }) => void
+  dataProposta: string
+  onDataChange: (date: string) => void
 }
 
-export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect }: StepClienteProps) {
+export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect, dataProposta, onDataChange }: StepClienteProps) {
   const [search, setSearch] = useState(nomeCliente || "")
   const [results, setResults] = useState<Paciente[]>([])
   const [searching, setSearching] = useState(false)
@@ -174,6 +176,16 @@ export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect }: S
             </button>
           </div>
         )}
+      </div>
+
+      <div>
+        <Label className="text-sm font-medium mb-2 block">Data da Proposta</Label>
+        <Input
+          type="date"
+          value={dataProposta}
+          onChange={(e) => onDataChange(e.target.value)}
+          className="w-full"
+        />
       </div>
 
       {selected && (
