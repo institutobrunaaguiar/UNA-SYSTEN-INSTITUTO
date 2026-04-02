@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Search, UserPlus, Check } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Search, UserPlus, Check, CalendarIcon } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
 import type { Paciente } from "../types"
 
@@ -180,12 +182,34 @@ export function StepCliente({ pacienteId, nomeCliente, cpfCliente, onSelect, dat
 
       <div>
         <Label className="text-sm font-medium mb-2 block">Data da Proposta</Label>
-        <Input
-          type="date"
-          value={dataProposta}
-          onChange={(e) => onDataChange(e.target.value)}
-          className="w-full"
-        />
+        <div className="flex gap-2">
+          <Input
+            type="date"
+            value={dataProposta}
+            onChange={(e) => onDataChange(e.target.value)}
+            className="flex-1"
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="outline" size="icon" className="shrink-0">
+                <CalendarIcon className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={dataProposta ? new Date(dataProposta + "T12:00:00") : undefined}
+                onSelect={(date) => {
+                  if (date) {
+                    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+                    onDataChange(iso)
+                  }
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       {selected && (
