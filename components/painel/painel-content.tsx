@@ -6,12 +6,24 @@ import { createClient } from "@supabase/supabase-js"
 import { PainelKpis, type PainelKpisData } from "./painel-kpis"
 import { PainelChart, type MesData } from "./painel-chart"
 import { PainelPipeline, type PainelPipelineData } from "./painel-pipeline"
+import { PainelRankings } from "./painel-rankings"
+import { PainelRecentes } from "./painel-recentes"
+
+interface PropostaItem {
+  procedimentoNome: string
+  profissionalNome: string
+  valor_final: number
+}
 
 interface PropostaRaw {
+  id: number
   valor_total: number
   status: string
   created_at: string
   updated_at: string
+  nome_cliente: string
+  itens: PropostaItem[]
+  data_proposta: string
 }
 
 const MESES_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
@@ -56,7 +68,12 @@ function computeKpis(propostas: PropostaRaw[]): PainelKpisData {
   const recebidoMesAnterior = pagasMesAnterior.reduce((s, p) => s + p.valor_total, 0)
   const aReceberValor = aReceber.reduce((s, p) => s + p.valor_total, 0)
   const ticketMedio = pagasMes.length > 0 ? recebidoMes / pagasMes.length : 0
-  const conversao = totalNaoPerdidas.length > 0 ? (pagasMes.length / totalNaoPerdidas.length) * 100 : 0
+  const conversao = totalNaoPerdidas.length > 0 ? (pagas.length / totalNaoPerdidas.length) * 100 : 0
+
+  const propostasMes = propostas.filter((p) => {
+    const d = new Date(p.created_at)
+    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual
+  }).length
 
   return {
     recebidoMes,
@@ -64,8 +81,9 @@ function computeKpis(propostas: PropostaRaw[]): PainelKpisData {
     aReceber: aReceberValor,
     aReceberCount: aReceber.length,
     ticketMedio,
-    totalPropostas: pagasMes.length,
+    totalPropostasPagas: pagasMes.length,
     conversao,
+    propostasMes,
   }
 }
 
@@ -120,6 +138,75 @@ function computePipeline(propostas: PropostaRaw[]): PainelPipelineData {
   }
 }
 
+export interface RankingProfissional {
+  nome: string
+  iniciais: string
+  valor: number
+}
+
+export interface RankingProcedimento {
+  nome: string
+  count: number
+  valor: number
+}
+
+export interface PropostaRecente {
+  id: number
+  nomeCliente: string
+  procedimentos: string
+  valorTotal: number
+  status: string
+}
+
+function computeRankingProfissionais(propostas: PropostaRaw[]): RankingProfissional[] {
+  const pagas = propostas.filter((p) => p.status === "pago")
+  const map = new Map<string, number>()
+  pagas.forEach((p) => {
+    p.itens.forEach((item) => {
+      if (!item.profissionalNome) return
+      map.set(item.profissionalNome, (map.get(item.profissionalNome) || 0) + item.valor_final)
+    })
+  })
+  return Array.from(map.entries())
+    .map(([nome, valor]) => ({
+      nome,
+      iniciais: nome.split(" ").filter(Boolean).map((w) => w[0]).join("").slice(0, 2).toUpperCase(),
+      valor,
+    }))
+    .sort((a, b) => b.valor - a.valor)
+    .slice(0, 3)
+}
+
+function computeRankingProcedimentos(propostas: PropostaRaw[]): RankingProcedimento[] {
+  const pagas = propostas.filter((p) => p.status === "pago")
+  const mapValor = new Map<string, number>()
+  const mapCount = new Map<string, number>()
+  pagas.forEach((p) => {
+    p.itens.forEach((item) => {
+      if (!item.procedimentoNome) return
+      mapValor.set(item.procedimentoNome, (mapValor.get(item.procedimentoNome) || 0) + item.valor_final)
+      mapCount.set(item.procedimentoNome, (mapCount.get(item.procedimentoNome) || 0) + 1)
+    })
+  })
+  return Array.from(mapValor.entries())
+    .map(([nome, valor]) => ({ nome, count: mapCount.get(nome) || 0, valor }))
+    .sort((a, b) => b.valor - a.valor)
+    .slice(0, 3)
+}
+
+function getPropostasRecentes(propostas: PropostaRaw[]): PropostaRecente[] {
+  return [...propostas]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5)
+    .map((p) => ({
+      id: p.id,
+      nomeCliente: p.nome_cliente,
+      procedimentos: p.itens.map((i) => i.procedimentoNome).join(", "),
+      valorTotal: p.valor_total,
+      status: p.status,
+    }))
+}
+
 export function PainelContent() {
   const [propostas, setPropostas] = useState<PropostaRaw[]>([])
   const [loading, setLoading] = useState(true)
@@ -130,7 +217,7 @@ export function PainelContent() {
         const supabase = getSupabase()
         const { data } = await supabase
           .from("propostas")
-          .select("valor_total, status, created_at, updated_at")
+          .select("id, valor_total, status, created_at, updated_at, nome_cliente, itens, data_proposta")
           .gte("created_at", startOfYear())
           .lte("created_at", endOfYear())
         if (data) setPropostas(data as PropostaRaw[])
@@ -154,14 +241,21 @@ export function PainelContent() {
   const kpisData = computeKpis(propostas)
   const chartData = computeChart(propostas)
   const pipelineData = computePipeline(propostas)
+  const rankingProfissionais = computeRankingProfissionais(propostas)
+  const rankingProcedimentos = computeRankingProcedimentos(propostas)
+  const propostasRecentes = getPropostasRecentes(propostas)
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-4">
-        <PainelKpis data={kpisData} />
+    <div className="space-y-6">
+      <PainelKpis data={kpisData} />
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
         <PainelChart dados={chartData} />
+        <PainelRankings profissionais={rankingProfissionais} procedimentos={rankingProcedimentos} />
       </div>
-      <PainelPipeline data={pipelineData} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <PainelPipeline data={pipelineData} />
+        <PainelRecentes propostas={propostasRecentes} />
+      </div>
     </div>
   )
 }
