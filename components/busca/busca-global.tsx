@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { FileText, Search, User } from "lucide-react"
 import { algoliasearch } from "algoliasearch"
 import styles from "./busca-trigger.module.css"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import {
   Command,
   CommandInput,
@@ -154,6 +154,7 @@ export function BuscaGlobal() {
       {/* Dialog — Command com shouldFilter={false} para não sobrescrever o Algolia */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent className="overflow-hidden p-0 gap-0 shadow-2xl max-w-xl">
+          <DialogTitle className="sr-only">Buscar paciente ou proposta</DialogTitle>
           <Command shouldFilter={false} className="rounded-lg border-0">
             <div className="flex items-center border-b border-border px-3">
               <Search className="w-4 h-4 text-muted-foreground shrink-0 mr-2" />
