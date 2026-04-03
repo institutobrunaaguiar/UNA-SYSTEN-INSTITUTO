@@ -18,6 +18,7 @@ import {
   CheckCircle,
   XCircle,
   ShieldCheck,
+  RotateCcw,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -171,6 +172,27 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         .eq("id", proposta.id)
       if (error) {
         console.error("[propostas] Erro ao aprovar:", error.message)
+        return
+      }
+      fetchPropostas()
+    } catch (error) {
+      console.error("[propostas] Erro:", error)
+    }
+  }
+
+  async function handleCancelarValidacao(proposta: Proposta) {
+    try {
+      const supabase = getSupabase()
+      const { error } = await supabase
+        .from("propostas")
+        .update({
+          validacao_status: "pendente",
+          validacao_motivo: null,
+          validado_em: null,
+        })
+        .eq("id", proposta.id)
+      if (error) {
+        console.error("[propostas] Erro ao cancelar validação:", error.message)
         return
       }
       fetchPropostas()
@@ -554,6 +576,11 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                               {proposta.validacao_status !== "reprovada" && (
                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}>
                                   <XCircle className="w-4 h-4 mr-2 text-red-500" /> Reprovar
+                                </DropdownMenuItem>
+                              )}
+                              {proposta.validacao_status !== "pendente" && (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCancelarValidacao(proposta) }}>
+                                  <RotateCcw className="w-4 h-4 mr-2 text-muted-foreground" /> Cancelar Validação
                                 </DropdownMenuItem>
                               )}
                             </>
