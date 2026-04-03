@@ -53,6 +53,9 @@ export function PropostasContent() {
         ...rest,
         nome_cliente: `${proposta.nome_cliente} (copia)`,
         status: "em_negociacao",
+        validacao_status: "pendente",
+        validacao_motivo: null,
+        validado_em: null,
       })
       setListKey((k) => k + 1)
     } catch (error) {
