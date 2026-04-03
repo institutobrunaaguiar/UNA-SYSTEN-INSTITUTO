@@ -8,6 +8,13 @@ import { PainelChart, type MesData } from "./painel-chart"
 import { PainelPipeline, type PainelPipelineData } from "./painel-pipeline"
 import { PainelRankings } from "./painel-rankings"
 import { PainelRecentes } from "./painel-recentes"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface PropostaItem {
   procedimentoNome: string
@@ -207,9 +214,45 @@ function getPropostasRecentes(propostas: PropostaRaw[]): PropostaRecente[] {
     }))
 }
 
+type Periodo = "este_mes" | "mes_passado" | "trimestre" | "ano"
+
+const PERIODOS: { value: Periodo; label: string }[] = [
+  { value: "este_mes", label: "Este mês" },
+  { value: "mes_passado", label: "Mês passado" },
+  { value: "trimestre", label: "Último trimestre" },
+  { value: "ano", label: "Este ano" },
+]
+
+function getDateRange(periodo: Periodo): { start: Date; end: Date } {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = now.getMonth()
+  switch (periodo) {
+    case "este_mes":
+      return { start: new Date(y, m, 1), end: new Date(y, m + 1, 0, 23, 59, 59) }
+    case "mes_passado":
+      return { start: new Date(y, m - 1, 1), end: new Date(y, m, 0, 23, 59, 59) }
+    case "trimestre":
+      return { start: new Date(y, m - 2, 1), end: new Date(y, m + 1, 0, 23, 59, 59) }
+    case "ano":
+    default:
+      return { start: new Date(y, 0, 1), end: new Date(y, 11, 31, 23, 59, 59) }
+  }
+}
+
+function filterByPeriodo(propostas: PropostaRaw[], periodo: Periodo): PropostaRaw[] {
+  if (periodo === "ano") return propostas
+  const { start, end } = getDateRange(periodo)
+  return propostas.filter((p) => {
+    const d = new Date(p.created_at)
+    return d >= start && d <= end
+  })
+}
+
 export function PainelContent() {
   const [propostas, setPropostas] = useState<PropostaRaw[]>([])
   const [loading, setLoading] = useState(true)
+  const [periodo, setPeriodo] = useState<Periodo>("ano")
 
   useEffect(() => {
     async function fetchData() {
@@ -238,15 +281,31 @@ export function PainelContent() {
     )
   }
 
-  const kpisData = computeKpis(propostas)
-  const chartData = computeChart(propostas)
-  const pipelineData = computePipeline(propostas)
-  const rankingProfissionais = computeRankingProfissionais(propostas)
-  const rankingProcedimentos = computeRankingProcedimentos(propostas)
-  const propostasRecentes = getPropostasRecentes(propostas)
+  const filtered = filterByPeriodo(propostas, periodo)
+  const kpisData = computeKpis(filtered)
+  const chartData = computeChart(filtered)
+  const pipelineData = computePipeline(filtered)
+  const rankingProfissionais = computeRankingProfissionais(filtered)
+  const rankingProcedimentos = computeRankingProcedimentos(filtered)
+  const propostasRecentes = getPropostasRecentes(filtered)
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div />
+        <Select value={periodo} onValueChange={(v) => setPeriodo(v as Periodo)}>
+          <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIODOS.map((p) => (
+              <SelectItem key={p.value} value={p.value} className="text-xs">
+                {p.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <PainelKpis data={kpisData} />
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
         <PainelChart dados={chartData} />
