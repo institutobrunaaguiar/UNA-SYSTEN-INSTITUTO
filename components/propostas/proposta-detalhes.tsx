@@ -7,9 +7,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock } from "lucide-react"
-import type { Proposta } from "./types"
-import { STATUS_CONFIG } from "./types"
+import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck } from "lucide-react"
+import type { Proposta, ValidacaoStatus } from "./types"
+import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
 
 interface PropostaDetalhesProps {
   proposta: Proposta | null
@@ -169,6 +169,34 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap">{proposta.observacoes}</p>
             </div>
           )}
+
+          {/* Auditoria */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ShieldCheck className="w-4 h-4 text-primary" />
+              Auditoria
+            </div>
+            <div className="pl-6 space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Status:</span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${VALIDACAO_CONFIG[proposta.validacao_status as ValidacaoStatus]?.color ?? "bg-yellow-50 text-yellow-700"}`}>
+                  {VALIDACAO_CONFIG[proposta.validacao_status as ValidacaoStatus]?.label ?? "Pendente"}
+                </span>
+              </div>
+              {proposta.validacao_status === "reprovada" && proposta.validacao_motivo && (
+                <div>
+                  <span className="text-muted-foreground">Motivo:</span>
+                  <p className="mt-1 text-sm text-foreground bg-red-50 p-2 rounded-md">{proposta.validacao_motivo}</p>
+                </div>
+              )}
+              {proposta.validado_em && (
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Validado em:</span>
+                  <span className="text-foreground">{formatDate(proposta.validado_em)}</span>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Timestamps */}
           <div className="space-y-1 text-xs text-muted-foreground">
