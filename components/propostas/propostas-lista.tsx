@@ -15,6 +15,9 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  CheckCircle,
+  XCircle,
+  ShieldCheck,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -38,7 +41,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { createClient } from "@supabase/supabase-js"
 import type { Proposta, PropostaStatus } from "./types"
-import { STATUS_CONFIG } from "./types"
+import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
+import { useUser } from "@/context/user-context"
+import { ValidacaoReprovarDialog } from "./validacao-reprovar-dialog"
 
 interface PropostasListaProps {
   onNovaProposta: () => void
@@ -60,6 +65,11 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const { user } = useUser()
+  const isAdmin = user?.role === "admin"
+  const [abaValidacao, setAbaValidacao] = useState(false)
+  const [reprovarProposta, setReprovarProposta] = useState<Proposta | null>(null)
+  const [reprovarSaving, setReprovarSaving] = useState(false)
 
   useEffect(() => {
     fetchPropostas()
@@ -149,6 +159,52 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     }
   }
 
+  async function handleAprovar(proposta: Proposta) {
+    try {
+      const supabase = getSupabase()
+      const { error } = await supabase
+        .from("propostas")
+        .update({
+          validacao_status: "aprovada",
+          validado_em: new Date().toISOString(),
+        })
+        .eq("id", proposta.id)
+      if (error) {
+        console.error("[propostas] Erro ao aprovar:", error.message)
+        return
+      }
+      fetchPropostas()
+    } catch (error) {
+      console.error("[propostas] Erro:", error)
+    }
+  }
+
+  async function handleReprovar(motivo: string) {
+    if (!reprovarProposta) return
+    try {
+      setReprovarSaving(true)
+      const supabase = getSupabase()
+      const { error } = await supabase
+        .from("propostas")
+        .update({
+          validacao_status: "reprovada",
+          validacao_motivo: motivo,
+          validado_em: new Date().toISOString(),
+        })
+        .eq("id", reprovarProposta.id)
+      if (error) {
+        console.error("[propostas] Erro ao reprovar:", error.message)
+        return
+      }
+      setReprovarProposta(null)
+      fetchPropostas()
+    } catch (error) {
+      console.error("[propostas] Erro:", error)
+    } finally {
+      setReprovarSaving(false)
+    }
+  }
+
   // Filtrar propostas
   const filtered = propostas.filter((p) => {
     const term = searchTerm.toLowerCase()
@@ -222,6 +278,10 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     recusada: propostas.filter((p) => p.status === "recusada").length,
   }
 
+  const pendentesValidacao = propostas.filter(
+    (p) => p.status === "pago" && p.validacao_status === "pendente"
+  )
+
   function formatCurrency(value: number) {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
   }
@@ -256,18 +316,46 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       </div>
 
       {/* Filtros de status */}
-      <div className="flex gap-2 flex-wrap">
-        {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
+      {!abaValidacao && (
+        <div className="flex gap-2 flex-wrap">
+          {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
+            <Button
+              key={status}
+              variant={filterStatus === status ? "default" : "outline"}
+              onClick={() => setFilterStatus(status)}
+              size="sm"
+            >
+              {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="flex gap-2">
           <Button
-            key={status}
-            variant={filterStatus === status ? "default" : "outline"}
-            onClick={() => setFilterStatus(status)}
+            variant={!abaValidacao ? "default" : "outline"}
             size="sm"
+            onClick={() => setAbaValidacao(false)}
           >
-            {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
+            Propostas
           </Button>
-        ))}
-      </div>
+          <Button
+            variant={abaValidacao ? "default" : "outline"}
+            size="sm"
+            onClick={() => setAbaValidacao(true)}
+            className="gap-1.5"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Validação
+            {pendentesValidacao.length > 0 && (
+              <span className="ml-1 bg-yellow-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                {pendentesValidacao.length}
+              </span>
+            )}
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <Card className="p-12 flex items-center justify-center">
@@ -277,6 +365,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           </div>
         </Card>
       ) : (
+        <>
+        {!abaValidacao && (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
           {/* Calendario */}
           <Card className="p-4">
@@ -400,6 +490,11 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
                             {STATUS_CONFIG[proposta.status].label}
                           </span>
+                          {proposta.validacao_status && proposta.validacao_status !== "pendente" && (
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${VALIDACAO_CONFIG[proposta.validacao_status].color}`}>
+                              {VALIDACAO_CONFIG[proposta.validacao_status].label}
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm font-semibold text-foreground truncate">{proposta.nome_cliente}</p>
                         <p className="text-xs text-muted-foreground truncate">
@@ -448,6 +543,21 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                               ))}
                             </DropdownMenuSubContent>
                           </DropdownMenuSub>
+                          {isAdmin && proposta.status === "pago" && (
+                            <>
+                              <DropdownMenuSeparator />
+                              {proposta.validacao_status !== "aprovada" && (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}>
+                                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> Aprovar
+                                </DropdownMenuItem>
+                              )}
+                              {proposta.validacao_status !== "reprovada" && (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}>
+                                  <XCircle className="w-4 h-4 mr-2 text-red-500" /> Reprovar
+                                </DropdownMenuItem>
+                              )}
+                            </>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-destructive"
@@ -464,6 +574,69 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             )}
           </div>
         </div>
+        )}
+
+        {abaValidacao && (
+          <div className="space-y-3">
+            {pendentesValidacao.length === 0 ? (
+              <Card className="p-8 text-center">
+                <ShieldCheck className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Nenhuma proposta pendente de validação.</p>
+              </Card>
+            ) : (
+              pendentesValidacao.map((proposta) => (
+                <Card
+                  key={proposta.id}
+                  className="p-4 hover:shadow-md transition-all duration-200"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs text-muted-foreground">#{proposta.id}</span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
+                          {STATUS_CONFIG[proposta.status].label}
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{proposta.nome_cliente}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
+                      </p>
+                      <div className="flex items-center gap-4 mt-2">
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(proposta.valor_total)}</span>
+                        {proposta.valor_desconto_protocolo > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            Desconto: {formatCurrency(proposta.valor_desconto_protocolo)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 ml-3 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                        onClick={() => handleAprovar(proposta)}
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Aprovar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => setReprovarProposta(proposta)}
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        Reprovar
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
+        </>
       )}
 
       <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -486,6 +659,14 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ValidacaoReprovarDialog
+        open={reprovarProposta !== null}
+        onClose={() => setReprovarProposta(null)}
+        onConfirm={handleReprovar}
+        saving={reprovarSaving}
+        nomeCliente={reprovarProposta?.nome_cliente ?? ""}
+      />
     </div>
   )
 }
