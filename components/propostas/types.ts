@@ -19,6 +19,9 @@ export interface Proposta {
   created_at: string
   updated_at: string
   data_proposta: string  // formato ISO: "YYYY-MM-DD"
+  validacao_status: "pendente" | "aprovada" | "reprovada"
+  validacao_motivo: string | null
+  validado_em: string | null
 }
 
 export interface PropostaItem {
@@ -33,6 +36,14 @@ export interface PropostaItem {
 }
 
 export type PropostaStatus = "em_negociacao" | "aguardando_pagamento" | "pago" | "recusada"
+
+export type ValidacaoStatus = "pendente" | "aprovada" | "reprovada"
+
+export const VALIDACAO_CONFIG: Record<ValidacaoStatus, { label: string; color: string }> = {
+  pendente: { label: "Pendente", color: "bg-yellow-50 text-yellow-700" },
+  aprovada: { label: "Aprovada", color: "bg-green-50 text-green-700" },
+  reprovada: { label: "Reprovada", color: "bg-red-50 text-red-700" },
+}
 
 export type CenarioTipo = "agressivo" | "balanceado" | "conservador" | "personalizado"
 
