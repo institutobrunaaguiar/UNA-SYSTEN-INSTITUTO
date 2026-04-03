@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3, Settings,
-  HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone, UserCircle, FileSignature,
+  HelpCircle, LogOut, Stethoscope, DollarSign, Megaphone, UserCircle, FileSignature, ShieldCheck,
 } from "lucide-react"
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar"
 import { motion } from "motion/react"
@@ -14,6 +14,7 @@ import { useUser } from "@/context/user-context"
 const menuItems = [
   { icon: LayoutDashboard, label: "Painel",     href: "/painel",    modulo: "painel" },
   { icon: CheckSquare,    label: "Proposta",    href: "/proposta",  modulo: "proposta" },
+  { icon: ShieldCheck,    label: "Aprovadas",   href: "/aprovadas", modulo: "aprovadas" },
   { icon: Calendar,       label: "Calendário",  href: "/calendar",  modulo: "calendario" },
   { icon: BarChart3,      label: "Relatórios",  href: "/analytics", modulo: "relatorios" },
   { icon: Stethoscope,    label: "Pacientes",   href: "/pacientes", modulo: "pacientes" },
