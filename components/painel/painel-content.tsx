@@ -9,6 +9,7 @@ import { PainelPipeline, type PainelPipelineData } from "./painel-pipeline"
 import { PainelRankings } from "./painel-rankings"
 import { PainelRecentes } from "./painel-recentes"
 import { PainelAgenda } from "./painel-agenda"
+import { PainelComissoes } from "./painel-comissoes"
 import {
   Select,
   SelectContent,
@@ -317,6 +318,7 @@ export function PainelContent() {
         <PainelRecentes propostas={propostasRecentes} />
       </div>
       <PainelAgenda />
+      <PainelComissoes />
     </div>
   )
 }
