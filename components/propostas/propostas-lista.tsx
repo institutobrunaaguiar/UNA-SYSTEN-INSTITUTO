@@ -614,7 +614,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
               pendentesValidacao.map((proposta) => (
                 <Card
                   key={proposta.id}
-                  className="p-4 hover:shadow-md transition-all duration-200"
+                  className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
+                  onClick={() => onVerDetalhes(proposta)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -642,7 +643,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                         size="sm"
                         variant="outline"
                         className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
-                        onClick={() => handleAprovar(proposta)}
+                        onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}
                       >
                         <CheckCircle className="w-3.5 h-3.5" />
                         Aprovar
@@ -651,7 +652,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                         size="sm"
                         variant="outline"
                         className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => setReprovarProposta(proposta)}
+                        onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}
                       >
                         <XCircle className="w-3.5 h-3.5" />
                         Reprovar
