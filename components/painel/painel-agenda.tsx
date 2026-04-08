@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Calendar } from "lucide-react"
 
@@ -33,15 +33,12 @@ interface AgendaKpis {
   comparecimento: string
 }
 
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  )
-}
-
 function getToday(): string {
-  return new Date().toISOString().split("T")[0]
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, "0")
+  const d = String(now.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
 }
 
 function getMonthRange(): { start: string; end: string } {
@@ -96,6 +93,7 @@ export function PainelAgenda() {
   const [agendaHoje, setAgendaHoje] = useState<AgendaCompleta[]>([])
   const [kpis, setKpis] = useState<AgendaKpis>({ hoje: 0, confirmados: 0, canceladosMes: 0, comparecimento: "—" })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -104,7 +102,7 @@ export function PainelAgenda() {
         const today = getToday()
         const { start, end } = getMonthRange()
 
-        const [{ data: hojeData }, { data: mesData }] = await Promise.all([
+        const [{ data: hojeData, error: erroHoje }, { data: mesData, error: erroMes }] = await Promise.all([
           supabase
             .from("agenda_completa")
             .select("id, data_agenda, hora_inicio, hora_fim, profissional, local_agenda, rotulo, tipo_consulta, status_agenda, observacoes")
@@ -116,6 +114,12 @@ export function PainelAgenda() {
             .gte("data", start)
             .lte("data", end),
         ])
+
+        if (erroHoje || erroMes) {
+          console.error("[painel-agenda] erro Supabase:", erroHoje ?? erroMes)
+          setError(true)
+          return
+        }
 
         const agenda: AgendaCompleta[] = (hojeData as AgendaCompleta[]) || []
         const mes: AgendaMes[] = (mesData as AgendaMes[]) || []
@@ -131,6 +135,14 @@ export function PainelAgenda() {
     fetchData()
   }, [])
 
+  if (error) {
+    return (
+      <p className="text-xs text-destructive text-center py-6">
+        Erro ao carregar agenda. Tente recarregar a página.
+      </p>
+    )
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -144,11 +156,6 @@ export function PainelAgenda() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Calendar className="w-4 h-4 text-muted-foreground" />
-        <p className="text-sm font-semibold text-foreground">Agenda &amp; Operação</p>
-      </div>
-
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="p-4 bg-white border border-border rounded-xl">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Hoje</p>
