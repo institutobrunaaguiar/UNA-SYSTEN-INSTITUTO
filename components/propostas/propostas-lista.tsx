@@ -40,6 +40,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { createClient } from "@supabase/supabase-js"
 import type { Proposta, PropostaStatus } from "./types"
 import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
@@ -69,6 +76,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   const { user } = useUser()
   const isAdmin = user?.role === "admin"
   const [abaValidacao, setAbaValidacao] = useState(false)
+  const [validacaoMes, setValidacaoMes] = useState<string>("todos")
   const [reprovarProposta, setReprovarProposta] = useState<Proposta | null>(null)
   const [reprovarSaving, setReprovarSaving] = useState(false)
 
@@ -300,9 +308,32 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     recusada: propostas.filter((p) => p.status === "recusada").length,
   }
 
-  const pendentesValidacao = propostas.filter(
+  const pendentesValidacaoAll = propostas.filter(
     (p) => p.status === "pago" && p.validacao_status === "pendente"
   )
+
+  const validacaoMeses = (() => {
+    const MESES_LABEL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+    const set = new Set<string>()
+    pendentesValidacaoAll.forEach((p) => {
+      const d = new Date(p.data_proposta + "T12:00:00")
+      set.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`)
+    })
+    return Array.from(set)
+      .sort((a, b) => b.localeCompare(a))
+      .map((key) => {
+        const [ano, mes] = key.split("-")
+        return { value: key, label: `${MESES_LABEL[parseInt(mes) - 1]} ${ano}` }
+      })
+  })()
+
+  const pendentesValidacao = validacaoMes === "todos"
+    ? pendentesValidacaoAll
+    : pendentesValidacaoAll.filter((p) => {
+        const d = new Date(p.data_proposta + "T12:00:00")
+        const mesAno = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+        return mesAno === validacaoMes
+      })
 
   function formatCurrency(value: number) {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
@@ -605,6 +636,24 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
         {abaValidacao && (
           <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Select value={validacaoMes} onValueChange={setValidacaoMes}>
+                <SelectTrigger className="w-[200px] bg-white border border-border rounded-lg text-xs">
+                  <SelectValue placeholder="Filtrar por mês" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos" className="text-xs">Todos os meses</SelectItem>
+                  {validacaoMeses.map((m) => (
+                    <SelectItem key={m.value} value={m.value} className="text-xs">
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="text-xs text-muted-foreground">
+                {pendentesValidacao.length} {pendentesValidacao.length === 1 ? "proposta" : "propostas"} pendente{pendentesValidacao.length !== 1 ? "s" : ""}
+              </span>
+            </div>
             {pendentesValidacao.length === 0 ? (
               <Card className="p-8 text-center">
                 <ShieldCheck className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
