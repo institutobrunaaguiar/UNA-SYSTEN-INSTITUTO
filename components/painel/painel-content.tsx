@@ -10,6 +10,7 @@ import { PainelRankings } from "./painel-rankings"
 import { PainelRecentes } from "./painel-recentes"
 import { PainelAgenda } from "./painel-agenda"
 import { PainelComissoes } from "./painel-comissoes"
+import { PainelContratos } from "./painel-contratos"
 import {
   Select,
   SelectContent,
@@ -319,6 +320,7 @@ export function PainelContent() {
       </div>
       <PainelAgenda />
       <PainelComissoes />
+      <PainelContratos />
     </div>
   )
 }
