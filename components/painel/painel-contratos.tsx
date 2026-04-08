@@ -13,7 +13,6 @@ interface Contrato {
   status: "rascunho" | "pendente" | "assinado" | "recusado" | "expirado" | "cancelado"
   nome_paciente: string | null
   created_at: string
-  signed_at: string | null
 }
 
 const STATUS_LABEL: Record<Contrato["status"], string> = {
@@ -31,7 +30,7 @@ const STATUS_CLASS: Record<Contrato["status"], string> = {
   assinado: "bg-green-100 text-green-700",
   recusado: "bg-red-100 text-red-700",
   expirado: "bg-orange-100 text-orange-700",
-  cancelado: "bg-red-100 text-red-700",
+  cancelado: "bg-slate-100 text-slate-700",
 }
 
 export function PainelContratos() {
@@ -47,7 +46,7 @@ export function PainelContratos() {
 
         const { data, error } = await getSupabase()
           .from("contratos")
-          .select("id, titulo, status, nome_paciente, created_at, signed_at")
+          .select("id, titulo, status, nome_paciente, created_at")
           .gte("created_at", ninetyDaysAgo.toISOString())
           .order("created_at", { ascending: false })
 
