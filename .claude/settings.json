@@ -11,7 +11,11 @@
       "Bash(pnpm -C /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO add @supabase/ssr)",
       "WebFetch(domain:www.assinafy.com.br)",
       "WebFetch(domain:api.assinafy.com.br)",
-      "Bash(find /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO -path */.next -prune -o -path */node_modules -prune -o -type f \\\\\\(-name *.sql -o -name *migration* -o -name *schema* \\\\\\) -print)"
+      "Bash(find /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO -path */.next -prune -o -path */node_modules -prune -o -type f \\\\\\(-name *.sql -o -name *migration* -o -name *schema* \\\\\\) -print)",
+      "Bash(/Users/alexrodriguesdossantos/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir /Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO)"
+    ],
+    "additionalDirectories": [
+      "/Users/alexrodriguesdossantos/Projetos/UNA-SYSTEN-INSTITUTO/docs/superpowers/specs"
     ]
   }
 }
