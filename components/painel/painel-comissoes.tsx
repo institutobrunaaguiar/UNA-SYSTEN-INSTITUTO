@@ -31,13 +31,8 @@ interface Meta {
 }
 
 function formatBRL(value: number) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value)
 }
-
-const currentPeriod = (() => {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
-})()
 
 export function PainelComissoes() {
   const [comissoes, setComissoes] = useState<Comissao[]>([])
@@ -48,6 +43,8 @@ export function PainelComissoes() {
   useEffect(() => {
     async function fetchData() {
       try {
+        const now = new Date()
+        const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
         const supabase = getSupabase()
 
         const [{ data: comissoesData, error: erroComissoes }, { data: metasData, error: erroMetas }] =
@@ -128,29 +125,29 @@ export function PainelComissoes() {
     <div className="space-y-4">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="border border-border rounded-xl bg-white p-4 space-y-1">
-          <p className="text-[11px] uppercase text-muted-foreground tracking-wide">Total Comissões</p>
-          <p className="text-2xl font-bold text-foreground">{formatBRL(totalComissoes)}</p>
+        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+          <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Total Comissões</p>
+          <p className="text-2xl font-bold text-foreground leading-tight">{formatBRL(totalComissoes)}</p>
           <p className="text-xs text-muted-foreground">no período</p>
-        </div>
+        </Card>
 
-        <div className="border border-border rounded-xl bg-white p-4 space-y-1">
-          <p className="text-[11px] uppercase text-muted-foreground tracking-wide">Pendentes</p>
-          <p className="text-2xl font-bold text-foreground">{countPendentes}</p>
+        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+          <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Pendentes</p>
+          <p className="text-2xl font-bold text-foreground leading-tight">{countPendentes}</p>
           <p className="text-xs text-muted-foreground">aguardando</p>
-        </div>
+        </Card>
 
-        <div className="border border-border rounded-xl bg-white p-4 space-y-1">
-          <p className="text-[11px] uppercase text-muted-foreground tracking-wide">Aprovadas</p>
-          <p className="text-2xl font-bold text-foreground">{countAprovadas}</p>
+        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+          <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Aprovadas</p>
+          <p className="text-2xl font-bold text-foreground leading-tight">{countAprovadas}</p>
           <p className="text-xs text-muted-foreground">este mês</p>
-        </div>
+        </Card>
 
-        <div className="border border-border rounded-xl bg-white p-4 space-y-1">
-          <p className="text-[11px] uppercase text-muted-foreground tracking-wide">A Pagar</p>
-          <p className="text-2xl font-bold text-foreground">{formatBRL(totalAPagar)}</p>
+        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+          <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">A Pagar</p>
+          <p className="text-2xl font-bold text-foreground leading-tight">{formatBRL(totalAPagar)}</p>
           <p className="text-xs text-muted-foreground">aprovadas</p>
-        </div>
+        </Card>
       </div>
 
       {/* Two-column layout */}
@@ -166,10 +163,10 @@ export function PainelComissoes() {
             <p className="text-xs text-muted-foreground text-center py-6">Nenhuma comissão registrada.</p>
           ) : (
             <div className="flex flex-col gap-3">
-              {topProfissionais.map((prof) => {
+              {topProfissionais.map((prof, idx) => {
                 const pct = Math.round((prof.valor / maxValor) * 100)
                 return (
-                  <div key={prof.nome} className="space-y-1">
+                  <div key={`${prof.nome}-${idx}`} className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-foreground truncate max-w-[60%]">{prof.nome}</span>
                       <span className="text-xs font-semibold text-foreground shrink-0 ml-2">
