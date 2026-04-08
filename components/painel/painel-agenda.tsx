@@ -181,11 +181,6 @@ export function PainelAgenda() {
             <Calendar className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">Agenda de Hoje</p>
           </div>
-          {temMais && (
-            <Link href="/calendario" className="text-[11px] text-blue-500 hover:underline">
-              Ver todos no Calendário →
-            </Link>
-          )}
         </div>
 
         {agendaVisiveis.length === 0 ? (
