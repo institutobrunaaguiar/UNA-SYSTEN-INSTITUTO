@@ -59,7 +59,7 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
       return
     }
     if (dataFim < dataInicio) {
-      toast.error("Preencha todos os campos corretamente.")
+      toast.error("A data fim deve ser posterior à data início.")
       return
     }
 

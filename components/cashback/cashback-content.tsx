@@ -31,6 +31,7 @@ export function CashbackContent() {
       setCampanhas((data as CashbackCampanha[]) || [])
     } catch (err) {
       console.error("[cashback] Erro ao buscar campanhas:", err)
+      toast.error("Erro ao carregar campanhas")
     } finally {
       setLoading(false)
     }
