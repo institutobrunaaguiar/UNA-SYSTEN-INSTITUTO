@@ -27,6 +27,12 @@ export interface Proposta {
   cashback_utilizado?: number | null
 }
 
+export interface CashbackCampanha {
+  id: number
+  nome: string
+  percentual: number
+}
+
 export interface PropostaItem {
   procedimentoId: string
   procedimentoNome: string

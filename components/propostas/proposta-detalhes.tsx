@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck } from "lucide-react"
+import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck, Gift } from "lucide-react"
 import type { Proposta, ValidacaoStatus } from "./types"
 import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
 
@@ -161,6 +161,30 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               </div>
             </div>
           </div>
+
+          {/* Cashback */}
+          {(proposta.cashback_gerado != null && proposta.cashback_gerado > 0) || (proposta.cashback_utilizado != null && proposta.cashback_utilizado > 0) ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Gift className="w-4 h-4 text-primary" />
+                Cashback
+              </div>
+              <div className="pl-6 space-y-1 text-sm">
+                {proposta.cashback_gerado != null && proposta.cashback_gerado > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Cashback gerado</span>
+                    <span className="text-green-700 font-medium">+ {formatCurrency(proposta.cashback_gerado)}</span>
+                  </div>
+                )}
+                {proposta.cashback_utilizado != null && proposta.cashback_utilizado > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Cashback utilizado</span>
+                    <span className="text-orange-700 font-medium">- {formatCurrency(proposta.cashback_utilizado)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
 
           {/* Observacoes */}
           {proposta.observacoes && (

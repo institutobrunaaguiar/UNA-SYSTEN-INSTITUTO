@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS cashback_transacoes (
   id serial PRIMARY KEY,
-  paciente_id int NOT NULL,
-  proposta_id int NOT NULL,
+  paciente_id int NOT NULL REFERENCES pacientes(id) ON DELETE CASCADE,
+  proposta_id int NOT NULL REFERENCES propostas(id) ON DELETE CASCADE,
   tipo text NOT NULL CHECK (tipo IN ('gerado', 'utilizado')),
   valor numeric(12,2) NOT NULL CHECK (valor > 0),
   campanha_id int REFERENCES cashback_campanhas(id) ON DELETE SET NULL,

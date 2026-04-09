@@ -251,6 +251,9 @@ export function StepResumo({
               <span className="text-muted-foreground">Saldo disponivel do cliente</span>
               <span className="font-medium text-green-700">{formatCurrency(pacienteSaldo)}</span>
             </div>
+            <p className="text-[10px] text-muted-foreground">
+              Saldo ja considera restricoes por profissional desta proposta.
+            </p>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Usar cashback (abatimento)</Label>
               <Input
@@ -261,7 +264,7 @@ export function StepResumo({
                 value={cashbackUtilizado || ""}
                 onChange={(e) => {
                   const val = parseFloat(e.target.value) || 0
-                  onCashbackUtilizadoChange(Math.min(val, pacienteSaldo))
+                  onCashbackUtilizadoChange(Math.min(val, pacienteSaldo, valorTotal))
                 }}
                 placeholder="R$ 0,00"
                 className="w-40"

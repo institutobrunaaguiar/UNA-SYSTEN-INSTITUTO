@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { CashbackContent } from "@/components/cashback/cashback-content"
+import { CashbackPageContent } from "@/components/cashback/cashback-page-content"
 
 export default function CashbackPage() {
   return (
@@ -11,7 +11,7 @@ export default function CashbackPage() {
       <main className="flex-1 p-3 md:p-4 lg:p-5 lg:ml-[68px] dock-spacer">
         <Header title="Cashback" description="Gerencie campanhas de cashback e saldos de clientes." />
         <div className="mt-4 md:mt-5">
-          <CashbackContent />
+          <CashbackPageContent />
         </div>
       </main>
     </div>
