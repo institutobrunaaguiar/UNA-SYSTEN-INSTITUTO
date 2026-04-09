@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, ArrowRight, Save, Loader2 } from "lucide-react"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabase } from "@/lib/supabase/client"
 import { StepCliente } from "./steps/step-cliente"
 import { StepProcedimentos } from "./steps/step-procedimentos"
 import { StepCenarios } from "./steps/step-cenarios"
@@ -71,6 +71,12 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
   const [observacoes, setObservacoes] = useState(proposta?.observacoes ?? "")
   const [status, setStatus] = useState<PropostaStatus>(proposta?.status ?? "em_negociacao")
 
+  // Cashback state
+  const [cashbackCampanhas, setCashbackCampanhas] = useState<{ id: number; nome: string; percentual: number }[]>([])
+  const [pacienteSaldo, setPacienteSaldo] = useState(0)
+  const [cashbackCampanhaId, setCashbackCampanhaId] = useState<number | null>(proposta?.cashback_campanha_id ?? null)
+  const [cashbackUtilizado, setCashbackUtilizado] = useState(proposta?.cashback_utilizado ?? 0)
+
   // Recalculate cenario when itens change
   useEffect(() => {
     if (itens.length === 0) return
@@ -82,12 +88,39 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
     }
   }, [itens, cenarioTipo])
 
-  function getSupabase() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-    if (!url || !key) throw new Error("Supabase nao configurado")
-    return createClient(url, key)
-  }
+  // Fetch active cashback campaigns
+  useEffect(() => {
+    async function fetchCampanhas() {
+      const supabase = getSupabase()
+      const today = new Date().toISOString().split("T")[0]
+      const { data } = await supabase
+        .from("cashback_campanhas")
+        .select("id, nome, percentual")
+        .eq("ativa", true)
+        .lte("data_inicio", today)
+        .gte("data_fim", today)
+      if (data) setCashbackCampanhas(data)
+    }
+    fetchCampanhas()
+  }, [])
+
+  // Fetch patient cashback balance when pacienteId changes
+  useEffect(() => {
+    if (!pacienteId) { setPacienteSaldo(0); return }
+    async function fetchSaldo() {
+      const supabase = getSupabase()
+      const { data } = await supabase
+        .from("cashback_transacoes")
+        .select("tipo, valor")
+        .eq("paciente_id", pacienteId)
+      if (data) {
+        const gerado = data.filter((t: { tipo: string; valor: number }) => t.tipo === "gerado").reduce((s: number, t: { tipo: string; valor: number }) => s + t.valor, 0)
+        const utilizado = data.filter((t: { tipo: string; valor: number }) => t.tipo === "utilizado").reduce((s: number, t: { tipo: string; valor: number }) => s + t.valor, 0)
+        setPacienteSaldo(Math.max(0, gerado - utilizado))
+      }
+    }
+    fetchSaldo()
+  }, [pacienteId])
 
   function handleCenarioChange(tipo: CenarioTipo, entrada: number, parcelas: number) {
     setCenarioTipo(tipo)
@@ -116,15 +149,21 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
       const descontoItens = itens.reduce((sum, item) => sum + (item.valor - item.valor_final), 0)
       const descontoProtocolo = calcDescontoProtocolo()
       const valorTotal = subtotal - descontoProtocolo
+      const valorTotalFinal = valorTotal - (cashbackUtilizado || 0)
 
-      // Recalc entrada based on valorTotal (not subtotal)
+      // Recalc entrada based on valorTotalFinal (not subtotal)
       let finalEntrada = valorEntrada
       let finalParcelas = numParcelas
       if (cenarioTipo !== "personalizado") {
         const config = CENARIOS[cenarioTipo]
-        finalEntrada = (valorTotal * config.entrada_pct) / 100
+        finalEntrada = (valorTotalFinal * config.entrada_pct) / 100
         finalParcelas = config.parcelas
       }
+
+      const campanhaSelecionada = cashbackCampanhas.find((c) => c.id === cashbackCampanhaId)
+      const cashbackGerado = campanhaSelecionada
+        ? (valorTotalFinal * campanhaSelecionada.percentual) / 100
+        : 0
 
       const payload = {
         paciente_id: pacienteId,
@@ -136,7 +175,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
         desconto_protocolo_percentual: descontoProtocoloTipo === "percentual" ? descontoProtocoloValor : 0,
         desconto_protocolo_valor: descontoProtocoloTipo === "valor" ? descontoProtocoloValor : 0,
         valor_desconto_protocolo: descontoProtocolo,
-        valor_total: valorTotal,
+        valor_total: valorTotalFinal,
         cenario_tipo: cenarioTipo,
         valor_entrada: finalEntrada,
         num_parcelas: finalParcelas,
@@ -144,19 +183,64 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
         status,
         observacoes: observacoes || null,
         data_proposta: dataProposta,
+        cashback_campanha_id: cashbackCampanhaId || null,
+        cashback_gerado: cashbackGerado || null,
+        cashback_utilizado: cashbackUtilizado || null,
       }
 
       if (proposta) {
-        const { error } = await supabase.from("propostas").update(payload).eq("id", proposta.id)
+        const propostaId = proposta.id
+        const { error } = await supabase.from("propostas").update(payload).eq("id", propostaId)
         if (error) {
           console.error("[propostas] Erro ao atualizar:", error.message)
           return
         }
+        if (cashbackGerado > 0 && pacienteId) {
+          await supabase.from("cashback_transacoes").insert({
+            paciente_id: pacienteId,
+            proposta_id: propostaId,
+            tipo: "gerado",
+            valor: cashbackGerado,
+            campanha_id: cashbackCampanhaId,
+          })
+        }
+        if (cashbackUtilizado > 0 && pacienteId) {
+          await supabase.from("cashback_transacoes").insert({
+            paciente_id: pacienteId,
+            proposta_id: propostaId,
+            tipo: "utilizado",
+            valor: cashbackUtilizado,
+            campanha_id: null,
+          })
+        }
       } else {
-        const { error } = await supabase.from("propostas").insert(payload)
+        const { data: propostaData, error } = await supabase
+          .from("propostas")
+          .insert(payload)
+          .select("id")
+          .single()
         if (error) {
           console.error("[propostas] Erro ao criar:", error.message)
           return
+        }
+        const propostaId = propostaData.id
+        if (cashbackGerado > 0 && pacienteId) {
+          await supabase.from("cashback_transacoes").insert({
+            paciente_id: pacienteId,
+            proposta_id: propostaId,
+            tipo: "gerado",
+            valor: cashbackGerado,
+            campanha_id: cashbackCampanhaId,
+          })
+        }
+        if (cashbackUtilizado > 0 && pacienteId) {
+          await supabase.from("cashback_transacoes").insert({
+            paciente_id: pacienteId,
+            proposta_id: propostaId,
+            tipo: "utilizado",
+            valor: cashbackUtilizado,
+            campanha_id: null,
+          })
         }
       }
 
@@ -259,6 +343,12 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
             }}
             onObservacoesChange={setObservacoes}
             onStatusChange={setStatus}
+            cashbackCampanhas={cashbackCampanhas}
+            pacienteSaldo={pacienteSaldo}
+            cashbackCampanhaId={cashbackCampanhaId}
+            cashbackUtilizado={cashbackUtilizado}
+            onCashbackCampanhaChange={setCashbackCampanhaId}
+            onCashbackUtilizadoChange={setCashbackUtilizado}
           />
         )}
       </Card>

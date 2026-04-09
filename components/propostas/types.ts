@@ -22,6 +22,9 @@ export interface Proposta {
   validacao_status: "pendente" | "aprovada" | "reprovada"
   validacao_motivo: string | null
   validado_em: string | null
+  cashback_campanha_id?: number | null
+  cashback_gerado?: number | null
+  cashback_utilizado?: number | null
 }
 
 export interface PropostaItem {

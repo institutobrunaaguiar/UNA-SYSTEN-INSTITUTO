@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Percent, DollarSign, User, Stethoscope, CreditCard, FileText, Tag } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Percent, DollarSign, User, Stethoscope, CreditCard, FileText, Tag, Gift } from "lucide-react"
 import type { PropostaItem, CenarioTipo, TaxasMDR, PropostaStatus } from "../types"
 import { CENARIOS, STATUS_CONFIG } from "../types"
 
@@ -24,6 +25,12 @@ interface StepResumoProps {
   onDescontoProtocoloChange: (tipo: "percentual" | "valor" | null, valor: number) => void
   onObservacoesChange: (obs: string) => void
   onStatusChange: (status: PropostaStatus) => void
+  cashbackCampanhas: { id: number; nome: string; percentual: number }[]
+  pacienteSaldo: number
+  cashbackCampanhaId: number | null
+  cashbackUtilizado: number
+  onCashbackCampanhaChange: (id: number | null) => void
+  onCashbackUtilizadoChange: (valor: number) => void
 }
 
 export function StepResumo({
@@ -41,6 +48,12 @@ export function StepResumo({
   onDescontoProtocoloChange,
   onObservacoesChange,
   onStatusChange,
+  cashbackCampanhas,
+  pacienteSaldo,
+  cashbackCampanhaId,
+  cashbackUtilizado,
+  onCashbackCampanhaChange,
+  onCashbackUtilizadoChange,
 }: StepResumoProps) {
   const subtotal = itens.reduce((sum, item) => sum + item.valor_final, 0)
   const descontoItens = itens.reduce((sum, item) => sum + (item.valor - item.valor_final), 0)
@@ -53,10 +66,15 @@ export function StepResumo({
 
   const descontoProtocolo = calcDescontoProtocolo()
   const valorTotal = subtotal - descontoProtocolo
-  const valorParcela = numParcelas > 0 ? (valorTotal - valorEntrada) / numParcelas : 0
+
+  const campanhaSelecionada = cashbackCampanhas.find((c) => c.id === cashbackCampanhaId) ?? null
+  const cashbackGerado = campanhaSelecionada ? (valorTotal * campanhaSelecionada.percentual) / 100 : 0
+  const valorTotalFinal = valorTotal - cashbackUtilizado
+
+  const valorParcela = numParcelas > 0 ? (valorTotalFinal - valorEntrada) / numParcelas : 0
 
   function calcMDR(): number {
-    const valorParcelado = valorTotal - valorEntrada
+    const valorParcelado = valorTotalFinal - valorEntrada
     if (valorParcelado <= 0 || numParcelas === 0) return 0
     let taxa = taxas.parcelado_2_6
     if (numParcelas > 6) taxa = taxas.parcelado_7_12
@@ -64,7 +82,7 @@ export function StepResumo({
   }
 
   const custoMDR = calcMDR()
-  const valorLiquido = valorTotal - custoMDR
+  const valorLiquido = valorTotalFinal - custoMDR
 
   function formatCurrency(value: number) {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
@@ -189,6 +207,70 @@ export function StepResumo({
         </div>
       </Card>
 
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <Gift className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">Cashback</h3>
+        </div>
+
+        {cashbackCampanhas.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nenhuma campanha de cashback ativa no momento.</p>
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Campanha</Label>
+              <Select
+                value={cashbackCampanhaId?.toString() ?? "nenhuma"}
+                onValueChange={(v) => onCashbackCampanhaChange(v === "nenhuma" ? null : Number(v))}
+              >
+                <SelectTrigger className="text-sm">
+                  <SelectValue placeholder="Selecionar campanha..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nenhuma">Nenhuma</SelectItem>
+                  {cashbackCampanhas.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.nome} ({c.percentual}%)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {cashbackCampanhaId && (
+              <p className="text-sm text-green-700 font-medium">
+                Cashback a gerar: {formatCurrency(cashbackGerado)} ({campanhaSelecionada?.percentual}%)
+              </p>
+            )}
+          </div>
+        )}
+
+        {pacienteSaldo > 0 && (
+          <div className="space-y-2 pt-2 border-t border-border">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Saldo disponivel do cliente</span>
+              <span className="font-medium text-green-700">{formatCurrency(pacienteSaldo)}</span>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Usar cashback (abatimento)</Label>
+              <Input
+                type="number"
+                min={0}
+                max={pacienteSaldo}
+                step={0.01}
+                value={cashbackUtilizado || ""}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value) || 0
+                  onCashbackUtilizadoChange(Math.min(val, pacienteSaldo))
+                }}
+                placeholder="R$ 0,00"
+                className="w-40"
+              />
+            </div>
+          </div>
+        )}
+      </Card>
+
       <Card className="p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Tag className="w-4 h-4 text-primary" />
@@ -241,10 +323,22 @@ export function StepResumo({
               <span className="text-destructive">- {formatCurrency(descontoProtocolo)}</span>
             </div>
           )}
+          {cashbackUtilizado > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Cashback utilizado</span>
+              <span className="text-green-700">- {formatCurrency(cashbackUtilizado)}</span>
+            </div>
+          )}
           <div className="flex justify-between border-t border-border pt-2">
             <span className="font-semibold text-foreground">Valor Total</span>
-            <span className="text-lg font-bold text-foreground">{formatCurrency(valorTotal)}</span>
+            <span className="text-lg font-bold text-foreground">{formatCurrency(valorTotalFinal)}</span>
           </div>
+          {cashbackGerado > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Cashback a receber</span>
+              <span className="text-green-700">+ {formatCurrency(cashbackGerado)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-muted-foreground">Custo MDR</span>
             <span className="text-destructive">- {formatCurrency(custoMDR)}</span>
