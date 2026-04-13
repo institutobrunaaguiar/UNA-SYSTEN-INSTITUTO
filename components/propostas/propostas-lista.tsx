@@ -347,9 +347,9 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Header: busca + botao */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div className="flex-1 relative">
           <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -370,13 +370,14 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
       {/* Filtros de status */}
       {!abaValidacao && (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none">
           {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
             <Button
               key={status}
               variant={filterStatus === status ? "default" : "outline"}
               onClick={() => setFilterStatus(status)}
               size="sm"
+              className="shrink-0 text-xs sm:text-sm"
             >
               {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
             </Button>
@@ -420,13 +421,13 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       ) : (
         <>
         {!abaValidacao && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 sm:gap-6">
           {/* Calendario */}
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             {/* Navegacao do mes */}
             <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
-                <ChevronLeft className="w-4 h-4" />
+              <Button variant="ghost" size="icon" onClick={prevMonth} className="h-10 w-10 sm:h-8 sm:w-8">
+                <ChevronLeft className="w-5 h-5 sm:w-4 sm:h-4" />
               </Button>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold text-foreground">
@@ -436,8 +437,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   Hoje
                 </Button>
               </div>
-              <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
-                <ChevronRight className="w-4 h-4" />
+              <Button variant="ghost" size="icon" onClick={nextMonth} className="h-10 w-10 sm:h-8 sm:w-8">
+                <ChevronRight className="w-5 h-5 sm:w-4 sm:h-4" />
               </Button>
             </div>
 
@@ -454,7 +455,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, i) => {
                 if (day === null) {
-                  return <div key={`empty-${i}`} className="h-10" />
+                  return <div key={`empty-${i}`} className="h-11 sm:h-10" />
                 }
                 const dayKey = getDayKey(day)
                 const dayPropostas = propostasPorDia[dayKey] || []
@@ -467,7 +468,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                     key={dayKey}
                     type="button"
                     onClick={() => setSelectedDay(dayKey)}
-                    className={`h-10 rounded-lg text-sm relative transition-all duration-200 flex flex-col items-center justify-center ${
+                    className={`h-11 sm:h-10 rounded-lg text-sm relative transition-all duration-200 flex flex-col items-center justify-center ${
                       isSelected
                         ? "bg-primary text-primary-foreground font-semibold"
                         : isToday
@@ -569,7 +570,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onVerDetalhes(proposta) }}>
                             <Eye className="w-4 h-4 mr-2" /> Ver detalhes
                           </DropdownMenuItem>
@@ -636,9 +637,9 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
         {abaValidacao && (
           <div className="space-y-3">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <Select value={validacaoMes} onValueChange={setValidacaoMes}>
-                <SelectTrigger className="w-[200px] bg-white border border-border rounded-lg text-xs">
+                <SelectTrigger className="w-full sm:w-[200px] bg-white border border-border rounded-lg text-xs">
                   <SelectValue placeholder="Filtrar por mês" />
                 </SelectTrigger>
                 <SelectContent>
@@ -666,9 +667,9 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
                   onClick={() => onVerDetalhes(proposta)}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-xs text-muted-foreground">#{proposta.id}</span>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
                           {STATUS_CONFIG[proposta.status].label}
@@ -687,11 +688,11 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                         )}
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-3 shrink-0">
+                    <div className="flex gap-2 mt-3 sm:mt-0 sm:ml-3 shrink-0">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                        className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50 flex-1 sm:flex-none"
                         onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}
                       >
                         <CheckCircle className="w-3.5 h-3.5" />
@@ -700,7 +701,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                       <Button
                         size="sm"
                         variant="outline"
-                        className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 flex-1 sm:flex-none"
                         onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}
                       >
                         <XCircle className="w-3.5 h-3.5" />

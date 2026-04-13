@@ -217,6 +217,15 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Hide scrollbar for horizontal scroll containers on mobile */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Mobile dock spacing — adds bottom padding so content isn't hidden behind dock */
 @media (max-width: 1023px) {
   .dock-spacer {
