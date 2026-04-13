@@ -20,9 +20,11 @@ export default function LogoutPage() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar />
+      <div className="hidden lg:block">
+        <AppSidebar />
+      </div>
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-[68px] dock-spacer">
+      <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:ml-[68px] dock-spacer">
         <Header />
 
         <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">

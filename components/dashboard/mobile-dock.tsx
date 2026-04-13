@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3,
-  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature, LogOut,
+  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature, LogOut, Gift,
 } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { getSupabase } from "@/lib/supabase/client"
@@ -25,6 +25,7 @@ const moreItems = [
   { icon: DollarSign,    label: "Comissão",  href: "/comissao" },
   { icon: Megaphone,     label: "Campanha",  href: "/campanha" },
   { icon: FileSignature, label: "Contratos", href: "/contratos" },
+  { icon: Gift,          label: "Cashback",  href: "/cashback" },
   { icon: Settings,      label: "Admin",     href: "/settings" },
 ]
 

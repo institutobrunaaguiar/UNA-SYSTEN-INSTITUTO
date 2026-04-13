@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 export default function PacientesPage() {
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar />
+      <div className="hidden lg:block">
+        <AppSidebar />
+      </div>
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-[68px] dock-spacer">
+      <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:ml-[68px] dock-spacer">
         <Header
           title="Pacientes"
           description="Gerencie e visualize todos os pacientes do sistema."
