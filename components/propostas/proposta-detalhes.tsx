@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck, Gift, ChevronDown } from "lucide-react"
+import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck, Gift, ChevronDown, ArrowLeft } from "lucide-react"
 import type { Proposta, ValidacaoStatus } from "./types"
 import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
 
@@ -78,6 +78,15 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
       <SheetContent className="overflow-y-auto w-full sm:max-w-lg p-0">
         {/* Resumo fixo no topo — sempre visivel */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-4 sm:px-6 pt-4 pb-3">
+          <div className="flex items-center justify-between mb-1">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-1 text-sm text-muted-foreground active:text-foreground transition-colors -ml-1 py-1 px-1 rounded-lg"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Voltar</span>
+            </button>
+          </div>
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-base">
               Proposta #{proposta.id}
