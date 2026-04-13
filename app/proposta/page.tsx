@@ -7,13 +7,13 @@ export default function PropostaPage() {
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-[68px] dock-spacer">
+      <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:ml-[68px] dock-spacer">
         <Header
           title="Propostas"
           description="Crie e gerencie propostas comerciais para seus pacientes."
         />
 
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           <PropostasContent />
         </div>
       </main>

@@ -19,6 +19,8 @@ import {
   XCircle,
   ShieldCheck,
   RotateCcw,
+  CalendarDays,
+  X,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -73,6 +75,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const { user } = useUser()
   const isAdmin = user?.role === "admin"
   const [abaValidacao, setAbaValidacao] = useState(false)
@@ -346,6 +349,94 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     return date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
   }
 
+  function renderPropostaCard(proposta: Proposta) {
+    return (
+      <Card
+        key={proposta.id}
+        className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98]"
+        onClick={() => onVerDetalhes(proposta)}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+              <span className="text-xs text-muted-foreground">#{proposta.id}</span>
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
+                {STATUS_CONFIG[proposta.status].label}
+              </span>
+              {proposta.validacao_status && proposta.validacao_status !== "pendente" && (
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${VALIDACAO_CONFIG[proposta.validacao_status].color}`}>
+                  {VALIDACAO_CONFIG[proposta.validacao_status].label}
+                </span>
+              )}
+            </div>
+            <p className="text-sm font-semibold text-foreground truncate">{proposta.nome_cliente}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
+            </p>
+            <p className="text-base font-bold text-foreground mt-1">
+              {formatCurrency(proposta.valor_total)}
+            </p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={(e) => e.stopPropagation()}>
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onVerDetalhes(proposta) }}>
+                <Eye className="w-4 h-4 mr-2" /> Ver detalhes
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditarProposta(proposta) }}>
+                <Pencil className="w-4 h-4 mr-2" /> Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicar(proposta) }}>
+                <Copy className="w-4 h-4 mr-2" /> Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <RefreshCw className="w-4 h-4 mr-2" /> Alterar status
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {(Object.keys(STATUS_CONFIG) as PropostaStatus[]).map((s) => (
+                    <DropdownMenuItem key={s} onClick={(e) => { e.stopPropagation(); handleStatusChange(proposta.id, s) }} disabled={proposta.status === s}>
+                      {STATUS_CONFIG[s].label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              {isAdmin && proposta.status === "pago" && (
+                <>
+                  <DropdownMenuSeparator />
+                  {proposta.validacao_status !== "aprovada" && (
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}>
+                      <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> Aprovar
+                    </DropdownMenuItem>
+                  )}
+                  {proposta.validacao_status !== "reprovada" && (
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}>
+                      <XCircle className="w-4 h-4 mr-2 text-red-500" /> Reprovar
+                    </DropdownMenuItem>
+                  )}
+                  {proposta.validacao_status !== "pendente" && (
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCancelarValidacao(proposta) }}>
+                      <RotateCcw className="w-4 h-4 mr-2 text-muted-foreground" /> Cancelar Validação
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(proposta.id) }}>
+                <Trash2 className="w-4 h-4 mr-2" /> Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Header: busca + botao */}
@@ -421,218 +512,213 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       ) : (
         <>
         {!abaValidacao && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 sm:gap-6">
-          {/* Calendario */}
-          <Card className="p-3 sm:p-4">
-            {/* Navegacao do mes */}
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="icon" onClick={prevMonth} className="h-10 w-10 sm:h-8 sm:w-8">
-                <ChevronLeft className="w-5 h-5 sm:w-4 sm:h-4" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {MESES[month]} {year}
-                </h3>
-                <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-6 px-2">
-                  Hoje
+        <>
+          {/* Mobile: botao para abrir calendario + data selecionada */}
+          <div className="flex items-center justify-between lg:hidden">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground capitalize">
+                {formatSelectedDate()}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
+                {propostasDoDia.length > 0 && (
+                  <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>
+                )}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setCalendarOpen(true)}
+            >
+              <CalendarDays className="w-4 h-4" />
+              Calendario
+            </Button>
+          </div>
+
+          {/* Mobile calendar bottom sheet */}
+          {calendarOpen && (
+            <div className="fixed inset-0 z-[998] lg:hidden" onClick={() => setCalendarOpen(false)}>
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+              <div
+                className="absolute bottom-0 left-0 right-0 bg-card rounded-t-2xl p-4 pb-6 shadow-xl animate-slide-up safe-area-bottom"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-foreground">Selecionar data</h3>
+                  <button
+                    onClick={() => setCalendarOpen(false)}
+                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+                  >
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                {/* Calendar nav */}
+                <div className="flex items-center justify-between mb-3">
+                  <Button variant="ghost" size="icon" onClick={prevMonth} className="h-10 w-10">
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold">{MESES[month]} {year}</span>
+                    <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-6 px-2">
+                      Hoje
+                    </Button>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={nextMonth} className="h-10 w-10">
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+                </div>
+                {/* Weekday headers */}
+                <div className="grid grid-cols-7 gap-1 mb-1">
+                  {DIAS_SEMANA.map((dia) => (
+                    <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-1">
+                      {dia}
+                    </div>
+                  ))}
+                </div>
+                {/* Days */}
+                <div className="grid grid-cols-7 gap-1">
+                  {calendarDays.map((day, i) => {
+                    if (day === null) return <div key={`empty-${i}`} className="h-11" />
+                    const dayKey = getDayKey(day)
+                    const dayPropostas = propostasPorDia[dayKey] || []
+                    const count = dayPropostas.length
+                    const isToday = dayKey === todayStr
+                    const isSelected = dayKey === selectedDay
+                    return (
+                      <button
+                        key={dayKey}
+                        type="button"
+                        onClick={() => { setSelectedDay(dayKey); setCalendarOpen(false) }}
+                        className={`h-11 rounded-lg text-sm transition-all duration-150 flex flex-col items-center justify-center ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground font-semibold"
+                            : isToday
+                              ? "bg-primary/10 text-primary font-semibold ring-1 ring-primary/30"
+                              : "text-foreground active:bg-muted"
+                        }`}
+                      >
+                        <span className="text-xs">{day}</span>
+                        {count > 0 && (
+                          <div className="flex gap-0.5 mt-0.5">
+                            {count <= 3 ? (
+                              dayPropostas.slice(0, 3).map((p, idx) => (
+                                <div key={idx} className={`w-1.5 h-1.5 rounded-full ${
+                                  isSelected ? "bg-primary-foreground"
+                                    : p.status === "pago" ? "bg-green-500"
+                                    : p.status === "em_negociacao" ? "bg-yellow-500"
+                                    : p.status === "aguardando_pagamento" ? "bg-blue-500"
+                                    : "bg-red-500"
+                                }`} />
+                              ))
+                            ) : (
+                              <span className={`text-[9px] font-bold ${isSelected ? "text-primary-foreground" : "text-primary"}`}>{count}</span>
+                            )}
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop: grid layout side-by-side */}
+          <div className="hidden lg:grid lg:grid-cols-[1fr_1fr] gap-6">
+            {/* Desktop Calendario */}
+            <Card className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-foreground">{MESES[month]} {year}</h3>
+                  <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-6 px-2">Hoje</Button>
+                </div>
+                <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
-              <Button variant="ghost" size="icon" onClick={nextMonth} className="h-10 w-10 sm:h-8 sm:w-8">
-                <ChevronRight className="w-5 h-5 sm:w-4 sm:h-4" />
-              </Button>
-            </div>
-
-            {/* Dias da semana */}
-            <div className="grid grid-cols-7 gap-1 mb-1">
-              {DIAS_SEMANA.map((dia) => (
-                <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-1">
-                  {dia}
-                </div>
-              ))}
-            </div>
-
-            {/* Dias do mes */}
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map((day, i) => {
-                if (day === null) {
-                  return <div key={`empty-${i}`} className="h-11 sm:h-10" />
-                }
-                const dayKey = getDayKey(day)
-                const dayPropostas = propostasPorDia[dayKey] || []
-                const count = dayPropostas.length
-                const isToday = dayKey === todayStr
-                const isSelected = dayKey === selectedDay
-
-                return (
-                  <button
-                    key={dayKey}
-                    type="button"
-                    onClick={() => setSelectedDay(dayKey)}
-                    className={`h-11 sm:h-10 rounded-lg text-sm relative transition-all duration-200 flex flex-col items-center justify-center ${
-                      isSelected
-                        ? "bg-primary text-primary-foreground font-semibold"
-                        : isToday
-                          ? "bg-primary/10 text-primary font-semibold ring-1 ring-primary/30"
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {DIAS_SEMANA.map((dia) => (
+                  <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-1">{dia}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((day, i) => {
+                  if (day === null) return <div key={`empty-${i}`} className="h-10" />
+                  const dayKey = getDayKey(day)
+                  const dayPropostas = propostasPorDia[dayKey] || []
+                  const count = dayPropostas.length
+                  const isToday = dayKey === todayStr
+                  const isSelected = dayKey === selectedDay
+                  return (
+                    <button
+                      key={dayKey}
+                      type="button"
+                      onClick={() => setSelectedDay(dayKey)}
+                      className={`h-10 rounded-lg text-sm transition-all duration-200 flex flex-col items-center justify-center ${
+                        isSelected ? "bg-primary text-primary-foreground font-semibold"
+                          : isToday ? "bg-primary/10 text-primary font-semibold ring-1 ring-primary/30"
                           : "text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span className="text-xs">{day}</span>
-                    {count > 0 && (
-                      <div className={`flex gap-0.5 mt-0.5 ${isSelected ? "" : ""}`}>
-                        {count <= 3 ? (
-                          dayPropostas.slice(0, 3).map((p, idx) => (
-                            <div
-                              key={idx}
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                isSelected
-                                  ? "bg-primary-foreground"
-                                  : p.status === "pago"
-                                    ? "bg-green-500"
-                                    : p.status === "em_negociacao"
-                                      ? "bg-yellow-500"
-                                      : p.status === "aguardando_pagamento"
-                                        ? "bg-blue-500"
-                                        : "bg-red-500"
-                              }`}
-                            />
-                          ))
-                        ) : (
-                          <span className={`text-[9px] font-bold ${isSelected ? "text-primary-foreground" : "text-primary"}`}>
-                            {count}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </Card>
+                      }`}
+                    >
+                      <span className="text-xs">{day}</span>
+                      {count > 0 && (
+                        <div className="flex gap-0.5 mt-0.5">
+                          {count <= 3 ? (
+                            dayPropostas.slice(0, 3).map((p, idx) => (
+                              <div key={idx} className={`w-1.5 h-1.5 rounded-full ${
+                                isSelected ? "bg-primary-foreground"
+                                  : p.status === "pago" ? "bg-green-500"
+                                  : p.status === "em_negociacao" ? "bg-yellow-500"
+                                  : p.status === "aguardando_pagamento" ? "bg-blue-500"
+                                  : "bg-red-500"
+                              }`} />
+                            ))
+                          ) : (
+                            <span className={`text-[9px] font-bold ${isSelected ? "text-primary-foreground" : "text-primary"}`}>{count}</span>
+                          )}
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </Card>
 
-          {/* Propostas do dia selecionado */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            {/* Desktop day header */}
+            <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground capitalize">
-                  {formatSelectedDate()}
-                </h3>
+                <h3 className="text-sm font-semibold text-foreground capitalize">{formatSelectedDate()}</h3>
                 <p className="text-xs text-muted-foreground">
                   {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
-                  {propostasDoDia.length > 0 && (
-                    <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>
-                  )}
+                  {propostasDoDia.length > 0 && <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>}
                 </p>
               </div>
+              {propostasDoDia.length === 0 ? (
+                <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p></Card>
+              ) : (
+                <div className="space-y-3">
+                  {propostasDoDia.map((proposta) => renderPropostaCard(proposta))}
+                </div>
+              )}
             </div>
+          </div>
 
+          {/* Mobile: lista direta (prioridade absoluta) */}
+          <div className="lg:hidden space-y-3">
             {propostasDoDia.length === 0 ? (
-              <Card className="p-8 text-center">
+              <Card className="p-6 text-center">
                 <p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p>
               </Card>
             ) : (
-              <div className="space-y-3">
-                {propostasDoDia.map((proposta) => (
-                  <Card
-                    key={proposta.id}
-                    className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
-                    onClick={() => onVerDetalhes(proposta)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-muted-foreground">#{proposta.id}</span>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
-                            {STATUS_CONFIG[proposta.status].label}
-                          </span>
-                          {proposta.validacao_status && proposta.validacao_status !== "pendente" && (
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${VALIDACAO_CONFIG[proposta.validacao_status].color}`}>
-                              {VALIDACAO_CONFIG[proposta.validacao_status].label}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm font-semibold text-foreground truncate">{proposta.nome_cliente}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
-                        </p>
-                        <p className="text-sm font-bold text-foreground mt-1">
-                          {formatCurrency(proposta.valor_total)}
-                        </p>
-                      </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 shrink-0"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onVerDetalhes(proposta) }}>
-                            <Eye className="w-4 h-4 mr-2" /> Ver detalhes
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditarProposta(proposta) }}>
-                            <Pencil className="w-4 h-4 mr-2" /> Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicar(proposta) }}>
-                            <Copy className="w-4 h-4 mr-2" /> Duplicar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              <RefreshCw className="w-4 h-4 mr-2" /> Alterar status
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent>
-                              {(Object.keys(STATUS_CONFIG) as PropostaStatus[]).map((s) => (
-                                <DropdownMenuItem
-                                  key={s}
-                                  onClick={(e) => { e.stopPropagation(); handleStatusChange(proposta.id, s) }}
-                                  disabled={proposta.status === s}
-                                >
-                                  {STATUS_CONFIG[s].label}
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuSubContent>
-                          </DropdownMenuSub>
-                          {isAdmin && proposta.status === "pago" && (
-                            <>
-                              <DropdownMenuSeparator />
-                              {proposta.validacao_status !== "aprovada" && (
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}>
-                                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> Aprovar
-                                </DropdownMenuItem>
-                              )}
-                              {proposta.validacao_status !== "reprovada" && (
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}>
-                                  <XCircle className="w-4 h-4 mr-2 text-red-500" /> Reprovar
-                                </DropdownMenuItem>
-                              )}
-                              {proposta.validacao_status !== "pendente" && (
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCancelarValidacao(proposta) }}>
-                                  <RotateCcw className="w-4 h-4 mr-2 text-muted-foreground" /> Cancelar Validação
-                                </DropdownMenuItem>
-                              )}
-                            </>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => { e.stopPropagation(); setDeleteId(proposta.id) }}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" /> Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              propostasDoDia.map((proposta) => renderPropostaCard(proposta))
             )}
           </div>
-        </div>
+        </>
         )}
 
         {abaValidacao && (

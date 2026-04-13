@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -7,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck, Gift } from "lucide-react"
+import { Pencil, Copy, User, Stethoscope, CreditCard, FileText, Clock, ShieldCheck, Gift, ChevronDown } from "lucide-react"
 import type { Proposta, ValidacaoStatus } from "./types"
 import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
 
@@ -17,6 +18,31 @@ interface PropostaDetalhesProps {
   onClose: () => void
   onEditar: (proposta: Proposta) => void
   onDuplicar: (proposta: Proposta) => void
+}
+
+function Section({ icon: Icon, title, children, defaultOpen = false }: {
+  icon: React.ElementType
+  title: string
+  children: React.ReactNode
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div className="border-b border-border last:border-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full py-3 text-left"
+      >
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <Icon className="w-4 h-4 text-primary" />
+          {title}
+        </div>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="pb-3">{children}</div>}
+    </div>
+  )
 }
 
 export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar }: PropostaDetalhesProps) {
@@ -49,23 +75,32 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto w-full sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-3">
-            Proposta #{proposta.id}
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_CONFIG[proposta.status].color}`}>
-              {STATUS_CONFIG[proposta.status].label}
-            </span>
-          </SheetTitle>
-        </SheetHeader>
-
-        <div className="mt-6 space-y-6">
-          {/* Cliente */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <User className="w-4 h-4 text-primary" />
-              Cliente
+      <SheetContent className="overflow-y-auto w-full sm:max-w-lg p-0">
+        {/* Resumo fixo no topo — sempre visivel */}
+        <div className="sticky top-0 z-10 bg-card border-b border-border px-4 sm:px-6 pt-4 pb-3">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2 text-base">
+              Proposta #{proposta.id}
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
+                {STATUS_CONFIG[proposta.status].label}
+              </span>
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-3 flex items-baseline justify-between">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{formatCurrency(proposta.valor_total)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{proposta.nome_cliente}</p>
             </div>
+            <div className="text-right text-xs text-muted-foreground">
+              <p>{proposta.num_parcelas}x {formatCurrency(valorParcela)}</p>
+              <p>Entrada: {formatCurrency(proposta.valor_entrada)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Seções colapsáveis */}
+        <div className="px-4 sm:px-6">
+          <Section icon={User} title="Cliente" defaultOpen={false}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm pl-6">
               <div>
                 <p className="text-muted-foreground">Nome</p>
@@ -84,14 +119,9 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 </p>
               </div>
             </div>
-          </div>
+          </Section>
 
-          {/* Procedimentos */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Stethoscope className="w-4 h-4 text-primary" />
-              Procedimentos ({proposta.itens.length})
-            </div>
+          <Section icon={Stethoscope} title={`Procedimentos (${proposta.itens.length})`} defaultOpen={false}>
             <div className="pl-6 space-y-2">
               {proposta.itens.map((item, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 text-sm py-2 border-b border-border last:border-0">
@@ -108,14 +138,9 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 </div>
               ))}
             </div>
-          </div>
+          </Section>
 
-          {/* Cenario */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <CreditCard className="w-4 h-4 text-primary" />
-              Cenario: {cenarioLabel}
-            </div>
+          <Section icon={CreditCard} title={`Cenario: ${cenarioLabel}`} defaultOpen={false}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm pl-6">
               <div>
                 <p className="text-muted-foreground">Entrada</p>
@@ -130,14 +155,9 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 <p className="font-medium">{formatCurrency(proposta.fluxo_caixa_imediato)}</p>
               </div>
             </div>
-          </div>
+          </Section>
 
-          {/* Valores */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <FileText className="w-4 h-4 text-primary" />
-              Valores
-            </div>
+          <Section icon={FileText} title="Valores" defaultOpen={false}>
             <div className="pl-6 space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
@@ -160,15 +180,10 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 <span className="text-lg">{formatCurrency(proposta.valor_total)}</span>
               </div>
             </div>
-          </div>
+          </Section>
 
-          {/* Cashback */}
-          {(proposta.cashback_gerado != null && proposta.cashback_gerado > 0) || (proposta.cashback_utilizado != null && proposta.cashback_utilizado > 0) ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Gift className="w-4 h-4 text-primary" />
-                Cashback
-              </div>
+          {((proposta.cashback_gerado != null && proposta.cashback_gerado > 0) || (proposta.cashback_utilizado != null && proposta.cashback_utilizado > 0)) && (
+            <Section icon={Gift} title="Cashback" defaultOpen={false}>
               <div className="pl-6 space-y-1 text-sm">
                 {proposta.cashback_gerado != null && proposta.cashback_gerado > 0 && (
                   <div className="flex justify-between">
@@ -183,23 +198,17 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                   </div>
                 )}
               </div>
-            </div>
-          ) : null}
+            </Section>
+          )}
 
-          {/* Observacoes */}
           {proposta.observacoes && (
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-foreground">Observacoes</p>
-              <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap">{proposta.observacoes}</p>
+            <div className="border-b border-border py-3">
+              <p className="text-sm font-semibold text-foreground mb-1">Observacoes</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{proposta.observacoes}</p>
             </div>
           )}
 
-          {/* Auditoria */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              Auditoria
-            </div>
+          <Section icon={ShieldCheck} title="Auditoria" defaultOpen={false}>
             <div className="pl-6 space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Status:</span>
@@ -210,7 +219,7 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               {proposta.validacao_status === "reprovada" && proposta.validacao_motivo && (
                 <div>
                   <span className="text-muted-foreground">Motivo:</span>
-                  <p className="mt-1 text-sm text-foreground bg-red-50 p-2 rounded-md">{proposta.validacao_motivo}</p>
+                  <p className="mt-1 text-sm text-foreground bg-red-50 p-2 rounded-md break-words">{proposta.validacao_motivo}</p>
                 </div>
               )}
               {proposta.validado_em && (
@@ -220,10 +229,10 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
                 </div>
               )}
             </div>
-          </div>
+          </Section>
 
           {/* Timestamps */}
-          <div className="space-y-1 text-xs text-muted-foreground">
+          <div className="space-y-1 text-xs text-muted-foreground py-3">
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Criado em: {formatDate(proposta.created_at)}
@@ -235,26 +244,22 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               </div>
             )}
           </div>
+        </div>
 
-          {/* Acoes */}
-          <div className="flex gap-2 pt-4 border-t border-border">
+        {/* Ações fixas no fundo */}
+        <div className="sticky bottom-0 bg-card border-t border-border px-4 sm:px-6 py-3 safe-area-bottom">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               className="flex-1 gap-2"
-              onClick={() => {
-                onClose()
-                onEditar(proposta)
-              }}
+              onClick={() => { onClose(); onEditar(proposta) }}
             >
               <Pencil className="w-4 h-4" /> Editar
             </Button>
             <Button
               variant="outline"
               className="flex-1 gap-2"
-              onClick={() => {
-                onClose()
-                onDuplicar(proposta)
-              }}
+              onClick={() => { onClose(); onDuplicar(proposta) }}
             >
               <Copy className="w-4 h-4" /> Duplicar
             </Button>
