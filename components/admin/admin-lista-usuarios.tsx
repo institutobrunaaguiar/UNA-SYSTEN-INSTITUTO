@@ -3,14 +3,26 @@
 
 import { useEffect, useState } from "react"
 import { getSupabase } from "@/lib/supabase/client"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import { AdminEditarUsuario } from "./admin-editar-usuario"
 
 export interface UserProfile {
@@ -33,6 +45,7 @@ export function AdminListaUsuarios() {
   const [usuarios, setUsuarios] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [editando, setEditando] = useState<UserProfile | null>(null)
+  const [excluindo, setExcluindo] = useState<UserProfile | null>(null)
 
   async function fetchUsuarios() {
     const { data } = await getSupabase()
@@ -52,6 +65,27 @@ export function AdminListaUsuarios() {
       body: JSON.stringify({ id: usuario.id, ativo: !usuario.ativo }),
     })
     fetchUsuarios()
+  }
+
+  async function handleExcluir() {
+    if (!excluindo) return
+    try {
+      const res = await fetch("/api/admin/delete-user", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: excluindo.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || "Erro ao excluir usuário")
+        return
+      }
+      toast.success("Usuário excluído permanentemente")
+      setExcluindo(null)
+      fetchUsuarios()
+    } catch {
+      toast.error("Erro ao excluir usuário")
+    }
   }
 
   if (loading) {
@@ -104,6 +138,14 @@ export function AdminListaUsuarios() {
                         <DropdownMenuItem onClick={() => toggleAtivo(u)}>
                           {u.ativo ? "Desativar" : "Reativar"}
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => setExcluindo(u)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
@@ -122,6 +164,27 @@ export function AdminListaUsuarios() {
         onClose={() => setEditando(null)}
         onSaved={() => { setEditando(null); fetchUsuarios() }}
       />
+
+      <AlertDialog open={excluindo !== null} onOpenChange={() => setExcluindo(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir usuário permanentemente</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir <strong>{excluindo?.nome}</strong> ({excluindo?.email})?
+              Esta acao remove o usuário do banco de dados e da autenticacao. Nao pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleExcluir}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir permanentemente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
