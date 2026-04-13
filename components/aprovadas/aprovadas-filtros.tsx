@@ -25,7 +25,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
   return (
     <div className="flex flex-wrap gap-3">
       <Select value={filtros.mesAno} onValueChange={(v) => update({ mesAno: v })}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-card border border-border rounded-lg text-xs">
           <SelectValue placeholder="Mês/Ano" />
         </SelectTrigger>
         <SelectContent>
@@ -38,7 +38,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.profissional} onValueChange={(v) => update({ profissional: v })}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-card border border-border rounded-lg text-xs">
           <SelectValue placeholder="Profissional" />
         </SelectTrigger>
         <SelectContent>
@@ -52,7 +52,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.procedimento} onValueChange={(v) => update({ procedimento: v })}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-card border border-border rounded-lg text-xs">
           <SelectValue placeholder="Procedimento" />
         </SelectTrigger>
         <SelectContent>
@@ -66,7 +66,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.faixaValor} onValueChange={(v) => update({ faixaValor: v })}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-card border border-border rounded-lg text-xs">
           <SelectValue placeholder="Faixa de valor" />
         </SelectTrigger>
         <SelectContent>
@@ -82,7 +82,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Buscar por nome do paciente..."
-          className="pl-9 bg-white border border-border rounded-lg text-xs"
+          className="pl-9 bg-card border border-border rounded-lg text-xs"
           value={filtros.busca}
           onChange={(e) => update({ busca: e.target.value })}
         />

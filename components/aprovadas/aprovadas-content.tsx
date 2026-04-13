@@ -24,6 +24,8 @@ function getMesAnoAtual(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
 }
 
+export type TabValidacao = "aprovadas" | "reprovadas"
+
 export interface FiltrosState {
   mesAno: string
   profissional: string
@@ -37,11 +39,14 @@ export interface KpisData {
   quantidade: number
   ticketMedio: number
   topConsultora: { nome: string; valor: number } | null
+  quantidadeReprovadas: number
 }
 
 export function AprovadasContent() {
-  const [propostas, setPropostas] = useState<Proposta[]>([])
+  const [aprovadas, setAprovadas] = useState<Proposta[]>([])
+  const [reprovadas, setReprovadas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<TabValidacao>("aprovadas")
   const [filtros, setFiltros] = useState<FiltrosState>({
     mesAno: getMesAnoAtual(),
     profissional: "todos",
@@ -54,12 +59,20 @@ export function AprovadasContent() {
     async function fetchData() {
       try {
         const supabase = getSupabase()
-        const { data } = await supabase
-          .from("propostas")
-          .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
-          .eq("validacao_status", "aprovada")
-          .order("validado_em", { ascending: false })
-        if (data) setPropostas(data as Proposta[])
+        const [aprovadasRes, reprovadasRes] = await Promise.all([
+          supabase
+            .from("propostas")
+            .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+            .eq("validacao_status", "aprovada")
+            .order("validado_em", { ascending: false }),
+          supabase
+            .from("propostas")
+            .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+            .eq("validacao_status", "reprovada")
+            .order("validado_em", { ascending: false }),
+        ])
+        if (aprovadasRes.data) setAprovadas(aprovadasRes.data as Proposta[])
+        if (reprovadasRes.data) setReprovadas(reprovadasRes.data as Proposta[])
       } catch (e) {
         console.error("[aprovadas] erro ao buscar:", e)
       } finally {
@@ -68,6 +81,8 @@ export function AprovadasContent() {
     }
     fetchData()
   }, [])
+
+  const propostas = tab === "aprovadas" ? aprovadas : reprovadas
 
   const profissionais = useMemo(() => {
     const set = new Set<string>()
@@ -130,11 +145,12 @@ export function AprovadasContent() {
   }, [propostas, filtros])
 
   const kpis = useMemo((): KpisData => {
-    const totalAprovado = filtered.reduce((s, p) => s + p.valor_total, 0)
-    const quantidade = filtered.length
+    const aprovadasFiltradas = tab === "aprovadas" ? filtered : aprovadas
+    const totalAprovado = aprovadasFiltradas.reduce((s, p) => s + p.valor_total, 0)
+    const quantidade = aprovadasFiltradas.length
     const ticketMedio = quantidade > 0 ? totalAprovado / quantidade : 0
     const map = new Map<string, number>()
-    filtered.forEach((p) => {
+    aprovadasFiltradas.forEach((p) => {
       p.itens.forEach((i) => {
         if (!i.profissionalNome) return
         map.set(i.profissionalNome, (map.get(i.profissionalNome) || 0) + i.valor_final)
@@ -146,8 +162,8 @@ export function AprovadasContent() {
         topConsultora = { nome, valor }
       }
     })
-    return { totalAprovado, quantidade, ticketMedio, topConsultora }
-  }, [filtered])
+    return { totalAprovado, quantidade, ticketMedio, topConsultora, quantidadeReprovadas: reprovadas.length }
+  }, [filtered, aprovadas, reprovadas, tab])
 
   if (loading) {
     return (
@@ -158,8 +174,35 @@ export function AprovadasContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <AprovadasKpis data={kpis} />
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-muted rounded-lg p-1 w-fit">
+        <button
+          onClick={() => setTab("aprovadas")}
+          className={[
+            "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+            tab === "aprovadas"
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          ].join(" ")}
+        >
+          Aprovadas ({aprovadas.length})
+        </button>
+        <button
+          onClick={() => setTab("reprovadas")}
+          className={[
+            "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+            tab === "reprovadas"
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          ].join(" ")}
+        >
+          Reprovadas ({reprovadas.length})
+        </button>
+      </div>
+
       <AprovadasFiltros
         filtros={filtros}
         onChange={setFiltros}
@@ -167,7 +210,7 @@ export function AprovadasContent() {
         profissionais={profissionais}
         procedimentos={procedimentos}
       />
-      <AprovadasLista propostas={filtered} />
+      <AprovadasLista propostas={filtered} tab={tab} />
     </div>
   )
 }
