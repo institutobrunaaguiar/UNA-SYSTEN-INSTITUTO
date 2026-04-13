@@ -750,14 +750,14 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
               pendentesValidacao.map((proposta) => (
                 <Card
                   key={proposta.id}
-                  className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
+                  className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98]"
                   onClick={() => onVerDetalhes(proposta)}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-start gap-2 mb-2">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         <span className="text-xs text-muted-foreground">#{proposta.id}</span>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
                           {STATUS_CONFIG[proposta.status].label}
                         </span>
                       </div>
@@ -765,35 +765,27 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                       <p className="text-xs text-muted-foreground truncate">
                         {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
                       </p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-sm font-bold text-foreground">{formatCurrency(proposta.valor_total)}</span>
-                        {proposta.valor_desconto_protocolo > 0 && (
-                          <span className="text-xs text-muted-foreground">
-                            Desconto: {formatCurrency(proposta.valor_desconto_protocolo)}
-                          </span>
-                        )}
-                      </div>
                     </div>
-                    <div className="flex gap-2 mt-3 sm:mt-0 sm:ml-3 shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50 flex-1 sm:flex-none"
-                        onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}
-                      >
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        Aprovar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 flex-1 sm:flex-none"
-                        onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        Reprovar
-                      </Button>
-                    </div>
+                    <p className="text-base font-bold text-foreground shrink-0">{formatCurrency(proposta.valor_total)}</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      size="sm"
+                      className="gap-1.5 bg-green-600 hover:bg-green-700 text-white flex-1"
+                      onClick={(e) => { e.stopPropagation(); handleAprovar(proposta) }}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Aprovar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 flex-1"
+                      onClick={(e) => { e.stopPropagation(); setReprovarProposta(proposta) }}
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Reprovar
+                    </Button>
                   </div>
                 </Card>
               ))
