@@ -60,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${inter.variable} ${interTight.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${interTight.variable} font-sans antialiased safe-area-top`}>
         <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
           <UserProvider>
             <AppLoader>

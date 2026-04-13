@@ -725,7 +725,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <Select value={validacaoMes} onValueChange={setValidacaoMes}>
-                <SelectTrigger className="w-full sm:w-[200px] bg-white border border-border rounded-lg text-xs">
+                <SelectTrigger className="w-full sm:w-[200px] bg-card border border-border rounded-lg text-xs">
                   <SelectValue placeholder="Filtrar por mês" />
                 </SelectTrigger>
                 <SelectContent>
@@ -753,20 +753,20 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   className="p-3 sm:p-4 hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98]"
                   onClick={() => onVerDetalhes(proposta)}
                 >
-                  <div className="flex items-start gap-2 mb-2">
+                  <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <span className="text-xs text-muted-foreground">#{proposta.id}</span>
+                        <span className="text-xs text-muted-foreground font-mono">#{proposta.id}</span>
                         <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CONFIG[proposta.status].color}`}>
                           {STATUS_CONFIG[proposta.status].label}
                         </span>
                       </div>
                       <p className="text-sm font-semibold text-foreground">{proposta.nome_cliente}</p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
                         {proposta.itens.map((i) => i.procedimentoNome).join(", ")}
                       </p>
+                      <p className="text-base font-bold text-foreground mt-1.5">{formatCurrency(proposta.valor_total)}</p>
                     </div>
-                    <p className="text-base font-bold text-foreground shrink-0">{formatCurrency(proposta.valor_total)}</p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button

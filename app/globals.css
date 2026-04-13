@@ -212,9 +212,41 @@
   animation: fade-in 0.2s ease-out forwards;
 }
 
+/* ── App Feel ── */
+/* Eliminate 300ms tap delay, remove tap highlight, prevent overscroll bounce */
+html {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Safe area CSS variables for iPhone notch/dynamic island */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* Prevent pull-to-refresh in app containers */
+.no-overscroll {
+  overscroll-behavior-y: contain;
+}
+
+/* Disable text selection on UI elements (not content) */
+button, [role="button"], nav, .select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* PWA safe area for bottom dock */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Safe area top for standalone PWA */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Hide scrollbar for horizontal scroll containers on mobile */
@@ -238,7 +270,7 @@
 /* Mobile dock spacing — adds bottom padding so content isn't hidden behind dock */
 @media (max-width: 1023px) {
   .dock-spacer {
-    padding-bottom: 76px;
+    padding-bottom: calc(76px + var(--sab, 0px));
   }
 }
 
@@ -246,6 +278,9 @@
 @media all and (display-mode: standalone) {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
   }
 }
 
