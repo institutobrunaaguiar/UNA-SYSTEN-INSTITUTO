@@ -252,7 +252,7 @@ export function ComissaoLista() {
           </Select>
         </div>
 
-        <div className="relative flex-1 sm:max-w-[200px]">
+        <div className="relative flex-1 w-full sm:max-w-[200px]">
           <Input
             type="month"
             placeholder="Periodo (YYYY-MM)"

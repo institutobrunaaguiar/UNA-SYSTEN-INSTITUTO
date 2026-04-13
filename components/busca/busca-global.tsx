@@ -169,7 +169,7 @@ export function BuscaGlobal() {
               )}
             </div>
 
-            <CommandList className="max-h-[400px] overflow-y-auto">
+            <CommandList className="max-h-[60vh] sm:max-h-[400px] overflow-y-auto">
 
               {/* Estado inicial */}
               {!searched && !loading && (

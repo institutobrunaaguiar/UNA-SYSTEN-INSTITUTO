@@ -34,11 +34,11 @@ export function PainelRecentes({ propostas }: { propostas: PropostaRecente[] }) 
               <div key={p.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-foreground truncate">{p.nomeCliente}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{p.procedimentos || "Sem procedimentos"}</p>
+                  <p className="text-xs text-muted-foreground truncate">{p.procedimentos || "Sem procedimentos"}</p>
                 </div>
                 <div className="text-right ml-3 shrink-0">
                   <p className="text-xs font-semibold text-foreground">{formatCurrency(p.valorTotal)}</p>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full inline-block ${badge.className}`}>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full inline-block ${badge.className}`}>
                     {badge.label}
                   </span>
                 </div>

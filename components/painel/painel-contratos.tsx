@@ -142,7 +142,7 @@ export function PainelContratos() {
                 className="flex items-center justify-between border-b border-border last:border-0 py-3 gap-3"
               >
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm text-foreground truncate max-w-[200px]">{contrato.titulo}</span>
+                  <span className="text-sm text-foreground truncate max-w-[150px] sm:max-w-[200px]">{contrato.titulo}</span>
                   <span className="text-xs text-muted-foreground">
                     {contrato.nome_paciente ?? "—"}
                   </span>

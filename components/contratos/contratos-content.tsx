@@ -90,7 +90,7 @@ export function ContratosContent() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+        <div className="relative flex-1 min-w-0 sm:min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <Input placeholder="Buscar contrato, paciente..." value={busca} onChange={(e) => setBusca(e.target.value)} className="pl-9 h-9" />
         </div>

@@ -23,7 +23,7 @@ export function PainelRankings({ profissionais, procedimentos }: PainelRankingsP
             {profissionais.map((prof) => (
               <div key={prof.nome} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
                     {prof.iniciais}
                   </div>
                   <span className="text-xs text-foreground">{prof.nome.split(" ").slice(0, 2).join(" ")}</span>
@@ -45,7 +45,7 @@ export function PainelRankings({ profissionais, procedimentos }: PainelRankingsP
               <div key={proc.nome} className="flex items-center justify-between">
                 <span className="text-xs text-foreground">{proc.nome}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                     {proc.count}x
                   </span>
                   <span className="text-xs font-semibold text-foreground">{formatCurrency(proc.valor)}</span>

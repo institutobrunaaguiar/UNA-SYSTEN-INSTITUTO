@@ -229,7 +229,7 @@ export function CashbackTransferir({
         <div className="mt-6 space-y-6">
           {/* Origem */}
           <Card className="p-4 bg-muted/30">
-            <p className="text-[11px] uppercase text-muted-foreground tracking-wider mb-2">De</p>
+            <p className="text-xs uppercase text-muted-foreground tracking-wider mb-2">De</p>
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <span className="text-xs font-semibold text-primary">{getIniciais(origemNome)}</span>
@@ -249,7 +249,7 @@ export function CashbackTransferir({
 
           {/* Destinatario */}
           <div className="space-y-3">
-            <p className="text-[11px] uppercase text-muted-foreground tracking-wider">Para</p>
+            <p className="text-xs uppercase text-muted-foreground tracking-wider">Para</p>
 
             {destinatario ? (
               <Card className="p-4 bg-primary/5 border-primary/20">
@@ -420,7 +420,7 @@ export function CashbackTransferir({
           {/* Confirmar */}
           {destinatario && valor > 0 && (
             <Card className="p-4 bg-muted/30 space-y-2">
-              <p className="text-[11px] uppercase text-muted-foreground tracking-wider">Resumo</p>
+              <p className="text-xs uppercase text-muted-foreground tracking-wider">Resumo</p>
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">De</span>

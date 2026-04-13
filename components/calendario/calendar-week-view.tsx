@@ -70,7 +70,8 @@ export function CalendarWeekView({ weekStart, agendamentos, colorMode, onVerDeta
   const nowLineTop = ((nowMinutes - HOURS_START * 60) / 60) * HOUR_HEIGHT
 
   return (
-    <Card className="p-4 overflow-x-auto">
+    <Card className="p-4">
+      <div className="overflow-x-auto -mx-3 sm:mx-0">
       <div className="min-w-[700px]">
         <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-1 mb-2">
           <div />
@@ -155,6 +156,7 @@ export function CalendarWeekView({ weekStart, agendamentos, colorMode, onVerDeta
             )
           })}
         </div>
+      </div>
       </div>
     </Card>
   )

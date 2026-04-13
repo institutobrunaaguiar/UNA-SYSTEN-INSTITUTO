@@ -25,7 +25,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
   return (
     <div className="flex flex-wrap gap-3">
       <Select value={filtros.mesAno} onValueChange={(v) => update({ mesAno: v })}>
-        <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
           <SelectValue placeholder="Mês/Ano" />
         </SelectTrigger>
         <SelectContent>
@@ -38,7 +38,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.profissional} onValueChange={(v) => update({ profissional: v })}>
-        <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
           <SelectValue placeholder="Profissional" />
         </SelectTrigger>
         <SelectContent>
@@ -52,7 +52,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.procedimento} onValueChange={(v) => update({ procedimento: v })}>
-        <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
           <SelectValue placeholder="Procedimento" />
         </SelectTrigger>
         <SelectContent>
@@ -66,7 +66,7 @@ export function AprovadasFiltros({ filtros, onChange, meses, profissionais, proc
       </Select>
 
       <Select value={filtros.faixaValor} onValueChange={(v) => update({ faixaValor: v })}>
-        <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+        <SelectTrigger className="w-full sm:w-[180px] bg-white border border-border rounded-lg text-xs">
           <SelectValue placeholder="Faixa de valor" />
         </SelectTrigger>
         <SelectContent>

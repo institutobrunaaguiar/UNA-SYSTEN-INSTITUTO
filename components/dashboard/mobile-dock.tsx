@@ -75,7 +75,7 @@ export function MobileDock() {
             className="fixed bottom-[68px] left-3 right-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl p-4 z-[999] lg:hidden shadow-lg"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.2em]">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.2em]">
                 Mais opções
               </span>
               <button
@@ -101,7 +101,7 @@ export function MobileDock() {
                     )}
                   >
                     <item.icon className="w-5 h-5" />
-                    <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
+                    <span className="text-xs font-medium tracking-wide">{item.label}</span>
                   </Link>
                 )
               })}

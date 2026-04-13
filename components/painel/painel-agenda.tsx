@@ -206,7 +206,7 @@ export function PainelAgenda() {
                       {a.profissional || "—"}
                     </span>
                   </div>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full inline-block shrink-0 ml-3 ${badge.className}`}>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full inline-block shrink-0 ml-3 ${badge.className}`}>
                     {badge.label}
                   </span>
                 </div>
