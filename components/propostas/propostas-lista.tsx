@@ -87,11 +87,13 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
     fetchPropostas()
   }, [])
 
-  // Selecionar o dia de hoje por padrao
+  // Selecionar o dia de hoje por padrao (apenas desktop — mobile mostra todas)
   useEffect(() => {
-    const today = new Date()
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
-    setSelectedDay(todayStr)
+    if (window.innerWidth >= 1024) {
+      const today = new Date()
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+      setSelectedDay(todayStr)
+    }
   }, [])
 
   function getSupabase() {
@@ -438,40 +440,45 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 animate-fade-in">
-      {/* Header: busca + botao */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+    <div className="space-y-3 sm:space-y-4 animate-fade-in">
+      {/* Busca + Nova Proposta (inline no mobile) */}
+      <div className="flex gap-2 sm:gap-3">
         <div className="flex-1 relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome ou CPF..."
-            className="pl-10"
+            className="pl-9 text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <Button
           onClick={onNovaProposta}
-          className="gap-2 w-full sm:w-auto"
+          size="sm"
+          className="gap-1.5 shrink-0"
         >
           <Plus className="w-4 h-4" />
-          Nova Proposta
+          <span className="hidden sm:inline">Nova Proposta</span>
+          <span className="sm:hidden">Nova</span>
         </Button>
       </div>
 
       {/* Filtros de status */}
       {!abaValidacao && (
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none">
           {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
-            <Button
+            <button
               key={status}
-              variant={filterStatus === status ? "default" : "outline"}
               onClick={() => setFilterStatus(status)}
-              size="sm"
-              className="shrink-0 text-xs sm:text-sm"
+              className={[
+                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                filterStatus === status
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground",
+              ].join(" ")}
             >
               {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
-            </Button>
+            </button>
           ))}
         </div>
       )}
@@ -481,7 +488,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           <button
             onClick={() => setAbaValidacao(false)}
             className={[
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[36px]",
+              "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors min-h-[36px]",
               !abaValidacao
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -492,7 +499,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
           <button
             onClick={() => setAbaValidacao(true)}
             className={[
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[36px] flex items-center gap-1.5",
+              "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors min-h-[36px] flex items-center gap-1.5",
               abaValidacao
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -517,28 +524,37 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         <>
         {!abaValidacao && (
         <>
-          {/* Mobile: botao para abrir calendario + data selecionada */}
+          {/* Mobile: mostra todas as propostas filtradas, com opcao de filtrar por dia */}
           <div className="flex items-center justify-between lg:hidden">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground capitalize">
-                {formatSelectedDate()}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
-                {propostasDoDia.length > 0 && (
-                  <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>
-                )}
-              </p>
+            <p className="text-xs text-muted-foreground">
+              {selectedDay ? (
+                <>
+                  {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
+                  {propostasDoDia.length > 0 && <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))}</>}
+                </>
+              ) : (
+                <>{filtered.length} propostas</>
+              )}
+            </p>
+            <div className="flex gap-1.5">
+              {selectedDay && (
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  className="text-xs text-primary font-medium px-2 py-1 rounded-md bg-primary/10"
+                >
+                  Ver todas
+                </button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 h-8 text-xs"
+                onClick={() => setCalendarOpen(true)}
+              >
+                <CalendarDays className="w-3.5 h-3.5" />
+                {selectedDay ? new Date(selectedDay + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "Data"}
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              onClick={() => setCalendarOpen(true)}
-            >
-              <CalendarDays className="w-4 h-4" />
-              Calendario
-            </Button>
           </div>
 
           {/* Mobile calendar bottom sheet */}
@@ -712,15 +728,21 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             </div>
           </div>
 
-          {/* Mobile: lista direta (prioridade absoluta) */}
-          <div className="lg:hidden space-y-3">
-            {propostasDoDia.length === 0 ? (
-              <Card className="p-6 text-center">
-                <p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p>
-              </Card>
-            ) : (
-              propostasDoDia.map((proposta) => renderPropostaCard(proposta))
-            )}
+          {/* Mobile: lista de propostas */}
+          <div className="lg:hidden space-y-2">
+            {(() => {
+              const mobileList = selectedDay ? propostasDoDia : filtered
+              if (mobileList.length === 0) {
+                return (
+                  <Card className="p-6 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDay ? "Nenhuma proposta neste dia." : "Nenhuma proposta encontrada."}
+                    </p>
+                  </Card>
+                )
+              }
+              return mobileList.map((proposta) => renderPropostaCard(proposta))
+            })()}
           </div>
         </>
         )}
@@ -799,7 +821,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         </>
       )}
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-xs text-muted-foreground text-center hidden sm:block">
         Mostrando {filtered.length} de {propostas.length} propostas
       </p>
 
