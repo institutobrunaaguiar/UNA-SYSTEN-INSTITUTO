@@ -317,10 +317,10 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Stepper */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-0.5 sm:gap-2">
         {STEPS.map((s, i) => (
           <div key={s.number} className="flex items-center flex-1">
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2 flex-1">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 transition-colors ${
                   step >= s.number
@@ -330,19 +330,19 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
               >
                 {s.number}
               </div>
-              <span className={`text-sm hidden sm:block ${step >= s.number ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+              <span className={`text-[10px] sm:text-sm ${step >= s.number ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                 {s.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`h-0.5 flex-1 mx-2 ${step > s.number ? "bg-primary" : "bg-muted"}`} />
+              <div className={`hidden sm:block h-0.5 flex-1 mx-2 ${step > s.number ? "bg-primary" : "bg-muted"}`} />
             )}
           </div>
         ))}
       </div>
 
       {/* Step Content */}
-      <Card className="p-4 sm:p-6">
+      <Card className="p-3 sm:p-4 lg:p-6">
         {step === 1 && (
           <StepCliente
             pacienteId={pacienteId}
@@ -401,12 +401,12 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
       </Card>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={step === 1 ? onCancel : () => setStep(step - 1)}
-          className="gap-2"
+          className="gap-2 flex-1 sm:flex-none"
         >
           <ArrowLeft className="w-4 h-4" />
           {step === 1 ? "Cancelar" : "Voltar"}
@@ -417,7 +417,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
             type="button"
             onClick={() => setStep(step + 1)}
             disabled={!canAdvance()}
-            className="gap-2"
+            className="gap-2 flex-1 sm:flex-none"
           >
             Proximo
             <ArrowRight className="w-4 h-4" />
@@ -427,10 +427,10 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            className="gap-2 flex-1 sm:flex-none"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "Salvando..." : proposta ? "Atualizar Proposta" : "Salvar Proposta"}
+            {saving ? "Salvando..." : proposta ? "Atualizar" : "Salvar"}
           </Button>
         )}
       </div>

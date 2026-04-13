@@ -452,7 +452,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         </div>
         <Button
           onClick={onNovaProposta}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105"
+          className="gap-2 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Nova Proposta
@@ -477,19 +477,26 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       )}
 
       {isAdmin && (
-        <div className="flex gap-2">
-          <Button
-            variant={!abaValidacao ? "default" : "outline"}
-            size="sm"
+        <div className="flex gap-1 bg-muted rounded-lg p-1 w-fit">
+          <button
             onClick={() => setAbaValidacao(false)}
+            className={[
+              "px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[36px]",
+              !abaValidacao
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            ].join(" ")}
           >
             Propostas
-          </Button>
-          <Button
-            variant={abaValidacao ? "default" : "outline"}
-            size="sm"
+          </button>
+          <button
             onClick={() => setAbaValidacao(true)}
-            className="gap-1.5"
+            className={[
+              "px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[36px] flex items-center gap-1.5",
+              abaValidacao
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            ].join(" ")}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             Validação
@@ -498,17 +505,14 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                 {pendentesValidacao.length}
               </span>
             )}
-          </Button>
+          </button>
         </div>
       )}
 
       {loading ? (
-        <Card className="p-12 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-            <p className="text-muted-foreground">Carregando propostas...</p>
-          </div>
-        </Card>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
       ) : (
         <>
         {!abaValidacao && (
@@ -795,9 +799,9 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         </>
       )}
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>Mostrando {filtered.length} de {propostas.length} propostas</span>
-      </div>
+      <p className="text-xs text-muted-foreground text-center">
+        Mostrando {filtered.length} de {propostas.length} propostas
+      </p>
 
       <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
