@@ -56,7 +56,23 @@ export default function LoginPage() {
         <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-[98%] h-1/2 bg-white/50 dark:bg-white/5 rounded-[10px] -z-10" />
 
         {/* Login box */}
-        <div className="w-full max-w-[400px] bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-[10px] shadow-[2px_4px_4px_#dcdcdc,-2px_4px_4px_#dcdcdc] dark:shadow-none dark:border dark:border-border px-[50px] py-5 relative">
+        <div className="w-full max-w-[400px] bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-[10px] shadow-[2px_4px_4px_#dcdcdc,-2px_4px_4px_#dcdcdc] dark:shadow-none dark:border dark:border-border px-[50px] py-5 relative overflow-hidden">
+
+          {/* Loading overlay — cobre só o card */}
+          {loading && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-[10px]">
+              {/* Spinner triplo */}
+              <div className="relative w-14 h-14">
+                <div className="absolute inset-0 rounded-full border-2 border-primary/10" />
+                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" style={{ animationDuration: "0.8s" }} />
+                <div className="absolute inset-[5px] rounded-full border-2 border-transparent border-t-primary/50 animate-spin" style={{ animationDuration: "1.2s", animationDirection: "reverse" }} />
+                <div className="absolute inset-[10px] rounded-full border-2 border-transparent border-t-primary/30 animate-spin" style={{ animationDuration: "1.6s" }} />
+              </div>
+              <p className="text-sm font-semibold text-primary tracking-[0.2em] uppercase">
+                Entrando...
+              </p>
+            </div>
+          )}
           {/* Header with accent bar */}
           <div className="relative h-[50px] leading-[50px]">
             <div className="absolute -left-[50px] top-0 h-full w-2 bg-primary rounded-l-[10px]" />
@@ -139,7 +155,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full sm:w-[70%] bg-transparent border border-[#ccc] dark:border-border px-4 py-3.5 text-[#ccc] dark:text-muted-foreground cursor-pointer uppercase tracking-[0.1em] text-sm font-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Entrando..." : "Entrar"}
+                Entrar
               </button>
             </div>
           </form>
