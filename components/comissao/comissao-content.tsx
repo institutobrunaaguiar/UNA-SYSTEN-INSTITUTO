@@ -3,7 +3,10 @@
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Calculator, ListChecks, BookOpen, Target, CalendarDays } from "lucide-react"
+import {
+  Calculator, ListChecks, BookOpen, Target, CalendarDays, LayoutDashboard,
+} from "lucide-react"
+import { ComissaoPainel } from "./comissao-painel"
 import { ComissaoLista } from "./comissao-lista"
 import { ComissaoRegras } from "./comissao-regras"
 import { ComissaoMetas } from "./comissao-metas"
@@ -19,8 +22,8 @@ export function ComissaoContent() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Action header */}
+    <div className="space-y-5 animate-fade-in">
+      {/* Botão calcular */}
       <div className="flex items-center justify-end">
         <Button
           onClick={() => setCalcularOpen(true)}
@@ -31,20 +34,23 @@ export function ComissaoContent() {
         </Button>
       </div>
 
-      <Tabs defaultValue="comissoes" className="space-y-4">
+      <Tabs defaultValue="painel" className="space-y-4">
         <TabsList className="flex-wrap h-auto gap-1">
-          <TabsTrigger value="comissoes" className="gap-1.5">
-            <ListChecks className="w-4 h-4" />
-            <span className="hidden sm:inline">Comissões</span>
-            <span className="sm:hidden">Comissões</span>
-          </TabsTrigger>
-          <TabsTrigger value="regras" className="gap-1.5">
-            <BookOpen className="w-4 h-4" />
-            Regras
+          <TabsTrigger value="painel" className="gap-1.5">
+            <LayoutDashboard className="w-4 h-4" />
+            Painel
           </TabsTrigger>
           <TabsTrigger value="metas" className="gap-1.5">
             <Target className="w-4 h-4" />
             Metas
+          </TabsTrigger>
+          <TabsTrigger value="comissoes" className="gap-1.5">
+            <ListChecks className="w-4 h-4" />
+            Lançamentos
+          </TabsTrigger>
+          <TabsTrigger value="regras" className="gap-1.5">
+            <BookOpen className="w-4 h-4" />
+            Regras
           </TabsTrigger>
           <TabsTrigger value="periodos" className="gap-1.5">
             <CalendarDays className="w-4 h-4" />
@@ -52,16 +58,20 @@ export function ComissaoContent() {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="painel">
+          <ComissaoPainel key={refreshKey} />
+        </TabsContent>
+
+        <TabsContent value="metas">
+          <ComissaoMetas />
+        </TabsContent>
+
         <TabsContent value="comissoes">
           <ComissaoLista key={refreshKey} />
         </TabsContent>
 
         <TabsContent value="regras">
           <ComissaoRegras />
-        </TabsContent>
-
-        <TabsContent value="metas">
-          <ComissaoMetas />
         </TabsContent>
 
         <TabsContent value="periodos">
