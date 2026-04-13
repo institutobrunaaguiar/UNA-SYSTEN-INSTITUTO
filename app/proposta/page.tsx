@@ -8,7 +8,7 @@ export default function PropostaPage() {
       <div className="hidden lg:block">
         <AppSidebar />
       </div>
-      <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:ml-[68px] dock-spacer">
+      <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:ml-[68px] dock-spacer overflow-x-hidden">
         <Header
           title="Propostas"
           description="Crie e gerencie propostas comerciais para seus pacientes."
