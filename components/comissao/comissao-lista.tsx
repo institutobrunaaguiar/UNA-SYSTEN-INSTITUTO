@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import {
@@ -118,21 +118,24 @@ function formatCurrency(value: number) {
 
 // ─── Form de lançamento manual ────────────────────────────────────────────────
 
-const EMPTY_FORM = {
-  profissional_nome: "",
-  procedimento_nome: "",
-  valor_base: "" as string | number,
-  percentual: "" as string | number,
-  valor_comissao: "" as string | number,
-  periodo_referencia: "",
-  observacoes: "",
+interface FormState {
+  profissional_nome: string
+  procedimento_nome: string
+  valor_base: number
+  percentual: number
+  valor_comissao: number
+  periodo_referencia: string
+  observacoes: string
 }
 
-type FormState = typeof EMPTY_FORM
-
-function calcComissao(valorBase: number, percentual: number) {
-  if (!valorBase || !percentual) return 0
-  return Math.round((valorBase * percentual) / 100 * 100) / 100
+const EMPTY_FORM: FormState = {
+  profissional_nome: "",
+  procedimento_nome: "",
+  valor_base: 0,
+  percentual: 0,
+  valor_comissao: 0,
+  periodo_referencia: "",
+  observacoes: "",
 }
 
 interface LancamentoSheetProps {
@@ -150,52 +153,44 @@ function LancamentoSheet({
   initialForm,
   onSaved,
 }: LancamentoSheetProps) {
-  const [form, setForm] = useState<FormState>(initialForm)
+  const [profissional, setProfissional] = useState("")
+  const [descricao, setDescricao] = useState("")
+  const [periodo, setPeriodo] = useState("")
+  const [valorBase, setValorBase] = useState("")
+  const [percentual, setPercentual] = useState("")
+  const [valorComissao, setValorComissao] = useState("")
+  const [observacoes, setObservacoes] = useState("")
   const [saving, setSaving] = useState(false)
-  const [comissaoManual, setComissaoManual] = useState(false)
 
-  // Sincroniza form ao abrir
+  // Sincroniza ao abrir
   useEffect(() => {
     if (open) {
-      setForm(initialForm)
-      setComissaoManual(false)
+      setProfissional(initialForm.profissional_nome)
+      setDescricao(initialForm.procedimento_nome)
+      setPeriodo(initialForm.periodo_referencia)
+      setValorBase(initialForm.valor_base > 0 ? String(initialForm.valor_base) : "")
+      setPercentual(initialForm.percentual > 0 ? String(initialForm.percentual) : "")
+      setValorComissao(initialForm.valor_comissao > 0 ? String(initialForm.valor_comissao) : "")
+      setObservacoes(initialForm.observacoes)
+      setSaving(false)
     }
-  }, [open, initialForm])
+  }, [open]) // só depende de open para não resetar ao editar
 
-  // Recalcula automaticamente quando valor_base ou percentual muda
-  useEffect(() => {
-    if (comissaoManual) return
-    const base = parseFloat(String(form.valor_base)) || 0
-    const pct = parseFloat(String(form.percentual)) || 0
-    const calc = calcComissao(base, pct)
-    if (calc > 0) {
-      setForm((f) => ({ ...f, valor_comissao: calc }))
-    }
-  }, [form.valor_base, form.percentual, comissaoManual])
-
-  function field<K extends keyof FormState>(key: K) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm((f) => ({ ...f, [key]: e.target.value }))
-  }
+  // Sugestão de cálculo (base × %)
+  const sugestao = useMemo(() => {
+    const b = parseFloat(valorBase) || 0
+    const p = parseFloat(percentual) || 0
+    if (b > 0 && p > 0) return Math.round(b * p / 100 * 100) / 100
+    return 0
+  }, [valorBase, percentual])
 
   async function handleSave() {
-    if (!form.profissional_nome.trim()) {
-      toast.error("Informe o nome do profissional/colaborador")
-      return
-    }
-    if (!form.procedimento_nome.trim()) {
-      toast.error("Informe a descrição da comissão")
-      return
-    }
-    if (!form.periodo_referencia) {
-      toast.error("Informe o período de referência")
-      return
-    }
-    const valorComissao = parseFloat(String(form.valor_comissao))
-    if (!valorComissao || valorComissao <= 0) {
-      toast.error("Informe um valor de comissão válido")
-      return
-    }
+    if (!profissional.trim()) { toast.error("Informe o profissional/colaborador"); return }
+    if (!descricao.trim())    { toast.error("Informe a descrição da comissão"); return }
+    if (!periodo)             { toast.error("Selecione o período de referência"); return }
+
+    const vc = parseFloat(valorComissao.replace(",", "."))
+    if (!vc || vc <= 0)       { toast.error("Informe o valor da comissão (campo obrigatório)"); return }
 
     try {
       setSaving(true)
@@ -203,16 +198,16 @@ function LancamentoSheet({
 
       const payload = {
         profissional_id: null,
-        profissional_nome: form.profissional_nome.trim(),
-        procedimento_nome: form.procedimento_nome.trim(),
-        valor_base: parseFloat(String(form.valor_base)) || 0,
-        percentual: parseFloat(String(form.percentual)) || 0,
-        valor_comissao: valorComissao,
+        profissional_nome: profissional.trim(),
+        procedimento_nome: descricao.trim(),
+        valor_base: parseFloat(valorBase.replace(",", ".")) || 0,
+        percentual: parseFloat(percentual.replace(",", ".")) || 0,
+        valor_comissao: vc,
         regra_id: null,
         proposta_id: null,
         status: "pendente",
-        periodo_referencia: form.periodo_referencia,
-        observacoes: form.observacoes?.trim() || null,
+        periodo_referencia: periodo,
+        observacoes: observacoes.trim() || null,
         updated_at: new Date().toISOString(),
       }
 
@@ -223,8 +218,8 @@ function LancamentoSheet({
           .eq("id", editingId)
 
         if (error) {
-          toast.error("Erro ao atualizar comissão")
-          console.error("[comissoes] Erro ao atualizar:", error.message)
+          toast.error("Erro ao atualizar: " + error.message)
+          console.error("[comissoes]", error)
           return
         }
         toast.success("Comissão atualizada")
@@ -232,8 +227,8 @@ function LancamentoSheet({
         const { error } = await supabase.from("comissoes").insert(payload)
 
         if (error) {
-          toast.error("Erro ao registrar comissão")
-          console.error("[comissoes] Erro ao criar:", error.message)
+          toast.error("Erro ao registrar: " + error.message)
+          console.error("[comissoes]", error)
           return
         }
         toast.success("Comissão registrada com sucesso")
@@ -249,9 +244,7 @@ function LancamentoSheet({
     }
   }
 
-  const baseNum = parseFloat(String(form.valor_base)) || 0
-  const pctNum = parseFloat(String(form.percentual)) || 0
-  const comissaoNum = parseFloat(String(form.valor_comissao)) || 0
+  const vcNum = parseFloat(valorComissao.replace(",", ".")) || 0
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -268,56 +261,85 @@ function LancamentoSheet({
         <div className="space-y-4 p-4">
           {/* Profissional */}
           <div className="space-y-2">
-            <Label htmlFor="lc-prof">Profissional / Colaborador</Label>
+            <Label htmlFor="lc-prof">Profissional / Colaborador *</Label>
             <Input
               id="lc-prof"
               placeholder="Ex: Giovanna Recepção"
-              value={form.profissional_nome}
-              onChange={field("profissional_nome")}
+              value={profissional}
+              onChange={(e) => setProfissional(e.target.value)}
             />
           </div>
 
           {/* Descrição */}
           <div className="space-y-2">
-            <Label htmlFor="lc-proc">Descrição da Comissão</Label>
+            <Label htmlFor="lc-proc">Descrição da Comissão *</Label>
             <Input
               id="lc-proc"
               placeholder="Ex: Bonificação Meta Cross-Selling — 9 agendamentos"
-              value={form.procedimento_nome}
-              onChange={field("procedimento_nome")}
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
             />
           </div>
 
           {/* Período */}
           <div className="space-y-2">
-            <Label htmlFor="lc-periodo">Período de Referência</Label>
+            <Label htmlFor="lc-periodo">Período de Referência *</Label>
             <Input
               id="lc-periodo"
               type="month"
-              value={form.periodo_referencia}
-              onChange={field("periodo_referencia")}
+              value={periodo}
+              onChange={(e) => setPeriodo(e.target.value)}
             />
           </div>
 
-          {/* Valor base + percentual */}
+          {/* Valor da comissão — campo principal, sempre editável */}
+          <div className="space-y-2">
+            <Label htmlFor="lc-comissao">
+              Valor da Comissão (R$) *
+            </Label>
+            <Input
+              id="lc-comissao"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Ex: 266.67"
+              value={valorComissao}
+              onChange={(e) => setValorComissao(e.target.value)}
+              className="font-semibold text-base"
+            />
+            {/* Sugestão de cálculo quando base+% preenchidos */}
+            {sugestao > 0 && Math.abs(sugestao - vcNum) > 0.01 && (
+              <button
+                type="button"
+                className="text-xs text-primary underline text-left"
+                onClick={() => setValorComissao(String(sugestao))}
+              >
+                Usar cálculo automático: {formatCurrency(sugestao)}
+              </button>
+            )}
+          </div>
+
+          {/* Valor base + percentual (opcionais — para referência) */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="lc-base">Valor Base (R$)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="lc-base" className="text-xs text-muted-foreground">
+                Valor Base (R$) — opcional
+              </Label>
               <Input
                 id="lc-base"
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder="Ex: 800"
-                value={form.valor_base}
-                onChange={field("valor_base")}
+                value={valorBase}
+                onChange={(e) => setValorBase(e.target.value)}
+                className="h-9 text-sm"
               />
-              <p className="text-[10px] text-muted-foreground">
-                Base de cálculo (opcional)
-              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lc-pct">Percentual (%)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="lc-pct" className="text-xs text-muted-foreground">
+                Percentual (%) — opcional
+              </Label>
               <Input
                 id="lc-pct"
                 type="number"
@@ -325,47 +347,17 @@ function LancamentoSheet({
                 max="100"
                 step="0.01"
                 placeholder="Ex: 33.33"
-                value={form.percentual}
-                onChange={field("percentual")}
+                value={percentual}
+                onChange={(e) => setPercentual(e.target.value)}
+                className="h-9 text-sm"
               />
-              <p className="text-[10px] text-muted-foreground">
-                % da meta atingida
-              </p>
             </div>
           </div>
-
-          {/* Valor da comissão */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="lc-comissao">Valor da Comissão (R$)</Label>
-              <button
-                type="button"
-                className="text-[10px] text-primary underline"
-                onClick={() => setComissaoManual((v) => !v)}
-              >
-                {comissaoManual ? "Calcular automaticamente" : "Editar manualmente"}
-              </button>
-            </div>
-            <Input
-              id="lc-comissao"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Ex: 266.67"
-              value={form.valor_comissao}
-              onChange={(e) => {
-                setComissaoManual(true)
-                field("valor_comissao")(e)
-              }}
-              className="font-semibold"
-            />
-            {/* Preview automático */}
-            {!comissaoManual && baseNum > 0 && pctNum > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {formatCurrency(baseNum)} × {pctNum}% = <strong>{formatCurrency(comissaoNum)}</strong>
-              </p>
-            )}
-          </div>
+          {sugestao > 0 && (
+            <p className="text-xs text-muted-foreground -mt-2">
+              {formatCurrency(parseFloat(valorBase) || 0)} × {percentual}% = <strong>{formatCurrency(sugestao)}</strong>
+            </p>
+          )}
 
           {/* Observações */}
           <div className="space-y-2">
@@ -373,27 +365,21 @@ function LancamentoSheet({
             <Input
               id="lc-obs"
               placeholder="Ex: 9 de 27 agendamentos — 33% da meta"
-              value={form.observacoes}
-              onChange={field("observacoes")}
+              value={observacoes}
+              onChange={(e) => setObservacoes(e.target.value)}
             />
           </div>
 
-          {/* Preview do registro */}
-          {form.profissional_nome && comissaoNum > 0 && (
-            <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 space-y-1.5">
-              <p className="text-[10px] font-semibold text-primary uppercase tracking-wider">
-                Resumo
-              </p>
+          {/* Resumo do registro */}
+          {profissional && vcNum > 0 && (
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 space-y-1">
+              <p className="text-[10px] font-semibold text-primary uppercase tracking-wider">Resumo</p>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">{form.profissional_nome}</span>
-                <span className="text-lg font-bold text-foreground">{formatCurrency(comissaoNum)}</span>
+                <span className="text-sm font-medium text-foreground">{profissional}</span>
+                <span className="text-lg font-bold text-foreground">{formatCurrency(vcNum)}</span>
               </div>
-              {form.procedimento_nome && (
-                <p className="text-xs text-muted-foreground">{form.procedimento_nome}</p>
-              )}
-              {form.periodo_referencia && (
-                <p className="text-[10px] text-muted-foreground">Período: {form.periodo_referencia}</p>
-              )}
+              {descricao && <p className="text-xs text-muted-foreground">{descricao}</p>}
+              {periodo && <p className="text-[10px] text-muted-foreground">Período: {periodo}</p>}
             </div>
           )}
         </div>
@@ -535,7 +521,7 @@ export function ComissaoLista() {
       percentual: c.percentual,
       valor_comissao: c.valor_comissao,
       periodo_referencia: c.periodo_referencia,
-      observacoes: c.observacoes || "",
+      observacoes: c.observacoes ?? "",
     })
     setSheetOpen(true)
   }
