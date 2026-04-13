@@ -177,13 +177,12 @@ function MesCard({ mes }: { mes: MesPeriodo }) {
 }
 
 export function MinhasComissoesContent() {
-  const { user } = useUser()
+  useUser() // mantém contexto de autenticação ativo
   const [aprovadas, setAprovadas] = useState<Proposta[]>([])
   const [reprovadas, setReprovadas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
-    if (!user?.nome) return
     setLoading(true)
     try {
       const supabase = getSupabase()
@@ -200,22 +199,14 @@ export function MinhasComissoesContent() {
           .order("validado_em", { ascending: false }),
       ])
 
-      // Filtra só as propostas onde o profissional logado aparece nos itens
-      const minhasAprovadas = (aprovadasRes.data ?? []).filter((p: Proposta) =>
-        p.itens.some((i) => i.profissionalNome === user.nome)
-      )
-      const minhasReprovadas = (reprovadasRes.data ?? []).filter((p: Proposta) =>
-        p.itens.some((i) => i.profissionalNome === user.nome)
-      )
-
-      setAprovadas(minhasAprovadas as Proposta[])
-      setReprovadas(minhasReprovadas as Proposta[])
+      setAprovadas((aprovadasRes.data ?? []) as Proposta[])
+      setReprovadas((reprovadasRes.data ?? []) as Proposta[])
     } catch (e) {
       console.error("[minhas-comissoes] erro:", e)
     } finally {
       setLoading(false)
     }
-  }, [user?.nome])
+  }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
 
