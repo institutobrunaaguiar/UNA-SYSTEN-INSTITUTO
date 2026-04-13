@@ -4,9 +4,11 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3,
-  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature,
+  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature, LogOut,
 } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
+import { getSupabase } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
@@ -30,10 +32,17 @@ const hiddenPaths = ["/login", "/logout"]
 
 export function MobileDock() {
   const pathname = usePathname()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [showMore, setShowMore] = useState(false)
 
   useEffect(() => setMounted(true), [])
+
+  async function handleLogout() {
+    const supabase = getSupabase()
+    await supabase.auth.signOut()
+    router.push("/login")
+  }
 
   // Hide dock on login/logout pages
   if (mounted && hiddenPaths.includes(pathname)) return null
@@ -97,6 +106,13 @@ export function MobileDock() {
                 )
               })}
             </div>
+            <button
+              onClick={() => { setShowMore(false); handleLogout() }}
+              className="flex items-center gap-2 w-full mt-3 pt-3 border-t border-border text-destructive active:bg-destructive/10 rounded-lg px-3 py-2.5 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-xs font-medium">Sair da conta</span>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
