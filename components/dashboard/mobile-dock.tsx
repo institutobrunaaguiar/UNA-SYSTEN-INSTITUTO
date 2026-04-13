@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import {
   LayoutDashboard, CheckSquare, Calendar, BarChart3,
-  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature, LogOut, Gift, ShieldCheck, UserCircle,
+  Stethoscope, DollarSign, Megaphone, Settings, MoreHorizontal, X, FileSignature, LogOut, Gift, ShieldCheck, UserCircle, TrendingUp,
 } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { getSupabase } from "@/lib/supabase/client"
@@ -12,23 +12,25 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
+import { useUser } from "@/context/user-context"
 
-const mainItems = [
-  { icon: LayoutDashboard, label: "Painel", href: "/painel" },
-  { icon: CheckSquare, label: "Proposta", href: "/proposta" },
-  { icon: Calendar, label: "Agenda", href: "/calendar" },
-  { icon: BarChart3, label: "Relatórios", href: "/analytics" },
-  { icon: Stethoscope, label: "Pacientes", href: "/pacientes" },
+const allMainItems = [
+  { icon: LayoutDashboard, label: "Painel",     href: "/painel",    modulo: "painel" },
+  { icon: CheckSquare,     label: "Proposta",   href: "/proposta",  modulo: "proposta" },
+  { icon: Calendar,        label: "Agenda",     href: "/calendar",  modulo: "calendario" },
+  { icon: BarChart3,       label: "Relatórios", href: "/analytics", modulo: "relatorios" },
+  { icon: Stethoscope,     label: "Pacientes",  href: "/pacientes", modulo: "pacientes" },
 ]
 
-const moreItems = [
-  { icon: ShieldCheck,   label: "Validações", href: "/aprovadas" },
-  { icon: DollarSign,    label: "Comissão",  href: "/comissao" },
-  { icon: Megaphone,     label: "Campanha",  href: "/campanha" },
-  { icon: FileSignature, label: "Contratos", href: "/contratos" },
-  { icon: Gift,          label: "Cashback",  href: "/cashback" },
-  { icon: UserCircle,    label: "Perfil",    href: "/perfil" },
-  { icon: Settings,      label: "Admin",     href: "/settings" },
+const allMoreItems = [
+  { icon: ShieldCheck,   label: "Validações",  href: "/aprovadas",        modulo: "aprovadas" },
+  { icon: DollarSign,    label: "Comissão",    href: "/comissao",         modulo: "comissao" },
+  { icon: TrendingUp,    label: "Minhas Com.", href: "/minhas-comissoes", modulo: "minhas_comissoes" },
+  { icon: Megaphone,     label: "Campanha",    href: "/campanha",         modulo: "campanha" },
+  { icon: FileSignature, label: "Contratos",   href: "/contratos",        modulo: "contratos" },
+  { icon: Gift,          label: "Cashback",    href: "/cashback",         modulo: "cashback" },
+  { icon: UserCircle,    label: "Perfil",      href: "/perfil",           modulo: null },
+  { icon: Settings,      label: "Admin",       href: "/settings",         modulo: "admin" },
 ]
 
 const hiddenPaths = ["/login", "/logout"]
@@ -36,10 +38,22 @@ const hiddenPaths = ["/login", "/logout"]
 export function MobileDock() {
   const pathname = usePathname()
   const router = useRouter()
+  const { user } = useUser()
   const [mounted, setMounted] = useState(false)
   const [showMore, setShowMore] = useState(false)
 
   useEffect(() => setMounted(true), [])
+
+  const isAdmin = user?.role === "admin"
+  const modulos = user?.modulos ?? []
+
+  function canSee(modulo: string | null) {
+    if (modulo === null) return true
+    return isAdmin || modulos.includes(modulo)
+  }
+
+  const mainItems = allMainItems.filter((item) => canSee(item.modulo))
+  const moreItems = allMoreItems.filter((item) => canSee(item.modulo))
 
   async function handleLogout() {
     const supabase = getSupabase()

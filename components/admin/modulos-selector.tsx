@@ -7,16 +7,26 @@ import {
   Stethoscope,
   Settings,
   FileSignature,
+  DollarSign,
+  TrendingUp,
+  ShieldCheck,
+  Megaphone,
+  Gift,
 } from "lucide-react"
 
 export const MODULOS = [
-  { key: "painel",      label: "Painel",      icon: LayoutDashboard },
-  { key: "proposta",    label: "Proposta",    icon: CheckSquare },
-  { key: "calendario",  label: "Calendário",  icon: Calendar },
-  { key: "relatorios",  label: "Relatórios",  icon: BarChart3 },
-  { key: "pacientes",   label: "Pacientes",   icon: Stethoscope },
-  { key: "contratos",   label: "Contratos",   icon: FileSignature },
-  { key: "admin",       label: "Admin",       icon: Settings },
+  { key: "painel",            label: "Painel",           icon: LayoutDashboard },
+  { key: "proposta",          label: "Proposta",         icon: CheckSquare },
+  { key: "aprovadas",         label: "Validações",       icon: ShieldCheck },
+  { key: "calendario",        label: "Calendário",       icon: Calendar },
+  { key: "relatorios",        label: "Relatórios",       icon: BarChart3 },
+  { key: "pacientes",         label: "Pacientes",        icon: Stethoscope },
+  { key: "comissao",          label: "Comissão",         icon: DollarSign },
+  { key: "minhas_comissoes",  label: "Minhas Comissões", icon: TrendingUp },
+  { key: "campanha",          label: "Campanha",         icon: Megaphone },
+  { key: "cashback",          label: "Cashback",         icon: Gift },
+  { key: "contratos",         label: "Contratos",        icon: FileSignature },
+  { key: "admin",             label: "Admin",            icon: Settings },
 ] as const
 
 export type ModuloKey = (typeof MODULOS)[number]["key"]

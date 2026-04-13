@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -557,12 +558,12 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             </div>
           </div>
 
-          {/* Mobile calendar bottom sheet */}
-          {calendarOpen && (
-            <div className="fixed inset-0 z-[998] lg:hidden" onClick={() => setCalendarOpen(false)}>
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          {/* Mobile calendar bottom sheet — rendered via portal to escape parent transform/stacking context */}
+          {calendarOpen && typeof document !== "undefined" && createPortal(
+            <div className="fixed inset-0 z-[998] lg:hidden">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setCalendarOpen(false)} />
               <div
-                className="absolute bottom-0 left-0 right-0 bg-card rounded-t-2xl p-4 pb-6 shadow-xl animate-slide-up safe-area-bottom"
+                className="absolute bottom-0 left-0 right-0 z-[1] bg-card rounded-t-2xl p-4 pb-6 shadow-xl animate-slide-up safe-area-bottom"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -642,7 +643,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   })}
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
 
           {/* Desktop: grid layout side-by-side */}
