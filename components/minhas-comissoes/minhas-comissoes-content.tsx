@@ -1,47 +1,25 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
-import { getSupabase } from "@/lib/supabase/client"
+import { useEffect, useState, useMemo, useCallback } from "react"
+import { createClient } from "@supabase/supabase-js"
 import { useUser } from "@/context/user-context"
 import { Card } from "@/components/ui/card"
 import {
   CheckCircle2,
-  Clock,
   XCircle,
-  TrendingUp,
   Wallet,
   ChevronDown,
   ChevronUp,
   AlertCircle,
+  ShieldCheck,
 } from "lucide-react"
+import type { Proposta } from "@/components/propostas/types"
 
-interface ComissaoRaw {
-  id: number
-  procedimento_nome: string
-  valor_base: number
-  percentual: number
-  valor_comissao: number
-  status: "pendente" | "em_validacao" | "aprovado" | "pago"
-  periodo_referencia: string
-  created_at: string
-  proposta_id: number | null
-  propostas: {
-    nome_cliente: string
-    validacao_status: "pendente" | "aprovada" | "reprovada" | null
-    validacao_motivo: string | null
-  } | null
-}
-
-interface ComissaoPeriodo {
-  periodo: string          // "2025-04"
-  label: string            // "Abril 2025"
-  items: ComissaoRaw[]
-  totalAprovado: number
-  totalPendente: number
-  totalReprovado: number
-  countAprovado: number
-  countPendente: number
-  countReprovado: number
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
 }
 
 const MESES = [
@@ -53,151 +31,144 @@ function formatBRL(v: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(v)
 }
 
-function periodoLabel(periodo: string) {
-  const [ano, mes] = periodo.split("-")
+function formatDate(d: string | null) {
+  if (!d) return "—"
+  return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
+}
+
+function getMesKey(dateStr: string | null): string {
+  if (!dateStr) return "sem_data"
+  const d = new Date(dateStr)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+}
+
+function getMesLabel(key: string): string {
+  if (key === "sem_data") return "Sem data"
+  const [ano, mes] = key.split("-")
   return `${MESES[parseInt(mes) - 1]} ${ano}`
 }
 
-function getStatusEfetivo(item: ComissaoRaw): "aprovado" | "pendente" | "reprovado" {
-  if (item.propostas?.validacao_status === "reprovada") return "reprovado"
-  if (item.status === "aprovado" || item.status === "pago") return "aprovado"
-  return "pendente"
+interface MesPeriodo {
+  key: string
+  label: string
+  aprovadas: Proposta[]
+  reprovadas: Proposta[]
+  totalAprovado: number
+  totalReprovado: number
 }
 
-const STATUS_UI = {
-  aprovado: {
-    label: "Aprovada",
-    icon: CheckCircle2,
-    className: "bg-green-500/10 text-green-600 border-green-500/20",
-    iconClass: "text-green-500",
-  },
-  pendente: {
-    label: "Pendente",
-    icon: Clock,
-    className: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-    iconClass: "text-yellow-500",
-  },
-  reprovado: {
-    label: "Reprovada",
-    icon: XCircle,
-    className: "bg-destructive/10 text-destructive border-destructive/20",
-    iconClass: "text-destructive",
-  },
-}
-
-function ComissaoCard({ item }: { item: ComissaoRaw }) {
-  const status = getStatusEfetivo(item)
-  const ui = STATUS_UI[status]
-  const Icon = ui.icon
+function PropostaCard({ proposta, tipo }: { proposta: Proposta; tipo: "aprovada" | "reprovada" }) {
+  const isReprovada = tipo === "reprovada"
+  const procedimentos = proposta.itens.map((i) => i.procedimentoNome).join(", ")
 
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border last:border-0">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${ui.className} border`}>
-        <Icon className={`w-4 h-4 ${ui.iconClass}`} />
+      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+        isReprovada ? "bg-destructive/10" : "bg-green-500/10"
+      }`}>
+        {isReprovada
+          ? <XCircle className="w-4 h-4 text-destructive" />
+          : <CheckCircle2 className="w-4 h-4 text-green-500" />
+        }
       </div>
+
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground leading-tight truncate">
-          {item.procedimento_nome || "Procedimento"}
-        </p>
-        {item.propostas?.nome_cliente && (
-          <p className="text-xs text-muted-foreground mt-0.5 truncate">
-            {item.propostas.nome_cliente}
-          </p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{proposta.nome_cliente}</p>
+        {proposta.cpf_cliente && (
+          <p className="text-[10px] text-muted-foreground">{proposta.cpf_cliente}</p>
         )}
-        {status === "reprovado" && item.propostas?.validacao_motivo && (
-          <div className="flex items-start gap-1.5 mt-1.5 bg-destructive/5 rounded-md px-2 py-1.5">
+        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{procedimentos || "—"}</p>
+
+        {isReprovada && proposta.validacao_motivo && (
+          <div className="flex items-start gap-1.5 mt-2 bg-destructive/5 border border-destructive/20 rounded-lg px-2.5 py-2">
             <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0 mt-0.5" />
-            <p className="text-[11px] text-destructive leading-snug">
-              {item.propostas.validacao_motivo}
-            </p>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-destructive mb-0.5">
+                Motivo da reprovação
+              </p>
+              <p className="text-xs text-destructive/80 leading-snug">{proposta.validacao_motivo}</p>
+            </div>
           </div>
         )}
-        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${ui.className}`}>
-            {ui.label}
-          </span>
-          <span className="text-[11px] text-muted-foreground">
-            {item.percentual}% sobre {formatBRL(item.valor_base)}
-          </span>
-        </div>
-      </div>
-      <div className="shrink-0 text-right">
-        <p className={`text-sm font-bold ${status === "reprovado" ? "text-muted-foreground line-through" : "text-foreground"}`}>
-          {formatBRL(item.valor_comissao)}
+
+        <p className="text-[10px] text-muted-foreground mt-1.5">
+          {isReprovada ? "Reprovada" : "Aprovada"} em {formatDate(proposta.validado_em)}
         </p>
-        {status === "pago" && (
-          <p className="text-[10px] text-green-600 font-medium">Pago</p>
-        )}
+      </div>
+
+      <div className="shrink-0 text-right">
+        <p className={`text-sm font-bold ${isReprovada ? "text-muted-foreground line-through" : "text-foreground"}`}>
+          {formatBRL(proposta.valor_total)}
+        </p>
+        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+          isReprovada
+            ? "bg-destructive/10 text-destructive"
+            : "bg-green-500/10 text-green-600"
+        }`}>
+          {isReprovada ? "Reprovada" : "Aprovada"}
+        </span>
       </div>
     </div>
   )
 }
 
-function PeriodoCard({ periodo }: { periodo: ComissaoPeriodo }) {
+function MesCard({ mes }: { mes: MesPeriodo }) {
   const [expanded, setExpanded] = useState(true)
+  const total = mes.aprovadas.length + mes.reprovadas.length
 
   return (
     <Card className="overflow-hidden">
-      {/* Header */}
       <button
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex items-center justify-between p-4 text-left active:bg-muted/50 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <TrendingUp className="w-5 h-5 text-primary" />
+            <ShieldCheck className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">{periodo.label}</p>
+            <p className="text-sm font-semibold text-foreground">{mes.label}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {periodo.items.length} {periodo.items.length === 1 ? "comissão" : "comissões"}
+              {total} {total === 1 ? "proposta" : "propostas"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-base font-bold text-foreground">{formatBRL(periodo.totalAprovado)}</p>
+            <p className="text-base font-bold text-foreground">{formatBRL(mes.totalAprovado)}</p>
             <p className="text-[10px] text-muted-foreground">aprovado</p>
           </div>
-          {expanded ? (
-            <ChevronUp className="w-4 h-4 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-          )}
+          {expanded
+            ? <ChevronUp className="w-4 h-4 text-muted-foreground" />
+            : <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          }
         </div>
       </button>
 
-      {/* Summary chips */}
+      {/* Chips de resumo */}
       <div className="flex gap-2 px-4 pb-3 flex-wrap">
-        {periodo.countAprovado > 0 && (
+        {mes.aprovadas.length > 0 && (
           <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full bg-green-500/10 text-green-700 border border-green-500/20">
             <CheckCircle2 className="w-3 h-3" />
-            {periodo.countAprovado} aprovada{periodo.countAprovado > 1 ? "s" : ""}
-            {" · "}
-            {formatBRL(periodo.totalAprovado)}
+            {mes.aprovadas.length} aprovada{mes.aprovadas.length > 1 ? "s" : ""}
+            {" · "}{formatBRL(mes.totalAprovado)}
           </span>
         )}
-        {periodo.countPendente > 0 && (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-700 border border-yellow-500/20">
-            <Clock className="w-3 h-3" />
-            {periodo.countPendente} pendente{periodo.countPendente > 1 ? "s" : ""}
-            {" · "}
-            {formatBRL(periodo.totalPendente)}
-          </span>
-        )}
-        {periodo.countReprovado > 0 && (
+        {mes.reprovadas.length > 0 && (
           <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20">
             <XCircle className="w-3 h-3" />
-            {periodo.countReprovado} reprovada{periodo.countReprovado > 1 ? "s" : ""}
+            {mes.reprovadas.length} reprovada{mes.reprovadas.length > 1 ? "s" : ""}
           </span>
         )}
       </div>
 
-      {/* Items */}
       {expanded && (
         <div className="px-4 border-t border-border">
-          {periodo.items.map((item) => (
-            <ComissaoCard key={item.id} item={item} />
+          {mes.aprovadas.map((p) => (
+            <PropostaCard key={`a-${p.id}`} proposta={p} tipo="aprovada" />
+          ))}
+          {mes.reprovadas.map((p) => (
+            <PropostaCard key={`r-${p.id}`} proposta={p} tipo="reprovada" />
           ))}
         </div>
       )}
@@ -207,83 +178,81 @@ function PeriodoCard({ periodo }: { periodo: ComissaoPeriodo }) {
 
 export function MinhasComissoesContent() {
   const { user } = useUser()
-  const [periodos, setPeriodos] = useState<ComissaoPeriodo[]>([])
+  const [aprovadas, setAprovadas] = useState<Proposta[]>([])
+  const [reprovadas, setReprovadas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
-  const [totalGeral, setTotalGeral] = useState(0)
-  const [totalPendente, setTotalPendente] = useState(0)
-  const [totalReprovado, setTotalReprovado] = useState(0)
 
   const fetchData = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.nome) return
     setLoading(true)
     try {
       const supabase = getSupabase()
-      const { data, error } = await supabase
-        .from("comissoes")
-        .select(`
-          id, procedimento_nome, valor_base, percentual, valor_comissao,
-          status, periodo_referencia, created_at, proposta_id,
-          propostas!proposta_id(nome_cliente, validacao_status, validacao_motivo)
-        `)
-        .eq("profissional_id", user.id)
-        .order("periodo_referencia", { ascending: false })
+      const [aprovadasRes, reprovadasRes] = await Promise.all([
+        supabase
+          .from("propostas")
+          .select("id, valor_total, status, created_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+          .eq("validacao_status", "aprovada")
+          .order("validado_em", { ascending: false }),
+        supabase
+          .from("propostas")
+          .select("id, valor_total, status, created_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+          .eq("validacao_status", "reprovada")
+          .order("validado_em", { ascending: false }),
+      ])
 
-      if (error) throw error
+      // Filtra só as propostas onde o profissional logado aparece nos itens
+      const minhasAprovadas = (aprovadasRes.data ?? []).filter((p: Proposta) =>
+        p.itens.some((i) => i.profissionalNome === user.nome)
+      )
+      const minhasReprovadas = (reprovadasRes.data ?? []).filter((p: Proposta) =>
+        p.itens.some((i) => i.profissionalNome === user.nome)
+      )
 
-      const items = (data ?? []) as ComissaoRaw[]
-
-      // Group by periodo_referencia
-      const map = new Map<string, ComissaoRaw[]>()
-      items.forEach((item) => {
-        const p = item.periodo_referencia ?? "sem_periodo"
-        if (!map.has(p)) map.set(p, [])
-        map.get(p)!.push(item)
-      })
-
-      let sumAprovado = 0
-      let sumPendente = 0
-      let sumReprovado = 0
-
-      const result: ComissaoPeriodo[] = Array.from(map.entries()).map(([periodo, list]) => {
-        const aprovados = list.filter((i) => getStatusEfetivo(i) === "aprovado")
-        const pendentes = list.filter((i) => getStatusEfetivo(i) === "pendente")
-        const reprovados = list.filter((i) => getStatusEfetivo(i) === "reprovado")
-
-        const tA = aprovados.reduce((s, i) => s + i.valor_comissao, 0)
-        const tP = pendentes.reduce((s, i) => s + i.valor_comissao, 0)
-        const tR = reprovados.reduce((s, i) => s + i.valor_comissao, 0)
-
-        sumAprovado += tA
-        sumPendente += tP
-        sumReprovado += tR
-
-        return {
-          periodo,
-          label: periodoLabel(periodo),
-          items: list,
-          totalAprovado: tA,
-          totalPendente: tP,
-          totalReprovado: tR,
-          countAprovado: aprovados.length,
-          countPendente: pendentes.length,
-          countReprovado: reprovados.length,
-        }
-      })
-
-      setPeriodos(result)
-      setTotalGeral(sumAprovado)
-      setTotalPendente(sumPendente)
-      setTotalReprovado(sumReprovado)
+      setAprovadas(minhasAprovadas as Proposta[])
+      setReprovadas(minhasReprovadas as Proposta[])
     } catch (e) {
       console.error("[minhas-comissoes] erro:", e)
     } finally {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [user?.nome])
 
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
+  useEffect(() => { fetchData() }, [fetchData])
+
+  // Agrupa por mês baseado em validado_em
+  const periodos = useMemo((): MesPeriodo[] => {
+    const map = new Map<string, { aprovadas: Proposta[]; reprovadas: Proposta[] }>()
+
+    const ensureMes = (key: string) => {
+      if (!map.has(key)) map.set(key, { aprovadas: [], reprovadas: [] })
+    }
+
+    aprovadas.forEach((p) => {
+      const key = getMesKey(p.validado_em)
+      ensureMes(key)
+      map.get(key)!.aprovadas.push(p)
+    })
+
+    reprovadas.forEach((p) => {
+      const key = getMesKey(p.validado_em)
+      ensureMes(key)
+      map.get(key)!.reprovadas.push(p)
+    })
+
+    return Array.from(map.entries())
+      .sort(([a], [b]) => b.localeCompare(a)) // mais recente primeiro
+      .map(([key, data]) => ({
+        key,
+        label: getMesLabel(key),
+        aprovadas: data.aprovadas,
+        reprovadas: data.reprovadas,
+        totalAprovado: data.aprovadas.reduce((s, p) => s + p.valor_total, 0),
+        totalReprovado: data.reprovadas.reduce((s, p) => s + p.valor_total, 0),
+      }))
+  }, [aprovadas, reprovadas])
+
+  const totalAprovado = useMemo(() => aprovadas.reduce((s, p) => s + p.valor_total, 0), [aprovadas])
+  const totalReprovado = useMemo(() => reprovadas.reduce((s, p) => s + p.valor_total, 0), [reprovadas])
 
   if (loading) {
     return (
@@ -297,9 +266,9 @@ export function MinhasComissoesContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Wallet className="w-12 h-12 text-muted-foreground/30 mb-3" />
-        <p className="text-sm font-medium text-muted-foreground">Nenhuma comissão registrada</p>
-        <p className="text-xs text-muted-foreground/60 mt-1">
-          Suas comissões aparecerão aqui quando forem calculadas pelo administrador.
+        <p className="text-sm font-medium text-muted-foreground">Nenhuma proposta validada</p>
+        <p className="text-xs text-muted-foreground/60 mt-1 max-w-xs">
+          Suas propostas aprovadas e reprovadas pelo administrador aparecerão aqui.
         </p>
       </div>
     )
@@ -307,27 +276,16 @@ export function MinhasComissoesContent() {
 
   return (
     <div className="space-y-4 sm:space-y-5 animate-fade-in">
-      {/* KPI Cards */}
+      {/* KPIs */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <Card className="p-3 sm:p-4 space-y-0.5">
           <p className="text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground tracking-wider leading-tight">
             Total Aprovado
           </p>
-          <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalGeral)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalAprovado)}</p>
           <div className="flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-green-500" />
-            <p className="text-[10px] text-green-600 font-medium">aprovadas</p>
-          </div>
-        </Card>
-
-        <Card className="p-3 sm:p-4 space-y-0.5">
-          <p className="text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground tracking-wider leading-tight">
-            Pendente
-          </p>
-          <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalPendente)}</p>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-yellow-500" />
-            <p className="text-[10px] text-yellow-600 font-medium">em análise</p>
+            <p className="text-[10px] text-green-600 font-medium">{aprovadas.length} propost{aprovadas.length === 1 ? "a" : "as"}</p>
           </div>
         </Card>
 
@@ -338,15 +296,25 @@ export function MinhasComissoesContent() {
           <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalReprovado)}</p>
           <div className="flex items-center gap-1">
             <XCircle className="w-3 h-3 text-destructive" />
-            <p className="text-[10px] text-destructive font-medium">reprovadas</p>
+            <p className="text-[10px] text-destructive font-medium">{reprovadas.length} propost{reprovadas.length === 1 ? "a" : "as"}</p>
           </div>
+        </Card>
+
+        <Card className="p-3 sm:p-4 space-y-0.5">
+          <p className="text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground tracking-wider leading-tight">
+            Total Geral
+          </p>
+          <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">
+            {aprovadas.length + reprovadas.length}
+          </p>
+          <p className="text-[10px] text-muted-foreground font-medium">validações</p>
         </Card>
       </div>
 
-      {/* Period cards */}
+      {/* Períodos */}
       <div className="space-y-3">
-        {periodos.map((periodo) => (
-          <PeriodoCard key={periodo.periodo} periodo={periodo} />
+        {periodos.map((mes) => (
+          <MesCard key={mes.key} mes={mes} />
         ))}
       </div>
     </div>
