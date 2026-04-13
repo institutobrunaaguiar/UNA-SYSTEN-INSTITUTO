@@ -39,8 +39,8 @@ export function PainelChart({ dados }: { dados: MesData[] }) {
   }))
 
   return (
-    <Card className="p-5 bg-white border border-border rounded-xl">
-      <div className="flex items-start justify-between mb-4">
+    <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
         <div>
           <p className="text-sm font-semibold text-foreground">Receita Mensal</p>
           <p className="text-xs text-muted-foreground">Recebido vs Previsão — {new Date().getFullYear()}</p>

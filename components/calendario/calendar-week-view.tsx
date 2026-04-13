@@ -52,7 +52,7 @@ export function CalendarWeekView({ weekStart, agendamentos, colorMode, onVerDeta
     const startMin = timeToMinutes(agendamento.hora_inicio)
     const endMin = timeToMinutes(agendamento.hora_fim)
     const top = ((startMin - HOURS_START * 60) / 60) * HOUR_HEIGHT
-    const height = Math.max(((endMin - startMin) / 60) * HOUR_HEIGHT, 24)
+    const height = Math.max(((endMin - startMin) / 60) * HOUR_HEIGHT, 36)
     return { top: `${top}px`, height: `${height}px` }
   }
 
@@ -139,13 +139,13 @@ export function CalendarWeekView({ weekStart, agendamentos, colorMode, onVerDeta
                       onVerDetalhes={onVerDetalhes}
                     >
                       <div
-                        className={`absolute left-0.5 right-0.5 rounded-md px-1.5 py-0.5 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity z-[5] ${blockColor.className}`}
+                        className={`absolute left-0.5 right-0.5 rounded-md px-1.5 py-1 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity z-[5] ${blockColor.className}`}
                         style={{ ...blockStyle, ...blockColor.style }}
                       >
-                        <p className="text-[10px] font-medium truncate">
+                        <p className="text-[11px] font-medium truncate leading-tight">
                           {agendamento.hora_inicio.slice(0, 5)}
                         </p>
-                        <p className="text-[10px] truncate">
+                        <p className="text-[11px] truncate leading-tight">
                           {agendamento.nome_paciente || `#${agendamento.id_paciente}`}
                         </p>
                       </div>

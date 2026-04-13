@@ -224,7 +224,7 @@ export function RelatoriosGerencial({ filters }: RelatoriosGerencialProps) {
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             style={{ animationDelay: `${index * 80}ms` }}
-            className={`bg-card text-foreground p-4 transition-all duration-500 ease-out animate-slide-in-up cursor-default ${
+            className={`bg-card text-foreground p-3 sm:p-4 transition-all duration-500 ease-out animate-slide-in-up cursor-default ${
               hoveredCard === index ? "scale-[1.02] shadow-2xl" : "shadow-lg"
             }`}
           >
@@ -243,13 +243,13 @@ export function RelatoriosGerencial({ filters }: RelatoriosGerencialProps) {
                 <ArrowUpRight className="w-3 h-3 text-primary-foreground" />
               </div>
             </div>
-            <p className="text-2xl font-bold tracking-tight">{kpi.value}</p>
+            <p className="text-xl sm:text-2xl font-bold tracking-tight">{kpi.value}</p>
           </Card>
         ))}
       </div>
 
       {/* Monthly Revenue Chart */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-6">
           <div className="p-1.5 bg-primary/10 rounded-full">
             <BarChart3 className="w-4 h-4 text-primary" />

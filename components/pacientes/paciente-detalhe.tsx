@@ -125,7 +125,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ComponentType<{ cla
     <div className="flex items-start gap-3 py-2.5 border-b border-border last:border-0">
       <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
         <p className="text-sm text-foreground mt-0.5 break-words">{value || "-"}</p>
       </div>
     </div>
@@ -190,7 +190,7 @@ function TabAgendamentos({ pacienteId }: { pacienteId: number }) {
                   )}
                 </div>
               </div>
-              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${status.className}`}>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${status.className}`}>
                 {status.label}
               </span>
             </div>
@@ -264,7 +264,7 @@ function TabOrcamentos({ pacienteId }: { pacienteId: number }) {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-foreground">{formatCurrency(orc.valorLiquido)}</p>
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${status.className}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${status.className}`}>
                   {status.label}
                 </span>
               </div>
@@ -291,7 +291,7 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
 
   return (
     <Sheet open={!!paciente} onOpenChange={(v) => { if (!v) onClose() }}>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         {paciente && (
           <>
             <SheetHeader className="pb-4 border-b border-border">
@@ -308,9 +308,9 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
                   )}
                   <div className="flex items-center gap-2 mt-1">
                     {paciente.cpf_cnpj && (
-                      <span className="text-[10px] text-muted-foreground font-mono">{formatCpf(paciente.cpf_cnpj)}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{formatCpf(paciente.cpf_cnpj)}</span>
                     )}
-                    <Badge variant={paciente.ativo ? "default" : "secondary"} className="text-[10px] py-0 h-4">
+                    <Badge variant={paciente.ativo ? "default" : "secondary"} className="text-xs py-0 h-5">
                       {paciente.ativo ? "Ativo" : "Inativo"}
                     </Badge>
                   </div>
@@ -336,7 +336,7 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
 
               <TabsContent value="dados" className="mt-4 space-y-4">
                 <Card className="p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Dados Pessoais</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Dados Pessoais</p>
                   <InfoRow icon={CreditCard} label="CPF / CNPJ" value={formatCpf(paciente.cpf_cnpj)} />
                   <InfoRow icon={Calendar} label="Data de nascimento" value={formatDate(paciente.data_nascimento)} />
                   {paciente.sexo && <InfoRow icon={User} label="Sexo" value={paciente.sexo} />}
@@ -346,7 +346,7 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
                 </Card>
 
                 <Card className="p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Contato</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Contato</p>
                   <InfoRow icon={Phone} label="Celular" value={paciente.telefone_celular ?? "-"} />
                   <InfoRow icon={Phone} label="Telefone" value={paciente.telefone ?? "-"} />
                   <InfoRow icon={Mail} label="E-mail" value={paciente.email ?? "-"} />
@@ -354,7 +354,7 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
 
                 {endereco && (
                   <Card className="p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Endereço</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Endereço</p>
                     <InfoRow icon={MapPin} label="Logradouro" value={endereco} />
                     {paciente.cep && <InfoRow icon={MapPin} label="CEP" value={paciente.cep} />}
                   </Card>

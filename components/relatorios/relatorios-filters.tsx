@@ -97,7 +97,7 @@ export function RelatoriosFilters({ filters, onFiltersChange }: RelatoriosFilter
     filters.dataInicial || filters.dataFinal || filters.profissional || filters.procedimento
 
   return (
-    <Card className="p-4 animate-fade-in">
+    <Card className="p-3 sm:p-4 animate-fade-in">
       <div className="flex items-center gap-2 mb-3">
         <div className="p-1.5 bg-primary/10 rounded-full">
           <Filter className="w-3.5 h-3.5 text-primary" />

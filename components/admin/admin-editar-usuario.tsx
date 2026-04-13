@@ -93,7 +93,7 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
 
   return (
     <Sheet open={!!usuario} onOpenChange={(v) => { if (!v) onClose() }}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="overflow-y-auto w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Editar Usuário</SheetTitle>
         </SheetHeader>
@@ -109,7 +109,7 @@ export function AdminEditarUsuario({ usuario, onClose, onSaved }: Props) {
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nível de Acesso</Label>
             <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="operador">Operador</SelectItem>

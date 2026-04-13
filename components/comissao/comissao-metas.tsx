@@ -243,7 +243,7 @@ export function ComissaoMetas() {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
           Acompanhe as metas individuais e coletivas da equipe.
         </p>
@@ -292,7 +292,7 @@ export function ComissaoMetas() {
             return (
               <Card
                 key={meta.id}
-                className={`p-4 hover:shadow-lg transition-all duration-300 relative ${
+                className={`p-3 sm:p-4 hover:shadow-lg transition-all duration-300 relative ${
                   !meta.ativo ? "opacity-60" : ""
                 }`}
               >
@@ -300,7 +300,7 @@ export function ComissaoMetas() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${
                           meta.tipo === "individual"
                             ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
                             : "bg-violet-500/10 text-violet-500 border-violet-500/20"
@@ -314,7 +314,7 @@ export function ComissaoMetas() {
                         {meta.tipo === "individual" ? "Individual" : "Coletiva"}
                       </span>
                       {!meta.ativo && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
                           Inativa
                         </span>
                       )}
@@ -356,7 +356,7 @@ export function ComissaoMetas() {
                 <div className="space-y-2">
                   <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-lg font-bold text-foreground">
+                      <p className="text-base sm:text-lg font-bold text-foreground">
                         {formatCurrency(meta.valor_atingido)}
                       </p>
                       <p className="text-xs text-muted-foreground">

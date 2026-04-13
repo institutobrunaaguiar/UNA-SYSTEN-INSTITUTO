@@ -277,7 +277,7 @@ export function ComissaoRegras() {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
           Configure as regras de calculo de comissao por procedimento, profissional ou meta.
         </p>
@@ -316,6 +316,7 @@ export function ComissaoRegras() {
         </Card>
       ) : (
         <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -413,6 +414,7 @@ export function ComissaoRegras() {
               })}
             </TableBody>
           </Table>
+          </div>
         </Card>
       )}
 

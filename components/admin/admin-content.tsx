@@ -18,7 +18,7 @@ export function AdminContent() {
             key={t}
             onClick={() => setTab(t)}
             className={[
-              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              "px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[36px]",
               tab === t
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",

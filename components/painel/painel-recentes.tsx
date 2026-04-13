@@ -16,7 +16,7 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
 
 export function PainelRecentes({ propostas }: { propostas: PropostaRecente[] }) {
   return (
-    <Card className="p-5 bg-white border border-border rounded-xl">
+    <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm font-semibold text-foreground">Propostas Recentes</p>
         <Link href="/proposta" className="text-[11px] text-blue-500 hover:underline">

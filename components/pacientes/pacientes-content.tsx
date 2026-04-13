@@ -144,11 +144,11 @@ export function PacientesContent() {
   return (
     <div className="space-y-4">
       {/* Search */}
-      <div className="relative max-w-sm">
+      <div className="relative w-full sm:max-w-sm">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Buscar por nome, CPF, telefone ou e-mail..."
-          className="pl-9 h-9 text-sm"
+          className="pl-9 h-9 w-full text-sm"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -161,7 +161,7 @@ export function PacientesContent() {
             key={f}
             onClick={() => setFilterStatus(f)}
             className={[
-              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[36px] flex items-center",
               filterStatus === f
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -179,8 +179,8 @@ export function PacientesContent() {
           <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full" />
         </div>
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
+        <Card className="overflow-hidden overflow-x-auto">
+          <table className="w-full text-sm min-w-[480px]">
             <thead>
               <tr className="border-b border-border bg-muted/50">
                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Paciente</th>
@@ -219,7 +219,7 @@ export function PacientesContent() {
                           </p>
                         )}
                         {p.email && (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 truncate max-w-[180px]">
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 truncate max-w-[180px] sm:max-w-[220px]">
                             <Mail className="w-3 h-3 shrink-0" />{p.email}
                           </p>
                         )}
@@ -232,7 +232,7 @@ export function PacientesContent() {
                       {formatDate(p.data_nascimento) ?? "-"}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={p.ativo ? "default" : "secondary"} className="text-[10px] py-0 h-5">
+                      <Badge variant={p.ativo ? "default" : "secondary"} className="text-xs py-0 h-5">
                         {p.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                     </td>
@@ -251,7 +251,7 @@ export function PacientesContent() {
       )}
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-xs text-muted-foreground">
           {total === 0 ? "Nenhum resultado" : `${from}–${to} de ${total} pacientes`}
         </p>
@@ -259,19 +259,19 @@ export function PacientesContent() {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-9 w-9 p-0"
             disabled={page === 0 || loading}
             onClick={() => setPage((p) => p - 1)}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-xs text-muted-foreground min-w-[80px] text-center">
+          <span className="text-xs text-muted-foreground min-w-[5rem] text-center">
             Pág. {page + 1} de {totalPages}
           </span>
           <Button
             variant="outline"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-9 w-9 p-0"
             disabled={page >= totalPages - 1 || loading}
             onClick={() => setPage((p) => p + 1)}
           >

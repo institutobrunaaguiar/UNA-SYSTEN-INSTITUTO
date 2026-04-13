@@ -24,7 +24,7 @@ export function CalendarPopover({ agendamento, children, onVerDetalhes }: Calend
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-4" align="start">
+      <PopoverContent className="w-[calc(100vw-2rem)] sm:w-72 max-w-xs p-4" align="start">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusCfg.color}`}>

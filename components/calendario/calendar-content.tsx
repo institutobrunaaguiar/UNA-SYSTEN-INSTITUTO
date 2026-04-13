@@ -255,23 +255,23 @@ export function CalendarContent() {
           </div>
 
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prev}>
+            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={prev}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <span className="text-sm font-semibold min-w-0 sm:min-w-[160px] text-center">{getPeriodLabel()}</span>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
+            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={next}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
 
-          <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-7 px-2">
+          <Button variant="outline" size="sm" onClick={goToToday} className="text-xs h-9 px-3">
             Hoje
           </Button>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <Select value={filterProfissional} onValueChange={setFilterProfissional}>
-            <SelectTrigger className="w-full sm:w-[180px] h-8 text-xs">
+            <SelectTrigger className="w-full sm:w-[180px] h-9 text-xs">
               <SelectValue placeholder="Profissional" />
             </SelectTrigger>
             <SelectContent>
@@ -286,7 +286,7 @@ export function CalendarContent() {
             <Button
               variant={colorMode === "status" ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7"
+              className="text-xs h-9"
               onClick={() => setColorMode("status")}
             >
               Status
@@ -294,7 +294,7 @@ export function CalendarContent() {
             <Button
               variant={colorMode === "rotulo" ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7"
+              className="text-xs h-9"
               onClick={() => setColorMode("rotulo")}
             >
               Rotulo

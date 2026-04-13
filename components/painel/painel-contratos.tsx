@@ -97,34 +97,34 @@ export function PainelContratos() {
   return (
     <div className="space-y-4">
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Total</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{total}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{total}</p>
           <p className="text-xs text-muted-foreground">últimos 90 dias</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Assinados</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{assinados}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{assinados}</p>
           <p className="text-xs text-muted-foreground">contratos</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Pendentes</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{pendentes}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{pendentes}</p>
           <p className="text-xs text-muted-foreground">aguardando assinatura</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Taxa de Assinatura</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{taxaAssinatura}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{taxaAssinatura}</p>
           <p className="text-xs text-muted-foreground">conversão</p>
         </Card>
       </div>
 
       {/* Recent Contracts List */}
-      <Card className="p-5 bg-white border border-border rounded-xl">
+      <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
         <div className="flex items-center gap-2 mb-4">
           <FileText className="w-4 h-4 text-muted-foreground" />
           <p className="text-sm font-semibold text-foreground">Contratos Recentes</p>
@@ -141,19 +141,19 @@ export function PainelContratos() {
                 key={contrato.id}
                 className="flex items-center justify-between border-b border-border last:border-0 py-3 gap-3"
               >
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm text-foreground truncate max-w-[150px] sm:max-w-[200px]">{contrato.titulo}</span>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-sm text-foreground truncate">{contrato.titulo}</span>
                   <span className="text-xs text-muted-foreground">
                     {contrato.nome_paciente ?? "—"}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_CLASS[contrato.status]}`}
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${STATUS_CLASS[contrato.status]}`}
                   >
                     {STATUS_LABEL[contrato.status]}
                   </span>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">
                     {new Date(contrato.created_at).toLocaleDateString("pt-BR")}
                   </span>
                 </div>

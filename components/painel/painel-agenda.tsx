@@ -156,33 +156,33 @@ export function PainelAgenda() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4 bg-white border border-border rounded-xl">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Hoje</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{kpis.hoje}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{kpis.hoje}</p>
           <p className="text-[11px] text-muted-foreground mt-1">agendamentos</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Confirmados</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{kpis.confirmados}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{kpis.confirmados}</p>
           <p className="text-[11px] text-muted-foreground mt-1">hoje</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Cancelados</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{kpis.canceladosMes}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{kpis.canceladosMes}</p>
           <p className="text-[11px] text-muted-foreground mt-1">este mês</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Comparecimento</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{kpis.comparecimento}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{kpis.comparecimento}</p>
           <p className="text-[11px] text-muted-foreground mt-1">finalizados / total</p>
         </Card>
       </div>
 
-      <Card className="p-5 bg-white border border-border rounded-xl">
+      <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />

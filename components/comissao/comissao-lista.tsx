@@ -294,6 +294,7 @@ export function ComissaoLista() {
       ) : (
         <>
           <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -399,10 +400,11 @@ export function ComissaoLista() {
                 })}
               </TableBody>
             </Table>
+          </div>
           </Card>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
             <span>
               Mostrando {(currentPage - 1) * PER_PAGE + 1} a{" "}
               {Math.min(currentPage * PER_PAGE, totalCount)} de {totalCount} comissoes

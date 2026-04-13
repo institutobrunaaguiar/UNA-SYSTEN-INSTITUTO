@@ -124,28 +124,28 @@ export function PainelComissoes() {
   return (
     <div className="space-y-4">
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Total Comissões</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{formatBRL(totalComissoes)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalComissoes)}</p>
           <p className="text-xs text-muted-foreground">no período</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Pendentes</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{countPendentes}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{countPendentes}</p>
           <p className="text-xs text-muted-foreground">aguardando</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">Aprovadas</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{countAprovadas}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{countAprovadas}</p>
           <p className="text-xs text-muted-foreground">este mês</p>
         </Card>
 
-        <Card className="p-4 bg-white border border-border rounded-xl space-y-1">
+        <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl space-y-1">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wider">A Pagar</p>
-          <p className="text-2xl font-bold text-foreground leading-tight">{formatBRL(totalAPagar)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{formatBRL(totalAPagar)}</p>
           <p className="text-xs text-muted-foreground">aprovadas</p>
         </Card>
       </div>
@@ -153,7 +153,7 @@ export function PainelComissoes() {
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left — Top Comissões */}
-        <Card className="p-5 bg-white border border-border rounded-xl">
+        <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">Top Comissões</p>
@@ -187,7 +187,7 @@ export function PainelComissoes() {
         </Card>
 
         {/* Right — Metas do Período */}
-        <Card className="p-5 bg-white border border-border rounded-xl">
+        <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
           <div className="flex items-center gap-2 mb-4">
             <Target className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">Metas do Período</p>

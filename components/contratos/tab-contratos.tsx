@@ -71,7 +71,7 @@ export function TabContratos({ pacienteId, nomePaciente, emailPaciente }: Props)
     <div className="space-y-3 mt-2">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{contratos.length} contrato{contratos.length !== 1 ? "s" : ""}</span>
-        <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5" onClick={() => setShowNovo(true)}>
+        <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => setShowNovo(true)}>
           <Plus className="w-3.5 h-3.5" /> Novo
         </Button>
       </div>
@@ -97,7 +97,7 @@ export function TabContratos({ pacienteId, nomePaciente, emailPaciente }: Props)
             >
               <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
                 <p className="text-sm font-medium text-foreground leading-tight flex-1 truncate">{c.titulo}</p>
-                <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${s.className}`}>
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${s.className}`}>
                   <s.icon className="w-3 h-3" />
                   {s.label}
                 </span>

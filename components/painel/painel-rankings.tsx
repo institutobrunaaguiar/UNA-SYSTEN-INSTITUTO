@@ -14,7 +14,7 @@ interface PainelRankingsProps {
 export function PainelRankings({ profissionais, procedimentos }: PainelRankingsProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Card className="p-4 bg-white border border-border rounded-xl flex-1">
+      <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl flex-1">
         <p className="text-[13px] font-semibold text-foreground mb-3">Top Profissionais</p>
         {profissionais.length === 0 ? (
           <p className="text-xs text-muted-foreground">Nenhum dado disponível</p>
@@ -35,7 +35,7 @@ export function PainelRankings({ profissionais, procedimentos }: PainelRankingsP
         )}
       </Card>
 
-      <Card className="p-4 bg-white border border-border rounded-xl flex-1">
+      <Card className="p-3 sm:p-4 bg-card border border-border rounded-xl flex-1">
         <p className="text-[13px] font-semibold text-foreground mb-3">Top Procedimentos</p>
         {procedimentos.length === 0 ? (
           <p className="text-xs text-muted-foreground">Nenhum dado disponível</p>

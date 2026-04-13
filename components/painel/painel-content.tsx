@@ -293,11 +293,11 @@ export function PainelContent() {
   const propostasRecentes = getPropostasRecentes(filtered)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between">
         <div />
         <Select value={periodo} onValueChange={(v) => setPeriodo(v as Periodo)}>
-          <SelectTrigger className="w-[180px] bg-white border border-border rounded-lg text-xs">
+          <SelectTrigger className="w-[140px] sm:w-[180px] bg-card border border-border rounded-lg text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

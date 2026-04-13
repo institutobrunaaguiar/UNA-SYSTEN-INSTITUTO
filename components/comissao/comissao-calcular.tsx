@@ -302,7 +302,7 @@ export function ComissaoCalcular({ open, onOpenChange, onComplete }: ComissaoCal
                 type="month"
                 value={periodo}
                 onChange={(e) => setPeriodo(e.target.value)}
-                className="max-w-[200px]"
+                className="w-full sm:max-w-[200px]"
               />
               <p className="text-xs text-muted-foreground">
                 Serao consideradas todas as propostas com status "pago" dentro deste mes.
@@ -393,7 +393,7 @@ export function ComissaoCalcular({ open, onOpenChange, onComplete }: ComissaoCal
             </div>
 
             {/* Summary */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10">
               <div>
                 <p className="text-xs text-muted-foreground">
                   {preview.length} comissao(oes) calculada(s) para {periodo}

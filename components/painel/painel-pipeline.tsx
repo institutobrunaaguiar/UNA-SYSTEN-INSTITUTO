@@ -42,7 +42,7 @@ export function PainelPipeline({ data }: { data: PainelPipelineData }) {
   ]
 
   return (
-    <Card className="p-5 bg-white border border-border rounded-xl">
+    <Card className="p-3 sm:p-5 bg-card border border-border rounded-xl">
       <p className="text-sm font-semibold text-foreground mb-4">Pipeline</p>
       <div className="flex flex-col gap-4">
         {items.map((item) => (

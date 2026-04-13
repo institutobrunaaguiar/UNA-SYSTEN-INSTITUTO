@@ -218,6 +218,12 @@ html {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overscroll-behavior-y: contain;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Safe area CSS variables for iPhone notch/dynamic island */
@@ -226,6 +232,15 @@ html {
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
+}
+
+/* Smooth transitions for interactive elements */
+button, a, [role="button"] {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+button:active, a:active, [role="button"]:active {
+  transform: scale(0.98);
+  opacity: 0.9;
 }
 
 /* Prevent pull-to-refresh in app containers */
@@ -239,22 +254,24 @@ button, [role="button"], nav, .select-none {
   user-select: none;
 }
 
-/* PWA safe area for bottom dock */
+/* PWA safe area utilities */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-
-/* Safe area top for standalone PWA */
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
+.safe-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
 
-/* Hide scrollbar for horizontal scroll containers on mobile */
-.scrollbar-none {
+/* Hide scrollbar but keep scroll functional */
+.scrollbar-none, .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.scrollbar-none::-webkit-scrollbar {
+.scrollbar-none::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 

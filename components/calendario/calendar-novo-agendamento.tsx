@@ -167,18 +167,18 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
         </SheetHeader>
 
         <div className="mt-6 space-y-5">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <Label className="text-xs mb-1 block">Data</Label>
-              <Input type="date" value={data} onChange={(e) => setData(e.target.value)} />
+              <Input type="date" value={data} onChange={(e) => setData(e.target.value)} className="w-full" />
             </div>
             <div>
               <Label className="text-xs mb-1 block">Inicio</Label>
-              <Input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
+              <Input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} className="w-full" />
             </div>
             <div>
               <Label className="text-xs mb-1 block">Fim</Label>
-              <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} />
+              <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} className="w-full" />
             </div>
           </div>
 
@@ -194,8 +194,8 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
                       <p className="text-xs text-muted-foreground">{selectedPaciente.cpf_cnpj || "Sem CPF"}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setSelectedPaciente(null); setSearchPaciente("") }}>
-                    <X className="w-3 h-3" />
+                  <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => { setSelectedPaciente(null); setSearchPaciente("") }}>
+                    <X className="w-4 h-4" />
                   </Button>
                 </div>
               </Card>
@@ -214,7 +214,7 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
                       <button
                         key={p.id}
                         type="button"
-                        className="w-full px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                        className="w-full px-3 py-2.5 min-h-[44px] text-left hover:bg-muted/50 transition-colors"
                         onClick={() => { setSelectedPaciente(p); setSearchPaciente(p.nome); setPacienteResults([]) }}
                       >
                         <p className="text-sm font-medium">{p.nome}</p>
@@ -230,7 +230,7 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
           <div>
             <Label className="text-xs mb-1 block">Profissional</Label>
             <Select value={selectedProfissional} onValueChange={setSelectedProfissional}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {profissionais.map((p) => (
                   <SelectItem key={p.id} value={String(p.id)}>{p.nome}</SelectItem>
@@ -242,7 +242,7 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
           <div>
             <Label className="text-xs mb-1 block">Local / Sala</Label>
             <Select value={selectedLocal} onValueChange={setSelectedLocal}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {locais.map((l) => (
                   <SelectItem key={l.id} value={String(l.id)}>
@@ -259,7 +259,7 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
           <div>
             <Label className="text-xs mb-1 block">Tipo de Consulta</Label>
             <Select value={selectedTipoConsulta} onValueChange={setSelectedTipoConsulta}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {tiposConsulta.map((t) => (
                   <SelectItem key={t.id} value={String(t.id)}>{t.nome}</SelectItem>
@@ -271,7 +271,7 @@ export function CalendarNovoAgendamento({ open, onClose, onSaved, defaultDate }:
           <div>
             <Label className="text-xs mb-1 block">Rotulo</Label>
             <Select value={selectedRotulo} onValueChange={setSelectedRotulo}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {rotulos.map((r) => (
                   <SelectItem key={r.id} value={String(r.id)}>

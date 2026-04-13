@@ -129,7 +129,7 @@ export function ContratosContent() {
             return (
               <Card
                 key={c.id}
-                className="p-4 cursor-pointer hover:border-primary/40 transition-colors"
+                className="p-3 sm:p-4 cursor-pointer hover:border-primary/40 transition-colors"
                 onClick={() => setDetalhe(c)}
               >
                 <div className="flex items-start gap-4">
@@ -140,7 +140,7 @@ export function ContratosContent() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 flex-wrap">
                       <p className="text-sm font-medium text-foreground truncate">{c.titulo}</p>
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${s.className}`}>
+                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${s.className}`}>
                         <s.icon className="w-3 h-3" />
                         {s.label}
                       </span>
@@ -152,11 +152,11 @@ export function ContratosContent() {
 
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {formatDate(c.created_at)}
                         </span>
                         {c.signed_at && (
-                          <span className="text-[11px] text-green-500">
+                          <span className="text-xs text-green-500">
                             Assinado {formatDate(c.signed_at)}
                           </span>
                         )}

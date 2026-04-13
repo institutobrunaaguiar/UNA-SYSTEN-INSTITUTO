@@ -49,10 +49,10 @@ export function AdminCadastrarUsuario() {
   }
 
   return (
-    <Card className="p-6 max-w-lg">
+    <Card className="p-3 sm:p-6 w-full sm:max-w-lg">
       <h3 className="text-sm font-semibold text-foreground mb-4">Novo Usuário</h3>
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nome completo</Label>
             <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome do usuário" required />
@@ -68,7 +68,7 @@ export function AdminCadastrarUsuario() {
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nível de acesso</Label>
             <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="operador">Operador</SelectItem>
