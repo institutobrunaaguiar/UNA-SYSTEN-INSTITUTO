@@ -3,11 +3,12 @@
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Calculator, ListChecks, BookOpen, Target } from "lucide-react"
+import { Calculator, ListChecks, BookOpen, Target, CalendarDays } from "lucide-react"
 import { ComissaoLista } from "./comissao-lista"
 import { ComissaoRegras } from "./comissao-regras"
 import { ComissaoMetas } from "./comissao-metas"
 import { ComissaoCalcular } from "./comissao-calcular"
+import { ComissaoPeriodos } from "./comissao-periodos"
 
 export function ComissaoContent() {
   const [calcularOpen, setCalcularOpen] = useState(false)
@@ -26,15 +27,16 @@ export function ComissaoContent() {
           className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105"
         >
           <Calculator className="w-4 h-4" />
-          Calcular Comissoes
+          Calcular Comissões
         </Button>
       </div>
 
       <Tabs defaultValue="comissoes" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="comissoes" className="gap-1.5">
             <ListChecks className="w-4 h-4" />
-            Comissoes
+            <span className="hidden sm:inline">Comissões</span>
+            <span className="sm:hidden">Comissões</span>
           </TabsTrigger>
           <TabsTrigger value="regras" className="gap-1.5">
             <BookOpen className="w-4 h-4" />
@@ -43,6 +45,10 @@ export function ComissaoContent() {
           <TabsTrigger value="metas" className="gap-1.5">
             <Target className="w-4 h-4" />
             Metas
+          </TabsTrigger>
+          <TabsTrigger value="periodos" className="gap-1.5">
+            <CalendarDays className="w-4 h-4" />
+            Períodos
           </TabsTrigger>
         </TabsList>
 
@@ -56,6 +62,10 @@ export function ComissaoContent() {
 
         <TabsContent value="metas">
           <ComissaoMetas />
+        </TabsContent>
+
+        <TabsContent value="periodos">
+          <ComissaoPeriodos />
         </TabsContent>
       </Tabs>
 
