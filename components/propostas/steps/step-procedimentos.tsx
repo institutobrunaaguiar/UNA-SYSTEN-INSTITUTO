@@ -262,7 +262,7 @@ export function StepProcedimentos({ itens, onChange }: StepProcedimentosProps) {
             </div>
 
             {item.desconto_tipo && (
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 bg-muted/50 rounded-lg">
                 <div className="flex gap-1">
                   <Button
                     type="button"
@@ -285,7 +285,7 @@ export function StepProcedimentos({ itens, onChange }: StepProcedimentosProps) {
                   type="number"
                   min="0"
                   step="0.01"
-                  className="w-28"
+                  className="w-full sm:w-28"
                   value={item.desconto_valor || ""}
                   onChange={(e) =>
                     updateItem(index, { desconto_valor: parseFloat(e.target.value) || 0 })

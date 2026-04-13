@@ -93,13 +93,13 @@ export function StepResumo({
     : { agressivo: "Agressivo", balanceado: "Balanceado", conservador: "Conservador" }[cenarioTipo]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <User className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-foreground">Cliente</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Nome</p>
             <p className="font-medium text-foreground">{nomeCliente}</p>
@@ -118,12 +118,12 @@ export function StepResumo({
         </div>
         <div className="space-y-2">
           {itens.map((item, i) => (
-            <div key={i} className="flex items-center justify-between text-sm py-2 border-b border-border last:border-0">
-              <div>
-                <p className="font-medium text-foreground">{item.procedimentoNome}</p>
-                <p className="text-xs text-muted-foreground">{item.profissionalNome}</p>
+            <div key={i} className="flex items-center justify-between gap-3 text-sm py-2 border-b border-border last:border-0">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground truncate">{item.procedimentoNome}</p>
+                <p className="text-xs text-muted-foreground truncate">{item.profissionalNome}</p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 {item.desconto_tipo && (
                   <p className="text-xs text-muted-foreground line-through">{formatCurrency(item.valor)}</p>
                 )}
@@ -139,18 +139,18 @@ export function StepResumo({
           <CreditCard className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-foreground">Cenario: {cenarioLabel}</h3>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Entrada</p>
-            <p className="font-medium text-foreground">{formatCurrency(valorEntrada)}</p>
+            <p className="font-medium text-foreground text-xs sm:text-sm">{formatCurrency(valorEntrada)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Parcelas</p>
-            <p className="font-medium text-foreground">{numParcelas}x {formatCurrency(valorParcela)}</p>
+            <p className="font-medium text-foreground text-xs sm:text-sm">{numParcelas}x {formatCurrency(valorParcela)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Fluxo Imediato</p>
-            <p className="font-medium text-foreground">{formatCurrency(valorEntrada)}</p>
+            <p className="font-medium text-foreground text-xs sm:text-sm">{formatCurrency(valorEntrada)}</p>
           </div>
         </div>
       </Card>
@@ -160,7 +160,7 @@ export function StepResumo({
           <FileText className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-foreground">Desconto de Protocolo</h3>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex gap-1">
             <Button
               type="button"
@@ -196,7 +196,7 @@ export function StepResumo({
                 type="number"
                 min="0"
                 step="0.01"
-                className="w-28"
+                className="w-full sm:w-28"
                 value={descontoProtocoloValor || ""}
                 onChange={(e) => onDescontoProtocoloChange(descontoProtocoloTipo, parseFloat(e.target.value) || 0)}
                 placeholder={descontoProtocoloTipo === "percentual" ? "%" : "R$"}
@@ -267,7 +267,7 @@ export function StepResumo({
                   onCashbackUtilizadoChange(Math.min(val, pacienteSaldo, valorTotal))
                 }}
                 placeholder="R$ 0,00"
-                className="w-40"
+                className="w-full sm:w-40"
               />
             </div>
           </div>
@@ -286,7 +286,7 @@ export function StepResumo({
               type="button"
               onClick={() => onStatusChange(key)}
               className={[
-                "rounded-lg px-3 py-2 text-sm font-medium border-2 transition-all text-left",
+                "rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-2 transition-all text-left",
                 status === key
                   ? `${config.color} border-current`
                   : "border-transparent bg-muted/50 text-muted-foreground hover:bg-muted",

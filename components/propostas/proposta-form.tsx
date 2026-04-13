@@ -315,9 +315,9 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
   const subtotal = itens.reduce((sum, item) => sum + item.valor_final, 0)
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Stepper */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {STEPS.map((s, i) => (
           <div key={s.number} className="flex items-center flex-1">
             <div className="flex items-center gap-2 flex-1">
@@ -342,7 +342,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
       </div>
 
       {/* Step Content */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         {step === 1 && (
           <StepCliente
             pacienteId={pacienteId}

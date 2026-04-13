@@ -66,7 +66,7 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               <User className="w-4 h-4 text-primary" />
               Cliente
             </div>
-            <div className="grid grid-cols-2 gap-2 text-sm pl-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm pl-6">
               <div>
                 <p className="text-muted-foreground">Nome</p>
                 <p className="font-medium">{proposta.nome_cliente}</p>
@@ -94,12 +94,12 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
             </div>
             <div className="pl-6 space-y-2">
               {proposta.itens.map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-sm py-2 border-b border-border last:border-0">
-                  <div>
-                    <p className="font-medium">{item.procedimentoNome}</p>
+                <div key={i} className="flex items-center justify-between gap-3 text-sm py-2 border-b border-border last:border-0">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{item.procedimentoNome}</p>
                     <p className="text-xs text-muted-foreground">{item.profissionalNome}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     {item.desconto_tipo && (
                       <p className="text-xs text-muted-foreground line-through">{formatCurrency(item.valor)}</p>
                     )}
@@ -116,7 +116,7 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
               <CreditCard className="w-4 h-4 text-primary" />
               Cenario: {cenarioLabel}
             </div>
-            <div className="grid grid-cols-3 gap-2 text-sm pl-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm pl-6">
               <div>
                 <p className="text-muted-foreground">Entrada</p>
                 <p className="font-medium">{formatCurrency(proposta.valor_entrada)}</p>

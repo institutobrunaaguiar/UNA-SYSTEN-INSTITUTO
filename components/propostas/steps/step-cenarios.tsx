@@ -141,7 +141,7 @@ export function StepCenarios({
       {cenarioTipo === "personalizado" && (
         <Card className="p-4 space-y-4">
           <h3 className="text-sm font-semibold text-foreground">Configuracao Personalizada</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-xs mb-1 block">Entrada (%)</Label>
               <Input
@@ -171,22 +171,22 @@ export function StepCenarios({
       {cenarioTipo && (
         <Card className="p-4 space-y-3">
           <h3 className="text-sm font-semibold text-foreground">Resumo do Cenario</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div>
               <p className="text-xs text-muted-foreground">Entrada</p>
-              <p className="text-lg font-bold text-foreground">{formatCurrency(valorEntrada)}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground">{formatCurrency(valorEntrada)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Parcelas</p>
-              <p className="text-lg font-bold text-foreground">{numParcelas}x {formatCurrency(valorParcela)}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground">{numParcelas}x {formatCurrency(valorParcela)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Custo MDR</p>
-              <p className="text-lg font-bold text-destructive">- {formatCurrency(custoMDR)}</p>
+              <p className="text-base sm:text-lg font-bold text-destructive">- {formatCurrency(custoMDR)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Valor Liquido</p>
-              <p className="text-lg font-bold text-primary">{formatCurrency(valorLiquido)}</p>
+              <p className="text-base sm:text-lg font-bold text-primary">{formatCurrency(valorLiquido)}</p>
             </div>
           </div>
         </Card>
