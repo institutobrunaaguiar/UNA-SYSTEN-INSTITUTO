@@ -219,13 +219,13 @@ export function MinhasComissoesContent() {
     }
 
     aprovadas.forEach((p) => {
-      const key = getMesKey(p.validado_em)
+      const key = getMesKey(p.data_proposta)
       ensureMes(key)
       map.get(key)!.aprovadas.push(p)
     })
 
     reprovadas.forEach((p) => {
-      const key = getMesKey(p.validado_em)
+      const key = getMesKey(p.data_proposta)
       ensureMes(key)
       map.get(key)!.reprovadas.push(p)
     })
