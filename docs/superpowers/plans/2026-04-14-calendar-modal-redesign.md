@@ -1,3 +1,23 @@
+# Calendar Modal Redesign — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Rewrite `calendar-detalhes.tsx` para adotar o mesmo padrão visual do `proposta-detalhes.tsx` — cabeçalho fixo, seções colapsáveis e rodapé fixo com ações.
+
+**Architecture:** Componente único com Section helper interno, sticky header com nome do paciente + data/hora, seções colapsáveis para cada campo do agendamento, sticky footer com botão de contrato e select de status.
+
+**Tech Stack:** React, TypeScript, Tailwind CSS, Radix UI (Sheet), Lucide Icons, Supabase
+
+---
+
+### Task 1: Reescrever `calendar-detalhes.tsx`
+
+**Files:**
+- Modify: `components/calendario/calendar-detalhes.tsx`
+
+- [ ] **Step 1: Substituir o conteúdo do arquivo pelo novo componente**
+
+```tsx
 "use client"
 
 import { useState } from "react"
@@ -275,3 +295,19 @@ export function CalendarDetalhes({
     </Sheet>
   )
 }
+```
+
+- [ ] **Step 2: Verificar build sem erros**
+
+```bash
+npx tsc --noEmit
+```
+
+Esperado: sem erros de tipo.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add components/calendario/calendar-detalhes.tsx
+git commit -m "feat: redesign calendar modal to match proposal modal pattern"
+```
