@@ -10,6 +10,7 @@ export interface CashbackCampanha {
   data_inicio: string
   data_fim: string
   ativa: boolean
+  exclusivo: boolean
   created_at: string
 }
 
@@ -65,11 +66,18 @@ export function CashbackLista({ campanhas, onEditar, onToggleAtiva }: CashbackLi
               <h3 className="font-semibold text-sm text-foreground leading-tight">
                 {campanha.nome}
               </h3>
-              <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${status.className}`}
-              >
-                {status.label}
-              </span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {campanha.exclusivo && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700">
+                    Exclusiva
+                  </span>
+                )}
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status.className}`}
+                >
+                  {status.label}
+                </span>
+              </div>
             </div>
 
             {/* Percentual */}
