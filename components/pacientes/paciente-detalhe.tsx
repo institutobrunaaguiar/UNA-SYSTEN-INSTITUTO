@@ -8,8 +8,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import {
   Phone,
@@ -22,6 +20,8 @@ import {
   Clock,
   AlertCircle,
   FileSignature,
+  ChevronDown,
+  ArrowLeft,
 } from "lucide-react"
 import { TabContratos } from "@/components/contratos/tab-contratos"
 
@@ -72,11 +72,11 @@ interface Orcamento {
 }
 
 const STATUS_AGENDA: Record<string, { label: string; className: string }> = {
-  CONFIRMADO:    { label: "Confirmado",    className: "bg-green-500/10 text-green-500" },
-  AGUARDANDO:    { label: "Aguardando",    className: "bg-yellow-500/10 text-yellow-500" },
-  ATENDIDO:      { label: "Atendido",      className: "bg-blue-500/10 text-blue-400" },
-  CANCELADO:     { label: "Cancelado",     className: "bg-destructive/10 text-destructive" },
-  NAO_COMPARECEU:{ label: "Não compareceu",className: "bg-orange-500/10 text-orange-400" },
+  CONFIRMADO:     { label: "Confirmado",     className: "bg-green-500/10 text-green-500" },
+  AGUARDANDO:     { label: "Aguardando",     className: "bg-yellow-500/10 text-yellow-500" },
+  ATENDIDO:       { label: "Atendido",       className: "bg-blue-500/10 text-blue-400" },
+  CANCELADO:      { label: "Cancelado",      className: "bg-destructive/10 text-destructive" },
+  NAO_COMPARECEU: { label: "Não compareceu", className: "bg-orange-500/10 text-orange-400" },
 }
 
 const STATUS_ORC: Record<string, { label: string; className: string }> = {
@@ -108,11 +108,7 @@ function formatCpf(cpf: string | null) {
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "-"
-  try {
-    return new Date(dateStr).toLocaleDateString("pt-BR")
-  } catch {
-    return dateStr
-  }
+  try { return new Date(dateStr).toLocaleDateString("pt-BR") } catch { return dateStr }
 }
 
 function formatCurrency(val: number | null) {
@@ -120,14 +116,43 @@ function formatCurrency(val: number | null) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val)
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function Section({
+  icon: Icon,
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  icon: React.ElementType
+  title: string
+  children: React.ReactNode
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-border last:border-0">
-      <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-        <p className="text-sm text-foreground mt-0.5 break-words">{value || "-"}</p>
-      </div>
+    <div className="border-b border-border last:border-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full py-3 text-left"
+      >
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <Icon className="w-4 h-4 text-primary" />
+          {title}
+        </div>
+        <ChevronDown
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="pb-3">{children}</div>}
+    </div>
+  )
+}
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-foreground mt-0.5">{value || "-"}</p>
     </div>
   )
 }
@@ -276,12 +301,16 @@ function TabOrcamentos({ pacienteId }: { pacienteId: number }) {
   )
 }
 
+type ActiveTab = "dados" | "agenda" | "orcamentos" | "contratos"
+
 interface Props {
   paciente: Paciente | null
   onClose: () => void
 }
 
 export function PacienteDetalhe({ paciente, onClose }: Props) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("dados")
+
   const endereco = [
     paciente?.rua,
     paciente?.numero && `nº ${paciente.numero}`,
@@ -289,94 +318,131 @@ export function PacienteDetalhe({ paciente, onClose }: Props) {
     paciente?.bairro,
   ].filter(Boolean).join(", ")
 
+  const TABS: { key: ActiveTab; label: string; icon: React.ElementType }[] = [
+    { key: "dados", label: "Dados", icon: User },
+    { key: "agenda", label: "Agenda", icon: Calendar },
+    { key: "orcamentos", label: "Orçamentos", icon: FileText },
+    { key: "contratos", label: "Contratos", icon: FileSignature },
+  ]
+
   return (
     <Sheet open={!!paciente} onOpenChange={(v) => { if (!v) onClose() }}>
-      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-lg p-0 flex flex-col">
         {paciente && (
           <>
-            <SheetHeader className="pb-4 border-b border-border">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shrink-0 ${avatarColor(paciente.nome)}`}>
+            {/* Cabeçalho fixo */}
+            <div className="sticky top-0 z-10 bg-card border-b border-border px-4 sm:px-6 pt-4 pb-3">
+              <SheetHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <SheetTitle className="text-sm font-semibold text-muted-foreground">
+                    Paciente #{paciente.id}
+                  </SheetTitle>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      paciente.ativo
+                        ? "bg-green-500/10 text-green-700"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {paciente.ativo ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+              </SheetHeader>
+
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 ${avatarColor(paciente.nome)}`}>
                   {getInitials(paciente.nome)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <SheetTitle className="text-base font-bold text-foreground leading-tight truncate">
-                    {paciente.nome}
-                  </SheetTitle>
+                <div className="min-w-0">
+                  <p className="text-xl font-bold text-foreground leading-tight truncate">{paciente.nome}</p>
                   {paciente.nome_social && (
                     <p className="text-xs text-muted-foreground">({paciente.nome_social})</p>
                   )}
-                  <div className="flex items-center gap-2 mt-1">
-                    {paciente.cpf_cnpj && (
-                      <span className="text-xs text-muted-foreground font-mono">{formatCpf(paciente.cpf_cnpj)}</span>
-                    )}
-                    <Badge variant={paciente.ativo ? "default" : "secondary"} className="text-xs py-0 h-5">
-                      {paciente.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
-                  </div>
+                  {paciente.cpf_cnpj && (
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">{formatCpf(paciente.cpf_cnpj)}</p>
+                  )}
                 </div>
               </div>
-            </SheetHeader>
 
-            <Tabs defaultValue="dados" className="mt-4">
-              <TabsList className="w-full grid grid-cols-4">
-                <TabsTrigger value="dados" className="text-xs gap-1.5">
-                  <User className="w-3.5 h-3.5" />Dados
-                </TabsTrigger>
-                <TabsTrigger value="agendamentos" className="text-xs gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />Agenda
-                </TabsTrigger>
-                <TabsTrigger value="orcamentos" className="text-xs gap-1.5">
-                  <FileText className="w-3.5 h-3.5" />Orçamentos
-                </TabsTrigger>
-                <TabsTrigger value="contratos" className="text-xs gap-1.5">
-                  <FileSignature className="w-3.5 h-3.5" />Contratos
-                </TabsTrigger>
-              </TabsList>
+              {/* Tabs inline no header */}
+              <div className="flex gap-1 mt-3 -mb-3 border-b-0">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors ${
+                      activeTab === tab.key
+                        ? "border-primary text-primary"
+                        : "border-transparent text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <tab.icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-              <TabsContent value="dados" className="mt-4 space-y-4">
-                <Card className="p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Dados Pessoais</p>
-                  <InfoRow icon={CreditCard} label="CPF / CNPJ" value={formatCpf(paciente.cpf_cnpj)} />
-                  <InfoRow icon={Calendar} label="Data de nascimento" value={formatDate(paciente.data_nascimento)} />
-                  {paciente.sexo && <InfoRow icon={User} label="Sexo" value={paciente.sexo} />}
-                  {paciente.numero_identificacao && (
-                    <InfoRow icon={CreditCard} label="Nº Identificação" value={paciente.numero_identificacao} />
+            {/* Conteúdo scrollável */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-2">
+              {activeTab === "dados" && (
+                <>
+                  <Section icon={User} title="Dados Pessoais" defaultOpen={true}>
+                    <div className="grid grid-cols-2 gap-3 pl-6">
+                      <InfoItem label="CPF / CNPJ" value={formatCpf(paciente.cpf_cnpj)} />
+                      <InfoItem label="Data de nascimento" value={formatDate(paciente.data_nascimento)} />
+                      {paciente.sexo && <InfoItem label="Sexo" value={paciente.sexo} />}
+                      {paciente.numero_identificacao && (
+                        <InfoItem label="Nº Identificação" value={paciente.numero_identificacao} />
+                      )}
+                    </div>
+                  </Section>
+
+                  <Section icon={Phone} title="Contato" defaultOpen={true}>
+                    <div className="grid grid-cols-2 gap-3 pl-6">
+                      <InfoItem label="Celular" value={paciente.telefone_celular ?? "-"} />
+                      <InfoItem label="Telefone" value={paciente.telefone ?? "-"} />
+                      <InfoItem label="E-mail" value={paciente.email ?? "-"} />
+                    </div>
+                  </Section>
+
+                  {endereco && (
+                    <Section icon={MapPin} title="Endereço" defaultOpen={false}>
+                      <div className="grid grid-cols-2 gap-3 pl-6">
+                        <div className="col-span-2">
+                          <InfoItem label="Logradouro" value={endereco} />
+                        </div>
+                        {paciente.cep && <InfoItem label="CEP" value={paciente.cep} />}
+                      </div>
+                    </Section>
                   )}
-                </Card>
+                </>
+              )}
 
-                <Card className="p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Contato</p>
-                  <InfoRow icon={Phone} label="Celular" value={paciente.telefone_celular ?? "-"} />
-                  <InfoRow icon={Phone} label="Telefone" value={paciente.telefone ?? "-"} />
-                  <InfoRow icon={Mail} label="E-mail" value={paciente.email ?? "-"} />
-                </Card>
-
-                {endereco && (
-                  <Card className="p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Endereço</p>
-                    <InfoRow icon={MapPin} label="Logradouro" value={endereco} />
-                    {paciente.cep && <InfoRow icon={MapPin} label="CEP" value={paciente.cep} />}
-                  </Card>
-                )}
-              </TabsContent>
-
-              <TabsContent value="agendamentos">
+              {activeTab === "agenda" && (
                 <TabAgendamentos pacienteId={paciente.id} />
-              </TabsContent>
+              )}
 
-              <TabsContent value="orcamentos">
+              {activeTab === "orcamentos" && (
                 <TabOrcamentos pacienteId={paciente.id} />
-              </TabsContent>
+              )}
 
-              <TabsContent value="contratos">
+              {activeTab === "contratos" && (
                 <TabContratos
                   pacienteId={paciente.id}
                   nomePaciente={paciente.nome}
                   emailPaciente={paciente.email}
                 />
-              </TabsContent>
-            </Tabs>
+              )}
+            </div>
           </>
         )}
       </SheetContent>

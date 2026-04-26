@@ -71,6 +71,7 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
           .from("pacientes")
           .select("id, nome, cpf_cnpj")
           .order("nome")
+          .range(0, 9999)
         setPacientes(pacs ?? [])
 
         if (campanha?.exclusivo) {
