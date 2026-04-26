@@ -95,11 +95,13 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
       try {
         const supabase = getSupabase()
         const today = new Date().toISOString().split("T")[0]
-        const [campanhasRes, restritosRes] = await Promise.all([
+
+        const [universaisRes, restritosRes] = await Promise.all([
           supabase
             .from("cashback_campanhas")
             .select("id, nome, percentual")
             .eq("ativa", true)
+            .eq("exclusivo", false)
             .lte("data_inicio", today)
             .gte("data_fim", today),
           supabase
@@ -107,11 +109,34 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
             .select("id")
             .eq("cashback_restrito", true),
         ])
-        if (campanhasRes.error) {
-          console.error("[propostas] Erro ao buscar campanhas:", campanhasRes.error.message)
-        } else if (campanhasRes.data) {
-          setCashbackCampanhas(campanhasRes.data)
+
+        const universais = universaisRes.data ?? []
+
+        let exclusivas: { id: number; nome: string; percentual: number }[] = []
+        if (pacienteId) {
+          const { data: vinculos } = await supabase
+            .from("cashback_campanha_clientes")
+            .select("campanha_id")
+            .eq("paciente_id", pacienteId)
+
+          const campanhaIds = (vinculos ?? []).map((v) => v.campanha_id)
+
+          if (campanhaIds.length > 0) {
+            const { data: excl } = await supabase
+              .from("cashback_campanhas")
+              .select("id, nome, percentual")
+              .eq("ativa", true)
+              .eq("exclusivo", true)
+              .lte("data_inicio", today)
+              .gte("data_fim", today)
+              .in("id", campanhaIds)
+
+            exclusivas = excl ?? []
+          }
         }
+
+        setCashbackCampanhas([...universais, ...exclusivas])
+
         if (restritosRes.data) {
           setProfissionaisRestritos(new Set(restritosRes.data.map((p) => p.id)))
         }
@@ -120,7 +145,7 @@ export function PropostaForm({ proposta, onSave, onCancel }: PropostaFormProps) 
       }
     }
     fetchCampanhasERestritos()
-  }, [])
+  }, [pacienteId])
 
   // Fetch patient cashback balance considering professional restrictions
   useEffect(() => {
