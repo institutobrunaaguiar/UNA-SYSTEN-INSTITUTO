@@ -246,115 +246,175 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && handleClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader className="mb-6">
-          <SheetTitle>Novo Contrato</SheetTitle>
-        </SheetHeader>
-
-        {step === "form" && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Título */}
-            <div className="space-y-1.5">
-              <Label>Título do contrato</Label>
-              <Input placeholder="Ex: Termo de Consentimento" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
+      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
+        {/* Header fixo */}
+        <div className="sticky top-0 z-10 bg-card border-b border-border px-4 sm:px-6 pt-4 pb-3 shrink-0">
+          <SheetHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <SheetTitle className="text-sm font-semibold text-muted-foreground">
+                Novo Contrato
+              </SheetTitle>
             </div>
+          </SheetHeader>
+          <p className="text-xl font-bold text-foreground leading-tight">
+            {nomePaciente || (pacienteSelecionado?.nome) || "Selecione um paciente"}
+          </p>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Preencha os dados e envie para assinatura
+          </p>
+        </div>
 
-            {/* Template ou Upload */}
-            <div className="space-y-1.5">
-              <Label>Documento</Label>
-              {templateSelecionado ? (
-                <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                  <FileSignature className="w-4 h-4 text-primary shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{templateSelecionado.nome}</p>
-                    <p className="text-xs text-muted-foreground">Template salvo</p>
-                  </div>
-                  <button type="button" onClick={limparTemplate} className="text-muted-foreground hover:text-foreground">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : file ? (
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <FileText className="w-4 h-4 text-primary shrink-0" />
-                  <span className="text-sm truncate flex-1">{file.name}</span>
-                  <button type="button" onClick={() => setFile(null)} className="text-muted-foreground hover:text-foreground">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {/* Templates disponíveis */}
-                  {templates.length > 0 && (
-                    <div className="space-y-1.5">
-                      <p className="text-xs text-muted-foreground">Usar um template</p>
-                      <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
-                        {templates.map((t) => (
-                          <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => selecionarTemplate(t)}
-                            className="flex items-center gap-2 p-2 bg-muted rounded-lg hover:bg-accent transition-colors text-left"
-                          >
-                            <FileSignature className="w-3.5 h-3.5 text-primary shrink-0" />
-                            <span className="text-xs font-medium text-foreground truncate">{t.nome}</span>
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-px bg-border" />
-                        <span className="text-[10px] text-muted-foreground">ou</span>
-                        <div className="flex-1 h-px bg-border" />
-                      </div>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-5 hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground"
-                  >
-                    <Upload className="w-5 h-5" />
-                    <span className="text-sm">Enviar PDF</span>
-                    <span className="text-xs">Máximo 25MB</span>
-                  </button>
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setTemplateSelecionado(null) }} />
-            </div>
-
-            {/* Busca de Paciente */}
-            {!pacienteId && (
+        {/* Conteúdo scrollável */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+          {step === "form" && (
+            <form id="contrato-form" onSubmit={handleSubmit} className="space-y-5">
+              {/* Título */}
               <div className="space-y-1.5">
-                <Label>Paciente</Label>
-                {pacienteSelecionado ? (
+                <Label>Título do contrato</Label>
+                <Input placeholder="Ex: Termo de Consentimento" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
+              </div>
+
+              {/* Template ou Upload */}
+              <div className="space-y-1.5">
+                <Label>Documento</Label>
+                {templateSelecionado ? (
                   <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
+                    <FileSignature className="w-4 h-4 text-primary shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{pacienteSelecionado.nome}</p>
-                      <p className="text-xs text-muted-foreground">ID: {pacienteSelecionado.id}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{templateSelecionado.nome}</p>
+                      <p className="text-xs text-muted-foreground">Template salvo</p>
                     </div>
-                    <button type="button" onClick={limparPaciente} className="text-muted-foreground hover:text-foreground">
+                    <button type="button" onClick={limparTemplate} className="text-muted-foreground hover:text-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : file ? (
+                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                    <FileText className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-sm truncate flex-1">{file.name}</span>
+                    <button type="button" onClick={() => setFile(null)} className="text-muted-foreground hover:text-foreground">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
-                  <div ref={searchRef} className="relative">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                      {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
-                      <Input placeholder="Buscar por nome ou CPF..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onFocus={() => searchResults.length > 0 && setShowDropdown(true)} className="pl-9" />
+                  <div className="space-y-2">
+                    {templates.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-xs text-muted-foreground">Usar um template</p>
+                        <div className="grid grid-cols-2 gap-1.5 max-h-28 overflow-y-auto">
+                          {templates.map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => selecionarTemplate(t)}
+                              className="flex items-center gap-2 p-2 bg-muted rounded-lg hover:bg-accent transition-colors text-left"
+                            >
+                              <FileSignature className="w-3.5 h-3.5 text-primary shrink-0" />
+                              <span className="text-xs font-medium text-foreground truncate">{t.nome}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-px bg-border" />
+                          <span className="text-[10px] text-muted-foreground">ou</span>
+                          <div className="flex-1 h-px bg-border" />
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
+                    >
+                      <Upload className="w-6 h-6" />
+                      <span className="text-sm font-medium">Enviar PDF</span>
+                      <span className="text-xs">Máximo 25MB</span>
+                    </button>
+                  </div>
+                )}
+                <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setTemplateSelecionado(null) }} />
+              </div>
+
+              {/* Busca de Paciente */}
+              {!pacienteId && (
+                <div className="space-y-1.5">
+                  <Label>Paciente</Label>
+                  {pacienteSelecionado ? (
+                    <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{pacienteSelecionado.nome}</p>
+                        <p className="text-xs text-muted-foreground">{pacienteSelecionado.email ?? "sem e-mail"}</p>
+                      </div>
+                      <button type="button" onClick={limparPaciente} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    {showDropdown && searchResults.length > 0 && (
+                  ) : (
+                    <div ref={searchRef} className="relative">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
+                        <Input placeholder="Buscar por nome ou CPF..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onFocus={() => searchResults.length > 0 && setShowDropdown(true)} className="pl-9" />
+                      </div>
+                      {showDropdown && searchResults.length > 0 && (
+                        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+                          {searchResults.map((p) => (
+                            <button key={p.id} type="button" onClick={() => selecionarPaciente(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
+                              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <User className="w-3.5 h-3.5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{p.nome}</p>
+                                <p className="text-xs text-muted-foreground">{p.email ?? "sem e-mail"} · ID {p.id}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Serviço / Procedimento */}
+              <div className="space-y-1.5">
+                <Label>Serviço <span className="text-muted-foreground text-xs font-normal">(opcional)</span></Label>
+                {servicoSelecionado ? (
+                  <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <Stethoscope className="w-4 h-4 text-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{servicoSelecionado.nome}</p>
+                      <p className="text-xs text-muted-foreground">{servicoSelecionado.tipo}</p>
+                    </div>
+                    <button type="button" onClick={limparServico} className="text-muted-foreground hover:text-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div ref={servicoRef} className="relative">
+                    <div className="relative">
+                      <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                      {servicoBuscando && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
+                      <Input placeholder="Buscar procedimento..." value={servicoTerm} onChange={(e) => setServicoTerm(e.target.value)} onFocus={() => servicoResults.length > 0 && setShowServicoDropdown(true)} className="pl-9" />
+                    </div>
+                    {showServicoDropdown && servicoResults.length > 0 && (
                       <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
-                        {searchResults.map((p) => (
-                          <button key={p.id} type="button" onClick={() => selecionarPaciente(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                              <User className="w-3.5 h-3.5 text-primary" />
-                            </div>
+                        {servicoResults.map((p) => (
+                          <button key={p.id} type="button" onClick={() => selecionarServico(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
+                            <Stethoscope className="w-3.5 h-3.5 text-primary shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">{p.nome}</p>
-                              <p className="text-xs text-muted-foreground">{p.email ?? "sem e-mail"} · ID {p.id}</p>
+                              <p className="text-xs text-muted-foreground">{p.tipo}</p>
                             </div>
                           </button>
                         ))}
@@ -363,116 +423,95 @@ export function ContratoNovoSheet({ open, onClose, onSuccess, pacienteId, nomePa
                   </div>
                 )}
               </div>
-            )}
 
-            {/* Serviço / Procedimento */}
-            <div className="space-y-1.5">
-              <Label>Serviço <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              {servicoSelecionado ? (
-                <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                  <Stethoscope className="w-4 h-4 text-primary shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{servicoSelecionado.nome}</p>
-                    <p className="text-xs text-muted-foreground">{servicoSelecionado.tipo}</p>
+              {/* E-mail */}
+              <div className="space-y-1.5">
+                <Label>E-mail para assinatura</Label>
+                <Input type="email" placeholder="email@exemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>WhatsApp <span className="text-muted-foreground text-xs font-normal">(opcional)</span></Label>
+                <Input placeholder="+5511999990000" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Mensagem <span className="text-muted-foreground text-xs font-normal">(opcional)</span></Label>
+                <Input placeholder="Mensagem para o paciente" value={mensagem} onChange={(e) => setMensagem(e.target.value)} />
+              </div>
+            </form>
+          )}
+
+          {(step === "uploading" || step === "sending") && (
+            <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-sm font-medium">{step === "uploading" ? "Fazendo upload do documento..." : "Enviando para assinatura..."}</p>
+              <p className="text-xs text-muted-foreground">Aguarde um momento</p>
+            </div>
+          )}
+
+          {step === "done" && (
+            <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+              <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="w-7 h-7 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Contrato enviado com sucesso!</p>
+                <p className="text-xs text-muted-foreground mt-1">O paciente receberá o link por e-mail para assinar.</p>
+              </div>
+              {signingUrl && (
+                <div className="w-full">
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Link de assinatura</p>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg text-left">
+                    <span className="text-xs text-foreground truncate flex-1">{signingUrl}</span>
+                    <button onClick={copyUrl} className="text-muted-foreground hover:text-foreground shrink-0">
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </button>
                   </div>
-                  <button type="button" onClick={limparServico} className="text-muted-foreground hover:text-foreground">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div ref={servicoRef} className="relative">
-                  <div className="relative">
-                    <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    {servicoBuscando && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />}
-                    <Input placeholder="Buscar procedimento..." value={servicoTerm} onChange={(e) => setServicoTerm(e.target.value)} onFocus={() => servicoResults.length > 0 && setShowServicoDropdown(true)} className="pl-9" />
-                  </div>
-                  {showServicoDropdown && servicoResults.length > 0 && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
-                      {servicoResults.map((p) => (
-                        <button key={p.id} type="button" onClick={() => selecionarServico(p)} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left">
-                          <Stethoscope className="w-3.5 h-3.5 text-primary shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{p.nome}</p>
-                            <p className="text-xs text-muted-foreground">{p.tipo}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+          )}
 
-            {/* E-mail */}
-            <div className="space-y-1.5">
-              <Label>E-mail para assinatura</Label>
-              <Input type="email" placeholder="email@exemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>WhatsApp <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Input placeholder="+5511999990000" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Mensagem <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Input placeholder="Mensagem para o paciente" value={mensagem} onChange={(e) => setMensagem(e.target.value)} />
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>Cancelar</Button>
-              <Button type="submit" className="flex-1" disabled={!canSubmit}>Enviar para Assinatura</Button>
-            </div>
-          </form>
-        )}
-
-        {(step === "uploading" || step === "sending") && (
-          <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-sm font-medium">{step === "uploading" ? "Fazendo upload do documento..." : "Enviando para assinatura..."}</p>
-            <p className="text-xs text-muted-foreground">Aguarde um momento</p>
-          </div>
-        )}
-
-        {step === "done" && (
-          <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
-            <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center">
-              <CheckCircle2 className="w-7 h-7 text-green-500" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Contrato enviado com sucesso!</p>
-              <p className="text-xs text-muted-foreground mt-1">O paciente receberá o link por e-mail para assinar.</p>
-            </div>
-            {signingUrl && (
-              <div className="w-full">
-                <p className="text-xs font-medium text-muted-foreground mb-1.5">Link de assinatura</p>
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-lg text-left">
-                  <span className="text-xs text-foreground truncate flex-1">{signingUrl}</span>
-                  <button onClick={copyUrl} className="text-muted-foreground hover:text-foreground shrink-0">
-                    {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
+          {step === "error" && (
+            <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
+                <X className="w-7 h-7 text-destructive" />
               </div>
-            )}
-            <Button className="w-full mt-2" onClick={() => { reset(); onSuccess() }}>Concluir</Button>
-          </div>
-        )}
+              <div>
+                <p className="text-sm font-semibold text-foreground">Ocorreu um erro</p>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xs">{erroMsg}</p>
+              </div>
+            </div>
+          )}
+        </div>
 
-        {step === "error" && (
-          <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
-            <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
-              <X className="w-7 h-7 text-destructive" />
+        {/* Footer fixo */}
+        <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 sm:px-6 py-3 shrink-0">
+          {step === "form" && (
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>Cancelar</Button>
+              <Button type="submit" form="contrato-form" className="flex-1" disabled={!canSubmit}>
+                Enviar para Assinatura
+              </Button>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Ocorreu um erro</p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-xs">{erroMsg}</p>
-            </div>
-            <div className="flex gap-2 w-full">
+          )}
+          {(step === "uploading" || step === "sending") && (
+            <Button variant="outline" className="w-full" disabled>
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              {step === "uploading" ? "Enviando arquivo..." : "Processando..."}
+            </Button>
+          )}
+          {step === "done" && (
+            <Button className="w-full" onClick={() => { reset(); onSuccess() }}>Concluir</Button>
+          )}
+          {step === "error" && (
+            <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={handleClose}>Fechar</Button>
               <Button className="flex-1" onClick={() => setStep("form")}>Tentar novamente</Button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   )
