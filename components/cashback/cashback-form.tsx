@@ -63,6 +63,7 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
       }
       setBuscaPaciente("")
 
+      setSelectedIds(new Set())
       setLoadingPacientes(true)
       try {
         const supabase = getSupabase()
@@ -78,8 +79,6 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
             .select("paciente_id")
             .eq("campanha_id", campanha.id)
           setSelectedIds(new Set((vinculos ?? []).map((v) => v.paciente_id)))
-        } else {
-          setSelectedIds(new Set())
         }
       } finally {
         setLoadingPacientes(false)
@@ -134,10 +133,11 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
         campanhaId = data.id
       }
 
-      await supabase
+      const { error: errDel } = await supabase
         .from("cashback_campanha_clientes")
         .delete()
         .eq("campanha_id", campanhaId)
+      if (errDel) throw errDel
 
       if (exclusivo && selectedIds.size > 0) {
         const { error: errVinculos } = await supabase
