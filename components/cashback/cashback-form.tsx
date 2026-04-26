@@ -67,12 +67,21 @@ export function CashbackForm({ open, onOpenChange, campanha, onSaved }: Cashback
       setLoadingPacientes(true)
       try {
         const supabase = getSupabase()
-        const { data: pacs } = await supabase
-          .from("pacientes")
-          .select("id, nome, cpf_cnpj")
-          .order("nome")
-          .range(0, 9999)
-        setPacientes(pacs ?? [])
+        const PAGE = 1000
+        let all: { id: number; nome: string; cpf_cnpj: string | null }[] = []
+        let from = 0
+        while (true) {
+          const { data: page } = await supabase
+            .from("pacientes")
+            .select("id, nome, cpf_cnpj")
+            .order("nome")
+            .range(from, from + PAGE - 1)
+          if (!page || page.length === 0) break
+          all = all.concat(page)
+          if (page.length < PAGE) break
+          from += PAGE
+        }
+        setPacientes(all)
 
         if (campanha?.exclusivo) {
           const { data: vinculos } = await supabase
