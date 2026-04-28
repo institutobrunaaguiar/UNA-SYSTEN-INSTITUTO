@@ -141,17 +141,34 @@ export function StepCenarios({
       {cenarioTipo === "personalizado" && (
         <Card className="p-4 space-y-4">
           <h3 className="text-sm font-semibold text-foreground">Configuracao Personalizada</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <Label className="text-xs mb-1 block">Entrada (%)</Label>
               <Input
                 type="number"
                 min="0"
                 max="100"
+                step="0.01"
                 value={customEntradaPct}
                 onChange={(e) => handleCustomChange(parseFloat(e.target.value) || 0, customParcelas)}
               />
               <p className="text-xs text-muted-foreground mt-1">{formatCurrency((valorTotal * customEntradaPct) / 100)}</p>
+            </div>
+            <div>
+              <Label className="text-xs mb-1 block">Entrada (R$)</Label>
+              <Input
+                type="number"
+                min="0"
+                max={valorTotal}
+                step="0.01"
+                value={Number(((valorTotal * customEntradaPct) / 100).toFixed(2))}
+                onChange={(e) => {
+                  const valor = parseFloat(e.target.value) || 0
+                  const pct = valorTotal > 0 ? (valor / valorTotal) * 100 : 0
+                  handleCustomChange(Number(pct.toFixed(4)), customParcelas)
+                }}
+              />
+              <p className="text-xs text-muted-foreground mt-1">{customEntradaPct.toFixed(2)}% do total</p>
             </div>
             <div>
               <Label className="text-xs mb-1 block">Parcelas</Label>
