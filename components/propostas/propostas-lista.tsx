@@ -268,6 +268,11 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   // Gerar dias do calendario
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
+
+  // Total das propostas do mês corrente do calendário
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`
+  const propostasDoMes = filtered.filter((p) => p.data_proposta?.startsWith(monthPrefix))
+  const totalMes = propostasDoMes.reduce((sum, p) => sum + (p.valor_total ?? 0), 0)
   const firstDay = new Date(year, month, 1)
   const lastDay = new Date(year, month + 1, 0)
   const startPad = firstDay.getDay()
@@ -534,7 +539,10 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   {propostasDoDia.length > 0 && <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))}</>}
                 </>
               ) : (
-                <>{filtered.length} propostas</>
+                <>
+                  {filtered.length} propostas
+                  {totalMes > 0 && <> • {formatCurrency(totalMes)} em {MESES[month]}</>}
+                </>
               )}
             </p>
             <div className="flex gap-1.5">
@@ -720,18 +728,39 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             {/* Desktop day header */}
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground capitalize">{formatSelectedDate()}</h3>
+                <h3 className="text-sm font-semibold text-foreground capitalize">
+                  {selectedDay ? formatSelectedDate() : `${MESES[month]} ${year}`}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
-                  {propostasDoDia.length > 0 && <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>}
+                  {selectedDay ? (
+                    <>
+                      {propostasDoDia.length} {propostasDoDia.length === 1 ? "proposta" : "propostas"}
+                      {propostasDoDia.length > 0 && <> • {formatCurrency(propostasDoDia.reduce((sum, p) => sum + p.valor_total, 0))} total</>}
+                    </>
+                  ) : (
+                    <>
+                      {propostasDoMes.length} {propostasDoMes.length === 1 ? "proposta" : "propostas"} no mês
+                      {totalMes > 0 && <> • {formatCurrency(totalMes)} total</>}
+                    </>
+                  )}
                 </p>
               </div>
-              {propostasDoDia.length === 0 ? (
-                <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p></Card>
+              {selectedDay ? (
+                propostasDoDia.length === 0 ? (
+                  <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhuma proposta neste dia.</p></Card>
+                ) : (
+                  <div className="space-y-3">
+                    {propostasDoDia.map((proposta) => renderPropostaCard(proposta))}
+                  </div>
+                )
               ) : (
-                <div className="space-y-3">
-                  {propostasDoDia.map((proposta) => renderPropostaCard(proposta))}
-                </div>
+                propostasDoMes.length === 0 ? (
+                  <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhuma proposta neste mês.</p></Card>
+                ) : (
+                  <div className="space-y-3">
+                    {propostasDoMes.map((proposta) => renderPropostaCard(proposta))}
+                  </div>
+                )
               )}
             </div>
           </div>
