@@ -563,8 +563,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             <div className="fixed inset-0 z-[998] lg:hidden flex flex-col justify-end">
               <div className="absolute inset-0 bg-black/50" onClick={() => setCalendarOpen(false)} />
               <div
-                className="relative z-[1] bg-card rounded-t-2xl shadow-xl animate-slide-up flex flex-col max-h-[85vh]"
-                style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
+                className="relative z-[1] bg-card rounded-t-2xl shadow-xl animate-slide-up flex flex-col h-[92vh] max-h-[92vh]"
+                style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 5rem)" }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header fixo */}
