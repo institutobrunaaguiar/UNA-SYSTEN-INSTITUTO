@@ -10,6 +10,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown, Zap, Scale, Shield, SlidersHorizontal } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 import { TaxasMDREditor } from "../taxas-mdr-editor"
 import type { CenarioTipo, TaxasMDR } from "../types"
 import { CENARIOS } from "../types"
@@ -56,12 +57,17 @@ export function StepCenarios({
 }: StepCenariosProps) {
   const [customEntradaPct, setCustomEntradaPct] = useState(30)
   const [customParcelas, setCustomParcelas] = useState(6)
+  const [aVista, setAVista] = useState(false)
   const [mdrOpen, setMdrOpen] = useState(false)
 
   function selectCenario(tipo: CenarioTipo) {
     if (tipo === "personalizado") {
-      const entrada = (valorTotal * customEntradaPct) / 100
-      onCenarioChange(tipo, entrada, customParcelas)
+      if (aVista) {
+        onCenarioChange(tipo, valorTotal, 0)
+      } else {
+        const entrada = (valorTotal * customEntradaPct) / 100
+        onCenarioChange(tipo, entrada, customParcelas)
+      }
     } else {
       const config = CENARIOS[tipo]
       const entrada = (valorTotal * config.entrada_pct) / 100
@@ -72,9 +78,21 @@ export function StepCenarios({
   function handleCustomChange(entradaPct: number, parcelas: number) {
     setCustomEntradaPct(entradaPct)
     setCustomParcelas(parcelas)
-    if (cenarioTipo === "personalizado") {
+    if (cenarioTipo === "personalizado" && !aVista) {
       const entrada = (valorTotal * entradaPct) / 100
       onCenarioChange("personalizado", entrada, parcelas)
+    }
+  }
+
+  function toggleAVista(checked: boolean) {
+    setAVista(checked)
+    if (cenarioTipo === "personalizado") {
+      if (checked) {
+        onCenarioChange("personalizado", valorTotal, 0)
+      } else {
+        const entrada = (valorTotal * customEntradaPct) / 100
+        onCenarioChange("personalizado", entrada, customParcelas)
+      }
     }
   }
 
@@ -140,48 +158,78 @@ export function StepCenarios({
 
       {cenarioTipo === "personalizado" && (
         <Card className="p-4 space-y-4">
-          <h3 className="text-sm font-semibold text-foreground">Configuracao Personalizada</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Label className="text-xs mb-1 block">Entrada (%)</Label>
-              <Input
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={customEntradaPct}
-                onChange={(e) => handleCustomChange(parseFloat(e.target.value) || 0, customParcelas)}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">Configuracao Personalizada</h3>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="a-vista-toggle" className="text-xs cursor-pointer">
+                Pagamento à vista
+              </Label>
+              <Switch
+                id="a-vista-toggle"
+                checked={aVista}
+                onCheckedChange={toggleAVista}
               />
-              <p className="text-xs text-muted-foreground mt-1">{formatCurrency((valorTotal * customEntradaPct) / 100)}</p>
-            </div>
-            <div>
-              <Label className="text-xs mb-1 block">Entrada (R$)</Label>
-              <Input
-                type="number"
-                min="0"
-                max={valorTotal}
-                step="0.01"
-                value={Number(((valorTotal * customEntradaPct) / 100).toFixed(2))}
-                onChange={(e) => {
-                  const valor = parseFloat(e.target.value) || 0
-                  const pct = valorTotal > 0 ? (valor / valorTotal) * 100 : 0
-                  handleCustomChange(Number(pct.toFixed(4)), customParcelas)
-                }}
-              />
-              <p className="text-xs text-muted-foreground mt-1">{customEntradaPct.toFixed(2)}% do total</p>
-            </div>
-            <div>
-              <Label className="text-xs mb-1 block">Parcelas</Label>
-              <Input
-                type="number"
-                min="1"
-                max="24"
-                value={customParcelas}
-                onChange={(e) => handleCustomChange(customEntradaPct, parseInt(e.target.value) || 1)}
-              />
-              <p className="text-xs text-muted-foreground mt-1">{formatCurrency(valorParcela)} / parcela</p>
             </div>
           </div>
+
+          {aVista ? (
+            <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
+              <p className="text-sm text-foreground">
+                Pagamento integral à vista — entrada de{" "}
+                <span className="font-semibold">{formatCurrency(valorTotal)}</span> sem parcelas.
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Sem custo de MDR sobre o parcelamento.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-xs mb-1 block">Entrada (%)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={customEntradaPct}
+                  onChange={(e) => handleCustomChange(parseFloat(e.target.value) || 0, customParcelas)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">{formatCurrency((valorTotal * customEntradaPct) / 100)}</p>
+              </div>
+              <div>
+                <Label className="text-xs mb-1 block">Entrada (R$)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max={valorTotal}
+                  step="0.01"
+                  value={Number(((valorTotal * customEntradaPct) / 100).toFixed(2))}
+                  onChange={(e) => {
+                    const valor = parseFloat(e.target.value) || 0
+                    const pct = valorTotal > 0 ? (valor / valorTotal) * 100 : 0
+                    handleCustomChange(Number(pct.toFixed(4)), customParcelas)
+                  }}
+                />
+                <p className="text-xs text-muted-foreground mt-1">{customEntradaPct.toFixed(2)}% do total</p>
+              </div>
+              <div>
+                <Label className="text-xs mb-1 block">Parcelas</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="24"
+                  value={customParcelas}
+                  onChange={(e) => {
+                    const v = e.target.value === "" ? 0 : parseInt(e.target.value)
+                    handleCustomChange(customEntradaPct, isNaN(v) ? 0 : v)
+                  }}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {customParcelas === 0 ? "Sem parcelamento" : `${formatCurrency(valorParcela)} / parcela`}
+                </p>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
@@ -195,7 +243,9 @@ export function StepCenarios({
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Parcelas</p>
-              <p className="text-base sm:text-lg font-bold text-foreground">{numParcelas}x {formatCurrency(valorParcela)}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground">
+                {numParcelas === 0 ? "À vista" : `${numParcelas}x ${formatCurrency(valorParcela)}`}
+              </p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Custo MDR</p>
