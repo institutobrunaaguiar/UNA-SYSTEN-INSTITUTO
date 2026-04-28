@@ -16,6 +16,7 @@ import {
 import { ChevronLeft, ChevronRight, FileSpreadsheet } from "lucide-react"
 import type { RelatorioFilters } from "./relatorios-filters"
 import type { Proposta, PropostaItem } from "@/components/propostas/types"
+import { PropostaDetalhes } from "@/components/propostas/proposta-detalhes"
 
 function getSupabase() {
   return createClient(
@@ -47,6 +48,7 @@ export function RelatoriosAnalitico({ filters }: RelatoriosAnaliticoProps) {
   const [propostas, setPropostas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
+  const [propostaSelecionada, setPropostaSelecionada] = useState<Proposta | null>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -174,8 +176,9 @@ export function RelatoriosAnalitico({ filters }: RelatoriosAnaliticoProps) {
               return (
                 <TableRow
                   key={proposta.id}
-                  className="animate-slide-in-up"
+                  className="animate-slide-in-up cursor-pointer hover:bg-muted/40 transition-colors"
                   style={{ animationDelay: `${index * 20}ms` }}
+                  onClick={() => setPropostaSelecionada(proposta)}
                 >
                   <TableCell className="font-medium text-sm">
                     {formatDate(proposta.created_at)}
@@ -279,6 +282,12 @@ export function RelatoriosAnalitico({ filters }: RelatoriosAnaliticoProps) {
           </Button>
         </div>
       </div>
+
+      <PropostaDetalhes
+        proposta={propostaSelecionada}
+        open={!!propostaSelecionada}
+        onClose={() => setPropostaSelecionada(null)}
+      />
     </div>
   )
 }

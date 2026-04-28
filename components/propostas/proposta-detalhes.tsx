@@ -16,8 +16,8 @@ interface PropostaDetalhesProps {
   proposta: Proposta | null
   open: boolean
   onClose: () => void
-  onEditar: (proposta: Proposta) => void
-  onDuplicar: (proposta: Proposta) => void
+  onEditar?: (proposta: Proposta) => void
+  onDuplicar?: (proposta: Proposta) => void
 }
 
 function Section({ icon: Icon, title, children, defaultOpen = false }: {
@@ -256,24 +256,30 @@ export function PropostaDetalhes({ proposta, open, onClose, onEditar, onDuplicar
         </div>
 
         {/* Ações fixas no fundo */}
-        <div className="sticky bottom-0 bg-card border-t border-border px-4 sm:px-6 py-3 safe-area-bottom">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1 gap-2"
-              onClick={() => { onClose(); onEditar(proposta) }}
-            >
-              <Pencil className="w-4 h-4" /> Editar
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1 gap-2"
-              onClick={() => { onClose(); onDuplicar(proposta) }}
-            >
-              <Copy className="w-4 h-4" /> Duplicar
-            </Button>
+        {(onEditar || onDuplicar) && (
+          <div className="sticky bottom-0 bg-card border-t border-border px-4 sm:px-6 py-3 safe-area-bottom">
+            <div className="flex gap-2">
+              {onEditar && (
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => { onClose(); onEditar(proposta) }}
+                >
+                  <Pencil className="w-4 h-4" /> Editar
+                </Button>
+              )}
+              {onDuplicar && (
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => { onClose(); onDuplicar(proposta) }}
+                >
+                  <Copy className="w-4 h-4" /> Duplicar
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </SheetContent>
     </Sheet>
   )
