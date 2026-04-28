@@ -560,13 +560,15 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
           {/* Mobile calendar bottom sheet — rendered via portal to escape parent transform/stacking context */}
           {calendarOpen && typeof document !== "undefined" && createPortal(
-            <div className="fixed inset-0 z-[998] lg:hidden">
+            <div className="fixed inset-0 z-[998] lg:hidden flex flex-col justify-end">
               <div className="absolute inset-0 bg-black/50" onClick={() => setCalendarOpen(false)} />
               <div
-                className="absolute bottom-0 left-0 right-0 z-[1] bg-card rounded-t-2xl p-4 pb-6 shadow-xl animate-slide-up safe-area-bottom"
+                className="relative z-[1] bg-card rounded-t-2xl shadow-xl animate-slide-up flex flex-col max-h-[85vh]"
+                style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between mb-4">
+                {/* Header fixo */}
+                <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border shrink-0">
                   <h3 className="text-sm font-semibold text-foreground">Selecionar data</h3>
                   <button
                     onClick={() => setCalendarOpen(false)}
@@ -575,6 +577,9 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                     <X className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </div>
+
+                {/* Conteúdo scrollável */}
+                <div className="flex-1 overflow-y-auto px-4 pt-3 pb-2 overscroll-contain">
                 {/* Calendar nav */}
                 <div className="flex items-center justify-between mb-3">
                   <Button variant="ghost" size="icon" onClick={prevMonth} className="h-10 w-10">
@@ -641,6 +646,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                       </button>
                     )
                   })}
+                </div>
                 </div>
               </div>
             </div>,
