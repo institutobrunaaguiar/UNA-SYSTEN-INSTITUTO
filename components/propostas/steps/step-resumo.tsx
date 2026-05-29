@@ -205,6 +205,61 @@ export function StepResumo({
             </>
           )}
         </div>
+
+        <div className="space-y-2 pt-3 border-t border-border">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Saldo de cashback do cliente</span>
+            <span className={`font-medium ${pacienteSaldo > 0 ? "text-green-700" : "text-muted-foreground"}`}>
+              {formatCurrency(pacienteSaldo)}
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Saldo ja considera restricoes por profissional desta proposta.
+          </p>
+          <div className="flex flex-wrap items-end gap-2 sm:gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Usar cashback (abatimento)</Label>
+              <Input
+                type="number"
+                min={0}
+                max={pacienteSaldo}
+                step={0.01}
+                disabled={pacienteSaldo <= 0}
+                value={cashbackUtilizado || ""}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value) || 0
+                  onCashbackUtilizadoChange(Math.min(val, pacienteSaldo, valorTotal))
+                }}
+                placeholder="R$ 0,00"
+                className="w-full sm:w-40"
+              />
+            </div>
+            {pacienteSaldo > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onCashbackUtilizadoChange(Math.min(pacienteSaldo, valorTotal))}
+              >
+                Usar saldo total
+              </Button>
+            )}
+            {cashbackUtilizado > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={() => onCashbackUtilizadoChange(0)}
+              >
+                Limpar
+              </Button>
+            )}
+          </div>
+          {cashbackUtilizado > 0 && (
+            <span className="text-sm text-green-700">Abatimento aplicado: - {formatCurrency(cashbackUtilizado)}</span>
+          )}
+        </div>
       </Card>
 
       <Card className="p-4 space-y-4">
@@ -242,34 +297,6 @@ export function StepResumo({
                 Cashback a gerar: {formatCurrency(cashbackGerado)} ({campanhaSelecionada?.percentual}%)
               </p>
             )}
-          </div>
-        )}
-
-        {pacienteSaldo > 0 && (
-          <div className="space-y-2 pt-2 border-t border-border">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Saldo disponivel do cliente</span>
-              <span className="font-medium text-green-700">{formatCurrency(pacienteSaldo)}</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">
-              Saldo ja considera restricoes por profissional desta proposta.
-            </p>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Usar cashback (abatimento)</Label>
-              <Input
-                type="number"
-                min={0}
-                max={pacienteSaldo}
-                step={0.01}
-                value={cashbackUtilizado || ""}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 0
-                  onCashbackUtilizadoChange(Math.min(val, pacienteSaldo, valorTotal))
-                }}
-                placeholder="R$ 0,00"
-                className="w-full sm:w-40"
-              />
-            </div>
           </div>
         )}
       </Card>
