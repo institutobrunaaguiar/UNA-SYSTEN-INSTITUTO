@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Inter_Tight } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AppLoader } from "@/components/loading/app-loader"
 import { MobileDock } from "@/components/dashboard/mobile-dock"
 import { ServiceWorkerRegister } from "@/components/pwa/sw-register"
 import { UserProvider } from "@/context/user-context"
@@ -63,10 +62,8 @@ export default function RootLayout({
       <body className={`${inter.variable} ${interTight.variable} font-sans antialiased safe-area-top`}>
         <ThemeProvider defaultTheme="dark" storageKey="tasko-theme">
           <UserProvider>
-            <AppLoader>
-              {children}
-              <MobileDock />
-            </AppLoader>
+            {children}
+            <MobileDock />
           </UserProvider>
         </ThemeProvider>
         <ServiceWorkerRegister />
