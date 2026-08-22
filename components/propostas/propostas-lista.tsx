@@ -352,13 +352,46 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       })
   })()
 
-  const pendentesValidacao = validacaoMes === "todos"
-    ? pendentesValidacaoAll
-    : pendentesValidacaoAll.filter((p) => {
-        const d = new Date(p.data_proposta + "T12:00:00")
-        const mesAno = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-        return mesAno === validacaoMes
-      })
+  const pendentesValidacao = pendentesValidacaoAll
+    .filter((p) => (p.valor_total ?? 0) > filterValorMin)
+    .filter((p) => {
+      if (validacaoMes === "todos") return true
+      const d = new Date(p.data_proposta + "T12:00:00")
+      const mesAno = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+      return mesAno === validacaoMes
+    })
+
+  const totalPendentesValidacao = pendentesValidacao.reduce((sum, p) => sum + (p.valor_total ?? 0), 0)
+
+  function renderValorFiltro(className: string) {
+    return (
+      <Select value={String(filterValorMin)} onValueChange={handleValorMinChange}>
+        <SelectTrigger
+          className={[
+            className,
+            "rounded-lg border text-xs",
+            filterValorMin > 0
+              ? "bg-primary/10 dark:bg-primary/15 border-primary/40 text-primary font-medium"
+              : "bg-card dark:bg-card border-border",
+          ].join(" ")}
+        >
+          <div className="flex items-center gap-1.5 min-w-0 line-clamp-1">
+            <Wallet
+              className={`w-3.5 h-3.5 shrink-0 ${filterValorMin > 0 ? "text-primary" : "text-muted-foreground"}`}
+            />
+            <SelectValue placeholder="Valor" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {VALOR_MIN_OPCOES.map((opcao) => (
+            <SelectItem key={opcao.value} value={opcao.value} className="text-xs">
+              {opcao.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )
+  }
 
   function handleValorMinChange(value: string) {
     const valor = Number(value)
@@ -511,30 +544,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             ))}
           </div>
 
-          <Select value={String(filterValorMin)} onValueChange={handleValorMinChange}>
-            <SelectTrigger
-              className={[
-                "w-full sm:w-[190px] shrink-0 rounded-lg border text-xs",
-                filterValorMin > 0
-                  ? "bg-primary/10 dark:bg-primary/15 border-primary/40 text-primary font-medium"
-                  : "bg-card dark:bg-card border-border",
-              ].join(" ")}
-            >
-              <div className="flex items-center gap-1.5 min-w-0 line-clamp-1">
-                <Wallet
-                  className={`w-3.5 h-3.5 shrink-0 ${filterValorMin > 0 ? "text-primary" : "text-muted-foreground"}`}
-                />
-                <SelectValue placeholder="Valor" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {VALOR_MIN_OPCOES.map((opcao) => (
-                <SelectItem key={opcao.value} value={opcao.value} className="text-xs">
-                  {opcao.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {renderValorFiltro("w-full sm:w-[190px] shrink-0")}
         </div>
       )}
 
@@ -849,8 +859,10 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
                   ))}
                 </SelectContent>
               </Select>
+              {renderValorFiltro("w-full sm:w-[190px] shrink-0")}
               <span className="text-xs text-muted-foreground">
                 {pendentesValidacao.length} {pendentesValidacao.length === 1 ? "proposta" : "propostas"} pendente{pendentesValidacao.length !== 1 ? "s" : ""}
+                {totalPendentesValidacao > 0 && <> • {formatCurrency(totalPendentesValidacao)}</>}
               </span>
             </div>
             {pendentesValidacao.length === 0 ? (
