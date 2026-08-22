@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   RotateCcw,
   CalendarDays,
+  Wallet,
   X,
 } from "lucide-react"
 import {
@@ -62,6 +63,14 @@ interface PropostasListaProps {
   onVerDetalhes: (proposta: Proposta) => void
 }
 
+const VALOR_MIN_OPCOES = [
+  { value: "0", label: "Todos os valores" },
+  { value: "2000", label: "Acima de R$ 2 mil" },
+  { value: "4000", label: "Acima de R$ 4 mil" },
+  { value: "5000", label: "Acima de R$ 5 mil" },
+  { value: "10000", label: "Acima de R$ 10 mil" },
+]
+
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
 const MESES = [
   "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho",
@@ -73,6 +82,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState<PropostaStatus | "todas">("todas")
+  const [filterValorMin, setFilterValorMin] = useState(0)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
@@ -249,7 +259,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
       p.nome_cliente.toLowerCase().includes(term) ||
       (p.cpf_cliente && p.cpf_cliente.includes(term))
     const matchesStatus = filterStatus === "todas" || p.status === filterStatus
-    return matchesSearch && matchesStatus
+    const matchesValor = (p.valor_total ?? 0) > filterValorMin
+    return matchesSearch && matchesStatus && matchesValor
   })
 
   // Agrupar propostas por dia (YYYY-MM-DD)
@@ -311,12 +322,15 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   // Propostas do dia selecionado
   const propostasDoDia = selectedDay ? (propostasPorDia[selectedDay] || []) : []
 
+  // Contadores das abas de status ja refletem a faixa de valor selecionada
+  const propostasNaFaixa = propostas.filter((p) => (p.valor_total ?? 0) > filterValorMin)
+
   const statusCounts = {
-    todas: propostas.length,
-    em_negociacao: propostas.filter((p) => p.status === "em_negociacao").length,
-    aguardando_pagamento: propostas.filter((p) => p.status === "aguardando_pagamento").length,
-    pago: propostas.filter((p) => p.status === "pago").length,
-    recusada: propostas.filter((p) => p.status === "recusada").length,
+    todas: propostasNaFaixa.length,
+    em_negociacao: propostasNaFaixa.filter((p) => p.status === "em_negociacao").length,
+    aguardando_pagamento: propostasNaFaixa.filter((p) => p.status === "aguardando_pagamento").length,
+    pago: propostasNaFaixa.filter((p) => p.status === "pago").length,
+    recusada: propostasNaFaixa.filter((p) => p.status === "recusada").length,
   }
 
   const pendentesValidacaoAll = propostas.filter(
@@ -345,6 +359,14 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         const mesAno = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
         return mesAno === validacaoMes
       })
+
+  function handleValorMinChange(value: string) {
+    const valor = Number(value)
+    setFilterValorMin(valor)
+    // Ao filtrar por valor o usuario quer ver todos os negocios da faixa,
+    // nao apenas os do dia selecionado no calendario
+    if (valor > 0) setSelectedDay(null)
+  }
 
   function formatCurrency(value: number) {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
@@ -469,23 +491,50 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         </Button>
       </div>
 
-      {/* Filtros de status */}
+      {/* Filtros de status + faixa de valor */}
       {!abaValidacao && (
-        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none">
-          {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none">
+            {(["todas", "em_negociacao", "aguardando_pagamento", "pago", "recusada"] as const).map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={[
+                  "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                  filterStatus === status
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground",
+                ].join(" ")}
+              >
+                {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
+              </button>
+            ))}
+          </div>
+
+          <Select value={String(filterValorMin)} onValueChange={handleValorMinChange}>
+            <SelectTrigger
               className={[
-                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                filterStatus === status
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground",
+                "w-full sm:w-[190px] shrink-0 rounded-lg border text-xs",
+                filterValorMin > 0
+                  ? "bg-primary/10 dark:bg-primary/15 border-primary/40 text-primary font-medium"
+                  : "bg-card dark:bg-card border-border",
               ].join(" ")}
             >
-              {status === "todas" ? "Todas" : STATUS_CONFIG[status].label} ({statusCounts[status]})
-            </button>
-          ))}
+              <div className="flex items-center gap-1.5 min-w-0 line-clamp-1">
+                <Wallet
+                  className={`w-3.5 h-3.5 shrink-0 ${filterValorMin > 0 ? "text-primary" : "text-muted-foreground"}`}
+                />
+                <SelectValue placeholder="Valor" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {VALOR_MIN_OPCOES.map((opcao) => (
+                <SelectItem key={opcao.value} value={opcao.value} className="text-xs">
+                  {opcao.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
