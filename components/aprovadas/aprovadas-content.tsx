@@ -5,12 +5,8 @@ import { createClient } from "@supabase/supabase-js"
 import { AprovadasKpis } from "./aprovadas-kpis"
 import { AprovadasFiltros } from "./aprovadas-filtros"
 import { AprovadasLista } from "./aprovadas-lista"
+import { montarOpcoesMeses } from "@/components/filtros/filtro-meses"
 import type { Proposta } from "@/components/propostas/types"
-
-const MESES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-]
 
 function getSupabase() {
   return createClient(
@@ -27,10 +23,12 @@ function getMesAnoAtual(): string {
 export type TabValidacao = "aprovadas" | "reprovadas"
 
 export interface FiltrosState {
-  mesAno: string
+  /** Meses "YYYY-MM" selecionados. Lista vazia = todos os meses. */
+  meses: string[]
   profissional: string
   procedimento: string
-  faixaValor: string
+  /** Valor minimo em reais. 0 = sem filtro. */
+  valorMin: number
   busca: string
 }
 
@@ -48,10 +46,10 @@ export function AprovadasContent() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<TabValidacao>("aprovadas")
   const [filtros, setFiltros] = useState<FiltrosState>({
-    mesAno: getMesAnoAtual(),
+    meses: [],
     profissional: "todos",
     procedimento: "todos",
-    faixaValor: "todas",
+    valorMin: 0,
     busca: "",
   })
 
@@ -96,29 +94,28 @@ export function AprovadasContent() {
     return Array.from(set).sort()
   }, [propostas])
 
+  // Mes de validacao ("YYYY-MM") a partir de validado_em
+  function mesValidacao(p: Proposta): string | null {
+    if (!p.validado_em) return null
+    const d = new Date(p.validado_em)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+  }
+
   const mesesDisponiveis = useMemo(() => {
-    const set = new Set<string>()
-    propostas.forEach((p) => {
-      if (p.validado_em) {
-        const d = new Date(p.validado_em)
-        set.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`)
-      }
-    })
-    set.add(getMesAnoAtual())
-    return Array.from(set)
-      .sort((a, b) => b.localeCompare(a))
-      .map((key) => {
-        const [ano, mes] = key.split("-")
-        return { value: key, label: `${MESES[parseInt(mes) - 1]} ${ano}` }
-      })
-  }, [propostas])
+    // Universo: todos os meses com propostas validadas, mais o mes atual —
+    // assim nenhum mes some do filtro por nao ter itens no recorte atual.
+    const universo = [...propostas.map(mesValidacao), getMesAnoAtual()]
+    const contados = propostas
+      .filter((p) => p.valor_total > filtros.valorMin)
+      .map(mesValidacao)
+    return montarOpcoesMeses(universo, contados)
+  }, [propostas, filtros.valorMin])
 
   const filtered = useMemo(() => {
     return propostas.filter((p) => {
-      if (filtros.mesAno && p.validado_em) {
-        const d = new Date(p.validado_em)
-        const mesAno = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-        if (mesAno !== filtros.mesAno) return false
+      if (filtros.meses.length > 0) {
+        const mes = mesValidacao(p)
+        if (!mes || !filtros.meses.includes(mes)) return false
       }
       if (filtros.profissional !== "todos") {
         const tem = p.itens.some((i) => i.profissionalNome === filtros.profissional)
@@ -128,15 +125,7 @@ export function AprovadasContent() {
         const tem = p.itens.some((i) => i.procedimentoNome === filtros.procedimento)
         if (!tem) return false
       }
-      if (filtros.faixaValor !== "todas") {
-        const v = p.valor_total
-        switch (filtros.faixaValor) {
-          case "ate_1000": if (v > 1000) return false; break
-          case "1000_5000": if (v < 1000 || v > 5000) return false; break
-          case "5000_10000": if (v < 5000 || v > 10000) return false; break
-          case "acima_10000": if (v < 10000) return false; break
-        }
-      }
+      if (p.valor_total <= filtros.valorMin) return false
       if (filtros.busca) {
         if (!p.nome_cliente.toLowerCase().includes(filtros.busca.toLowerCase())) return false
       }

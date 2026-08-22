@@ -21,16 +21,12 @@ import {
   ShieldCheck,
   RotateCcw,
   CalendarDays,
-  ChevronDown,
-  Wallet,
   X,
 } from "lucide-react"
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -47,14 +43,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { createClient } from "@supabase/supabase-js"
+import { FiltroValor } from "@/components/filtros/filtro-valor"
+import { FiltroMeses, montarOpcoesMeses } from "@/components/filtros/filtro-meses"
 import type { Proposta, PropostaStatus } from "./types"
 import { STATUS_CONFIG, VALIDACAO_CONFIG } from "./types"
 import { useUser } from "@/context/user-context"
@@ -65,14 +56,6 @@ interface PropostasListaProps {
   onEditarProposta: (proposta: Proposta) => void
   onVerDetalhes: (proposta: Proposta) => void
 }
-
-const VALOR_MIN_OPCOES = [
-  { value: "0", label: "Todos os valores" },
-  { value: "2000", label: "Acima de R$ 2 mil" },
-  { value: "4000", label: "Acima de R$ 4 mil" },
-  { value: "5000", label: "Acima de R$ 5 mil" },
-  { value: "10000", label: "Acima de R$ 10 mil" },
-]
 
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
 const MESES = [
@@ -346,26 +329,10 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
   // Lista TODOS os meses que existem na base — inclusive os sem pendencia,
   // para que o mes nunca desapareca do filtro. A contagem ao lado ja reflete
   // a faixa de valor selecionada.
-  const validacaoMeses = (() => {
-    const MESES_LABEL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-    const contagem = new Map<string, number>()
-    propostas.forEach((p) => {
-      if (!p.data_proposta) return
-      const key = p.data_proposta.slice(0, 7)
-      if (!contagem.has(key)) contagem.set(key, 0)
-    })
-    pendentesNaFaixa.forEach((p) => {
-      if (!p.data_proposta) return
-      const key = p.data_proposta.slice(0, 7)
-      contagem.set(key, (contagem.get(key) ?? 0) + 1)
-    })
-    return Array.from(contagem.entries())
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([key, count]) => {
-        const [ano, mes] = key.split("-")
-        return { value: key, label: `${MESES_LABEL[parseInt(mes) - 1]} ${ano}`, count }
-      })
-  })()
+  const validacaoMeses = montarOpcoesMeses(
+    propostas.map((p) => p.data_proposta),
+    pendentesNaFaixa.map((p) => p.data_proposta)
+  )
 
   const pendentesValidacao = pendentesNaFaixa.filter(
     (p) => validacaoMesesSel.length === 0 || validacaoMesesSel.includes((p.data_proposta ?? "").slice(0, 7))
@@ -373,52 +340,8 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
 
   const totalPendentesValidacao = pendentesValidacao.reduce((sum, p) => sum + (p.valor_total ?? 0), 0)
 
-  function toggleValidacaoMes(mes: string) {
-    setValidacaoMesesSel((atual) =>
-      atual.includes(mes) ? atual.filter((m) => m !== mes) : [...atual, mes]
-    )
-  }
 
-  const validacaoMesesLabel = (() => {
-    if (validacaoMesesSel.length === 0) return "Todos os meses"
-    if (validacaoMesesSel.length === 1) {
-      return validacaoMeses.find((m) => m.value === validacaoMesesSel[0])?.label ?? "1 mês"
-    }
-    return `${validacaoMesesSel.length} meses selecionados`
-  })()
-
-  function renderValorFiltro(className: string) {
-    return (
-      <Select value={String(filterValorMin)} onValueChange={handleValorMinChange}>
-        <SelectTrigger
-          className={[
-            className,
-            "rounded-lg border text-xs",
-            filterValorMin > 0
-              ? "bg-primary/10 dark:bg-primary/15 border-primary/40 text-primary font-medium"
-              : "bg-card dark:bg-card border-border",
-          ].join(" ")}
-        >
-          <div className="flex items-center gap-1.5 min-w-0 line-clamp-1">
-            <Wallet
-              className={`w-3.5 h-3.5 shrink-0 ${filterValorMin > 0 ? "text-primary" : "text-muted-foreground"}`}
-            />
-            <SelectValue placeholder="Valor" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {VALOR_MIN_OPCOES.map((opcao) => (
-            <SelectItem key={opcao.value} value={opcao.value} className="text-xs">
-              {opcao.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    )
-  }
-
-  function handleValorMinChange(value: string) {
-    const valor = Number(value)
+  function handleValorMinChange(valor: number) {
     setFilterValorMin(valor)
     // Ao filtrar por valor o usuario quer ver todos os negocios da faixa,
     // nao apenas os do dia selecionado no calendario
@@ -568,7 +491,7 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
             ))}
           </div>
 
-          {renderValorFiltro("w-full sm:w-[190px] shrink-0")}
+          <FiltroValor value={filterValorMin} onChange={handleValorMinChange} />
         </div>
       )}
 
@@ -870,54 +793,12 @@ export function PropostasLista({ onNovaProposta, onEditarProposta, onVerDetalhes
         {abaValidacao && (
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className={[
-                      "w-full sm:w-[220px] shrink-0 flex items-center justify-between gap-2",
-                      "rounded-lg border px-3 py-2 text-xs h-9 transition-colors",
-                      validacaoMesesSel.length > 0
-                        ? "bg-primary/10 dark:bg-primary/15 border-primary/40 text-primary font-medium"
-                        : "bg-card border-border text-foreground",
-                    ].join(" ")}
-                  >
-                    <span className="flex items-center gap-1.5 min-w-0">
-                      <CalendarDays
-                        className={`w-3.5 h-3.5 shrink-0 ${validacaoMesesSel.length > 0 ? "text-primary" : "text-muted-foreground"}`}
-                      />
-                      <span className="truncate">{validacaoMesesLabel}</span>
-                    </span>
-                    <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-50" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[220px]">
-                  <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                    Selecione um ou mais meses
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {validacaoMeses.map((m) => (
-                    <DropdownMenuCheckboxItem
-                      key={m.value}
-                      checked={validacaoMesesSel.includes(m.value)}
-                      onCheckedChange={() => toggleValidacaoMes(m.value)}
-                      onSelect={(e) => e.preventDefault()}
-                      className="text-xs"
-                    >
-                      <span className="flex-1">{m.label}</span>
-                      <span className="ml-2 text-[10px] text-muted-foreground tabular-nums">{m.count}</span>
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-xs"
-                    disabled={validacaoMesesSel.length === 0}
-                    onSelect={() => setValidacaoMesesSel([])}
-                  >
-                    Limpar seleção (ver todos)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {renderValorFiltro("w-full sm:w-[190px] shrink-0")}
+              <FiltroMeses
+                selecionados={validacaoMesesSel}
+                onChange={setValidacaoMesesSel}
+                opcoes={validacaoMeses}
+              />
+              <FiltroValor value={filterValorMin} onChange={handleValorMinChange} />
               <span className="text-xs text-muted-foreground">
                 {pendentesValidacao.length} {pendentesValidacao.length === 1 ? "proposta" : "propostas"} pendente{pendentesValidacao.length !== 1 ? "s" : ""}
                 {totalPendentesValidacao > 0 && <> • {formatCurrency(totalPendentesValidacao)}</>}
