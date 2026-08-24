@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import { createClient } from "@supabase/supabase-js"
 import { AprovadasKpis } from "./aprovadas-kpis"
 import { AprovadasFiltros } from "./aprovadas-filtros"
 import { AprovadasLista } from "./aprovadas-lista"
 import { montarOpcoesMeses } from "@/components/filtros/filtro-meses"
+import { useUser } from "@/context/user-context"
 import type { Proposta } from "@/components/propostas/types"
 
 function getSupabase() {
@@ -45,6 +46,8 @@ export function AprovadasContent() {
   const [reprovadas, setReprovadas] = useState<Proposta[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<TabValidacao>("aprovadas")
+  const { user } = useUser()
+  const isAdmin = user?.role === "admin"
   const [filtros, setFiltros] = useState<FiltrosState>({
     meses: [],
     profissional: "todos",
@@ -53,32 +56,55 @@ export function AprovadasContent() {
     busca: "",
   })
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const supabase = getSupabase()
-        const [aprovadasRes, reprovadasRes] = await Promise.all([
-          supabase
-            .from("propostas")
-            .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
-            .eq("validacao_status", "aprovada")
-            .order("validado_em", { ascending: false }),
-          supabase
-            .from("propostas")
-            .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
-            .eq("validacao_status", "reprovada")
-            .order("validado_em", { ascending: false }),
-        ])
-        if (aprovadasRes.data) setAprovadas(aprovadasRes.data as Proposta[])
-        if (reprovadasRes.data) setReprovadas(reprovadasRes.data as Proposta[])
-      } catch (e) {
-        console.error("[aprovadas] erro ao buscar:", e)
-      } finally {
-        setLoading(false)
-      }
+  const fetchData = useCallback(async () => {
+    try {
+      const supabase = getSupabase()
+      const [aprovadasRes, reprovadasRes] = await Promise.all([
+        supabase
+          .from("propostas")
+          .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+          .eq("validacao_status", "aprovada")
+          .order("validado_em", { ascending: false }),
+        supabase
+          .from("propostas")
+          .select("id, valor_total, status, created_at, updated_at, nome_cliente, cpf_cliente, itens, data_proposta, validacao_status, validacao_motivo, validado_em")
+          .eq("validacao_status", "reprovada")
+          .order("validado_em", { ascending: false }),
+      ])
+      if (aprovadasRes.data) setAprovadas(aprovadasRes.data as Proposta[])
+      if (reprovadasRes.data) setReprovadas(reprovadasRes.data as Proposta[])
+    } catch (e) {
+      console.error("[aprovadas] erro ao buscar:", e)
+    } finally {
+      setLoading(false)
     }
-    fetchData()
   }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  /**
+   * Desfaz a validacao: a proposta volta para a fila como "pendente" e o
+   * motivo da reprovacao e apagado. Mesmo comportamento do "Cancelar
+   * Validacao" da tela de propostas.
+   */
+  async function handleReverter(proposta: Proposta) {
+    const supabase = getSupabase()
+    const { error } = await supabase
+      .from("propostas")
+      .update({
+        validacao_status: "pendente",
+        validacao_motivo: null,
+        validado_em: null,
+      })
+      .eq("id", proposta.id)
+    if (error) {
+      console.error("[aprovadas] erro ao reverter validação:", error.message)
+      throw new Error(error.message)
+    }
+    await fetchData()
+  }
 
   const propostas = tab === "aprovadas" ? aprovadas : reprovadas
 
@@ -199,7 +225,11 @@ export function AprovadasContent() {
         profissionais={profissionais}
         procedimentos={procedimentos}
       />
-      <AprovadasLista propostas={filtered} tab={tab} />
+      <AprovadasLista
+        propostas={filtered}
+        tab={tab}
+        onReverter={isAdmin ? handleReverter : undefined}
+      />
     </div>
   )
 }
